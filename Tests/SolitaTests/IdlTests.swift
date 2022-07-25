@@ -1,5 +1,5 @@
 import XCTest
-@testable import Anchor
+@testable import Solita
 
 final class IdlTests: XCTestCase {
     fileprivate func getDencoder() -> JSONDecoder {
@@ -13,11 +13,19 @@ final class IdlTests: XCTestCase {
         XCTAssertEqual(idl.name, "serum_multisig")
         XCTAssertEqual(idl.instructions.first!.name, "createMultisig")
         XCTAssertEqual(idl.instructions.first!.args.first!.name, "owners")
+        XCTAssertEqual(idl.accounts!.first!.name, "Multisig")
+        XCTAssertEqual(idl.accounts![1].name, "Transaction")
         if case let .idlTypeVec(typeVec) = idl.instructions.first!.args.first!.type, case .publicKey = typeVec.vec {
             XCTAssertTrue(true)
         } else {
             XCTFail()
         }
+    }
+    
+    func testXXXX() {
+        let json = stubbedResponse("serum_multisig")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        let multisig = idl.accounts!.first!
     }
 }
 
