@@ -30,6 +30,10 @@ let package = Package(
             name: "Beet",
             dependencies: ["Solana"]),
         .testTarget(
+            name: "BeetTests",
+            dependencies: ["Solita"],
+            resources: [ .process("Resources")]),
+        .testTarget(
             name: "SolitaTests",
             dependencies: ["Solita"],
             resources: [ .process("Resources")])
