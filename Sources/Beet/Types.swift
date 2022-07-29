@@ -30,7 +30,7 @@ protocol BeetReadWrite {
    * @param offset at which to start writing into the buffer
    * @param value to write
    */
-    static func write<T>(buf: inout Data, offset: Int, value: T)
+    func write<T>(buf: inout Data, offset: Int, value: T)
   /**
    * Reads the data in the provided buffer and deserializes it into a value of
    * type {@link T}.
@@ -39,12 +39,12 @@ protocol BeetReadWrite {
    * @param offset at which to start reading from the buffer
    * @returns deserialized instance of type {@link T}.
    */
-    static func read<T>(buf: Data, offset: Int) -> T
+    func read<T>(buf: Data, offset: Int) -> T
 
   /**
    * Number of bytes that are used to store the value in a {@link Buffer}
    */
-    static var byteSize: UInt { get set }
+    var byteSize: UInt { get set }
 }
 
 
@@ -93,8 +93,8 @@ protocol ElementCollectionFixedSizeBeet: BeetBase & BeetReadWrite & ElementColle
  */
 
 enum FixedSizeBeetType {
-    case scalar(ScalarFixedSizeBeet.Type)
-    case collection (ElementCollectionFixedSizeBeet.Type)
+    case scalar(ScalarFixedSizeBeet)
+    case collection (ElementCollectionFixedSizeBeet)
 }
 
 class FixedSizeBeet {

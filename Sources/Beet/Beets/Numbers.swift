@@ -7,13 +7,10 @@ import Solana
  * @category beet/primitive
  */
 class u8: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 1
+    var byteSize: UInt = 1
     static var description: String = "u8"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let uint = value as! UInt8
         let data = uint.data()
@@ -21,10 +18,8 @@ class u8: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt8.self)
         })
@@ -39,13 +34,11 @@ class u8: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u16: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 2
+    var byteSize: UInt = 2
     static var description: String = "u16"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let uint = value as! UInt16
         let data = uint.data()
@@ -53,10 +46,8 @@ class u16: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt16.self)
         })
@@ -71,13 +62,11 @@ class u16: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u32: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 4
+    var byteSize: UInt = 4
     static var description: String = "u32"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let uint = value as! UInt32
         let data = uint.data()
@@ -85,10 +74,8 @@ class u32: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt32.self)
         })
@@ -103,13 +90,11 @@ class u32: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u64: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 8
+    var byteSize: UInt = 8
     static var description: String = "u64"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let uint = value as! UInt64
         let data = uint.data()
@@ -117,10 +102,8 @@ class u64: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt64.self)
         })
@@ -135,13 +118,11 @@ class u64: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u128: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 16
+    var byteSize: UInt = 16
     static var description: String = "u128"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
 
         let bigInt = value as! UInt128
@@ -151,15 +132,12 @@ class u128: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt128(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
@@ -170,13 +148,11 @@ class u128: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u256: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 32
+    var byteSize: UInt = 32
     static var description: String = "u256"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
 
         let bigInt = value as! UInt256
@@ -186,15 +162,12 @@ class u256: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt256(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
@@ -205,13 +178,11 @@ class u256: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u512: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 64
+    var byteSize: UInt = 64
     static var description: String = "u512"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
 
         let bigInt = value as! UInt512
@@ -221,15 +192,12 @@ class u512: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt512(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
@@ -243,13 +211,11 @@ class u512: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i8: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 1
+    var byteSize: UInt = 1
     static var description: String = "i8"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let int = value as! Int8
         let data = int.data()
@@ -257,10 +223,8 @@ class i8: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: Int8.self)
         })
@@ -275,13 +239,10 @@ class i8: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i16: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 2
+    var byteSize: UInt = 2
     static var description: String = "i16"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int16
         let data = int.data()
@@ -289,10 +250,8 @@ class i16: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: Int16.self)
         })
@@ -308,13 +267,10 @@ class i16: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i32: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 4
+    var byteSize: UInt = 4
     static var description: String = "i32"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int32
         let data = int.data()
@@ -322,10 +278,8 @@ class i32: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: Int32.self)
         })
@@ -340,13 +294,11 @@ class i32: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i64: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 8
+    var byteSize: UInt = 8
     static var description: String = "i64"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let int = value as! Int64
         let data = int.data()
@@ -354,10 +306,8 @@ class i64: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: Int64.self)
         })
@@ -376,13 +326,11 @@ class i64: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class bool: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 1
+    var byteSize: UInt = 1
     static var description: String = "bool"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
         let bool = value as! Bool
         let data: Data
@@ -395,10 +343,8 @@ class bool: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt8.self)
         })
@@ -413,15 +359,11 @@ class bool: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i128: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 16
+    var byteSize: UInt = 16
     static var description: String = "i128"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
-
         let bigInt = value as! Int128
         var data = Data()
         try! bigInt.serialize(to: &data)
@@ -429,15 +371,12 @@ class i128: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
+    func read<T>(buf: Data, offset: Int) -> T {
+
         
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int128(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
@@ -448,13 +387,11 @@ class i128: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i256: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 32
+    var byteSize: UInt = 32
     static var description: String = "i256"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+       
         var advanced = buf
 
         let bigInt = value as! Int256
@@ -464,15 +401,10 @@ class i256: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
-        
+    func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int256(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
@@ -483,15 +415,11 @@ class i256: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i512: ScalarFixedSizeBeet {
-    static var byteSize: UInt = 64
+    var byteSize: UInt = 64
     static var description: String = "i256"
     
-    static func write<T>(buf: inout Data, offset: Int, value: T) {
-        print("==== write ====")
-        print("write value: \(value)")
-        print("write buf: \(buf.count)")
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
-
         let bigInt = value as! Int512
         var data = Data()
         try! bigInt.serialize(to: &data)
@@ -499,15 +427,10 @@ class i512: ScalarFixedSizeBeet {
         buf = advanced
     }
     
-    static func read<T>(buf: Data, offset: Int) -> T {
-        print("==== read ====")
-        print("read offset: \(offset)")
-        print("read buf: \(buf.count)")
-        
+    func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int512(from: &binaryReader)
-        print("read x: \(r.hashValue)")
         return r as! T
     }
 }
