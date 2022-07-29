@@ -21,12 +21,6 @@ final class IdlTests: XCTestCase {
             XCTFail()
         }
     }
-    
-    func testXXXX() {
-        let json = stubbedResponse("serum_multisig")
-        let idl = try! getDencoder().decode(Idl.self, from: json)
-        let multisig = idl.accounts!.first!
-    }
 }
 
 func stubbedResponse(_ filename: String) -> Data {

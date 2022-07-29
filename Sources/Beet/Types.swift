@@ -18,7 +18,7 @@ protocol BeetBase {
    * Describes the type of data that is de/serialized and serves for debugging
    * and diagnostics only.
    */
-    static var description: String { get set }
+    var description: String { get }
 }
 
 protocol BeetReadWrite {
@@ -44,7 +44,7 @@ protocol BeetReadWrite {
   /**
    * Number of bytes that are used to store the value in a {@link Buffer}
    */
-    var byteSize: UInt { get set }
+    var byteSize: UInt { get }
 }
 
 
@@ -128,7 +128,7 @@ protocol FixableBeet: BeetBase {
    * @param offset the offset at which the data starts
    *
    */
-    var toFixedFromData: ((_ buf: Data, _ offset: Int) -> FixedSizeBeet) { get set }
+    var toFixedFromData: ((_ buf: Data, _ offset: Int) -> FixedSizeBeet) { get }
 
   /**
    * Provides a fixed size version of `this` by walking the provided value in
@@ -136,7 +136,7 @@ protocol FixableBeet: BeetBase {
    *
    * @param val the instance for which to adapt this beet to fixed size
    */
-    var toFixedFromValue: ((_ val: Any) -> FixedSizeBeet) { get set }
+    var toFixedFromValue: ((_ val: Any) -> FixedSizeBeet) { get }
 }
 
 

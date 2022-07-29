@@ -7,8 +7,8 @@ import Solana
  * @category beet/primitive
  */
 class u8: ScalarFixedSizeBeet {
-    var byteSize: UInt = 1
-    static var description: String = "u8"
+    let byteSize: UInt = 1
+    let description: String = "u8"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
@@ -34,8 +34,8 @@ class u8: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u16: ScalarFixedSizeBeet {
-    var byteSize: UInt = 2
-    static var description: String = "u16"
+    let byteSize: UInt = 2
+    let description: String = "u16"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -62,8 +62,8 @@ class u16: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u32: ScalarFixedSizeBeet {
-    var byteSize: UInt = 4
-    static var description: String = "u32"
+    let byteSize: UInt = 4
+    let description: String = "u32"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -90,8 +90,8 @@ class u32: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u64: ScalarFixedSizeBeet {
-    var byteSize: UInt = 8
-    static var description: String = "u64"
+    let byteSize: UInt = 8
+    let description: String = "u64"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -118,8 +118,8 @@ class u64: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u128: ScalarFixedSizeBeet {
-    var byteSize: UInt = 16
-    static var description: String = "u128"
+    let byteSize: UInt = 16
+    let description: String = "u128"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -148,8 +148,8 @@ class u128: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u256: ScalarFixedSizeBeet {
-    var byteSize: UInt = 32
-    static var description: String = "u256"
+    let byteSize: UInt = 32
+    let description: String = "u256"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -178,8 +178,8 @@ class u256: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class u512: ScalarFixedSizeBeet {
-    var byteSize: UInt = 64
-    static var description: String = "u512"
+    let byteSize: UInt = 64
+    let description: String = "u512"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -211,8 +211,8 @@ class u512: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i8: ScalarFixedSizeBeet {
-    var byteSize: UInt = 1
-    static var description: String = "i8"
+    let byteSize: UInt = 1
+    let description: String = "i8"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -239,8 +239,8 @@ class i8: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i16: ScalarFixedSizeBeet {
-    var byteSize: UInt = 2
-    static var description: String = "i16"
+    let byteSize: UInt = 2
+    let description: String = "i16"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
@@ -267,8 +267,8 @@ class i16: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i32: ScalarFixedSizeBeet {
-    var byteSize: UInt = 4
-    static var description: String = "i32"
+    let byteSize: UInt = 4
+    var description: String = "i32"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
@@ -294,8 +294,8 @@ class i32: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i64: ScalarFixedSizeBeet {
-    var byteSize: UInt = 8
-    static var description: String = "i64"
+    let byteSize: UInt = 8
+    let description: String = "i64"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -326,8 +326,8 @@ class i64: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class bool: ScalarFixedSizeBeet {
-    var byteSize: UInt = 1
-    static var description: String = "bool"
+    let byteSize: UInt = 1
+    let description: String = "bool"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -359,8 +359,8 @@ class bool: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i128: ScalarFixedSizeBeet {
-    var byteSize: UInt = 16
-    static var description: String = "i128"
+    let byteSize: UInt = 16
+    let description: String = "i128"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
@@ -387,8 +387,8 @@ class i128: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i256: ScalarFixedSizeBeet {
-    var byteSize: UInt = 32
-    static var description: String = "i256"
+    let byteSize: UInt = 32
+    let description: String = "i256"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
        
@@ -415,8 +415,8 @@ class i256: ScalarFixedSizeBeet {
  * @category beet/primitive
  */
 class i512: ScalarFixedSizeBeet {
-    var byteSize: UInt = 64
-    static var description: String = "i256"
+    let byteSize: UInt = 64
+    let description: String = "i256"
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
