@@ -57,7 +57,7 @@ protocol ElementCollectionBeet {
   /**
    * For arrays and strings this indicates the amount of elements/chars.
    */
-    var length: UInt { get set }
+    var length: UInt32 { get set }
 
   /**
    * For arrays and strings this indicates the byte size of the number that
