@@ -227,3 +227,5 @@ struct SupportedTypeDefinition {
     let arg: BeetTypeArg
     let letpack: String?
 }
+
+typealias Enum = CaseIterable
