@@ -41,9 +41,14 @@ class FixedScalarEnum<C>: ScalarFixedSizeBeet where C : CaseIterable & Equatable
  *
  * @category beet/composite
  */
-struct UniformDataEnumData {
-    let kind: Any
-    let data: Any
+struct UniformDataEnumData<K: Equatable, D: Equatable>: Equatable {
+    let kind: K
+    let data: D
+    
+    static func == (lhs: UniformDataEnumData<K, D>, rhs: UniformDataEnumData<K, D>) -> Bool {
+        return lhs.kind == rhs.kind
+            && lhs.data == rhs.data
+    }
 }
 
 /**
@@ -57,27 +62,45 @@ struct UniformDataEnumData {
  *
  * @category beet/enum
  */
-class UniformDataEnum: ScalarFixedSizeBeet {
-    let inner: ScalarFixedSizeBeet
+class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatable>: ScalarFixedSizeBeet {
+    let inner: FixedSizeBeet
     var description: String
     let byteSize: UInt
     
-    init(inner: ScalarFixedSizeBeet){
+    init(inner: FixedSizeBeet){
         self.inner = inner
-        byteSize =  1 + inner.byteSize
-        description = "UniformDataEnum<\(inner.description)>"
+        switch inner.value {
+        case .scalar(let type):
+            byteSize =  1 + type.byteSize
+            description = "UniformDataEnum<\(type.description)>"
+        case .collection(let type):
+            byteSize =  1 + type.byteSize
+            description = "UniformDataEnum<\(type.description)>"
+        }
     }
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
-        let x = value as! UniformDataEnumData
-        u8().write(buf: &buf, offset: offset, value: x.kind)
-        inner.write(buf: &buf, offset: offset + 1, value: x.data)
+        let x = value as! UniformDataEnumData<K,D>
+        u8().write(buf: &buf, offset: offset, value: x.kind.rawValue)
+        switch inner.value {
+        case .scalar(let type):
+            type.write(buf: &buf, offset: offset + 1, value: x.data)
+        case .collection(let type):
+            type.write(buf: &buf, offset: offset + 1, value: x.data)
+        }
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
-        let kind = u8().read(buf: buf, offset: offset) as Any
-        let data = inner.read(buf: buf, offset: offset + 1) as Any
-        return UniformDataEnumData(kind: kind, data: data) as! T
+        let kindRawValue: UInt8 = u8().read(buf: buf, offset: offset)
+        let kind = K.init(rawValue: kindRawValue as! K.RawValue)!
+        switch inner.value {
+        case .scalar(let type):
+            let data = type.read(buf: buf, offset: offset + 1) as D
+            return UniformDataEnumData<K, D>(kind: kind, data: data) as! T
+        case .collection(let type):
+            let data = type.read(buf: buf, offset: offset + 1) as D
+            return UniformDataEnumData<K, D>(kind: kind, data: data) as! T
+        }
     }
 }
 
@@ -87,22 +110,40 @@ class UniformDataEnum: ScalarFixedSizeBeet {
 class EnumDataVariantBeet: ScalarFixedSizeBeet{
     let description: String
     let byteSize: UInt
-    let inner: ScalarFixedSizeBeet
+    let inner: FixedSizeBeet
     let discriminant: UInt8
     
-    init(inner: ScalarFixedSizeBeet, discriminant: UInt8){
+    init(inner: FixedSizeBeet, discriminant: UInt8){
         self.inner = inner
         self.discriminant = discriminant
-        byteSize =  inner.byteSize + u8().byteSize
-        description = "EnumData<\(inner.description)>"
+        switch inner.value {
+        case .scalar(let type):
+            byteSize =  type.byteSize + u8().byteSize
+            description = "EnumData<\(type.description)>"
+        case .collection(let type):
+            byteSize =  type.byteSize + u8().byteSize
+            description = "EnumData<\(type.description)>"
+        }
     }
 
     func write<T>(buf: inout Data, offset: Int, value: T) {
         u8().write(buf: &buf, offset: offset, value: discriminant)
-        inner.write(buf: &buf, offset: offset + Int(u8().byteSize), value: value)
+        switch inner.value {
+        case .scalar(let type):
+            type.write(buf: &buf, offset: offset + Int(u8().byteSize), value: value)
+        case .collection(let type):
+            type.write(buf: &buf, offset: offset + Int(u8().byteSize), value: value)
+        }
+        
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
-        return inner.read(buf: buf, offset: offset + Int(u8().byteSize))
+        switch inner.value {
+        case .scalar(let type):
+            return type.read(buf: buf, offset: offset + Int(u8().byteSize))
+        case .collection(let type):
+            return type.read(buf: buf, offset: offset + Int(u8().byteSize))
+        }
+        
     }
 }
