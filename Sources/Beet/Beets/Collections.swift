@@ -271,7 +271,7 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
     let len: UInt
     let lenPrefix: Bool
     let arrayBufferBeet: FixedSizeBuffer
-    init(lenPrefix: Bool = false, len: UInt){
+    init(len: UInt, lenPrefix: Bool = false){
         self.lenPrefix = lenPrefix
         self.len = len
         self.description = "Uint8Array(\(len)"
@@ -288,11 +288,11 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
         var mutableOffset = offset
         assert(d.count == len, "Uint8Array length \(d.count) should match len \(len)")
         if lenPrefix {
-            u32().write(buf: &buf, offset: mutableOffset, value: len)
+            u32().write(buf: &buf, offset: mutableOffset, value: UInt32(len))
             mutableOffset += 4
         }
         let valueBuf = d
-        arrayBufferBeet.write(buf: &buf, offset: offset, value: valueBuf)
+        arrayBufferBeet.write(buf: &buf, offset: mutableOffset, value: valueBuf)
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
@@ -302,7 +302,7 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
             assert(size == len, "invalid byte size")
             mutableOffset += 4
         }
-        let arrayBuffer: Data = arrayBufferBeet.read(buf: buf, offset: offset)
+        let arrayBuffer: Data = arrayBufferBeet.read(buf: buf, offset: mutableOffset)
         return arrayBuffer as! T
     }
 }
@@ -316,13 +316,13 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
 class Uint8Array: FixableBeet {
     func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let len: UInt32 = u32().read(buf: buf, offset: offset)
-        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(lenPrefix: true, len: UInt(len))))
+        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(len: UInt(len), lenPrefix: true)))
     }
     
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let d = val as! Data
         let len = d.count
-        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(lenPrefix: true, len: UInt(len))))
+        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(len: UInt(len), lenPrefix: true)))
     }
     
     var description: String = "Uint8Array"
