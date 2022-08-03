@@ -13,7 +13,7 @@ func checkCases<U: Equatable>(
             print("Input: \(x)")
             print("Offset: \(offset)")
             
-            let beet = fixableBeet.toFixedFromValue(x)
+            let beet = fixableBeet.toFixedFromValue(val: x)
             
             let byteSize: UInt
             

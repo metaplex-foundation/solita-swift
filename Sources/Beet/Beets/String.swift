@@ -48,13 +48,13 @@ class FixedSizeUtf8String: ScalarFixedSizeBeet {
  * @category beet/collection
  */
 class Utf8String: FixableBeet {
-    var toFixedFromData: ((Data, Int) -> FixedSizeBeet) = { buf, offset in
+    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let size: UInt32 = u32().read(buf: buf, offset: offset)
-        return .init(value: .scalar(FixedSizeUtf8String(stringByteLength: 4)))
+        return .init(value: .scalar(FixedSizeUtf8String(stringByteLength: UInt(size))))
     }
     
-    var toFixedFromValue: ((Any) -> FixedSizeBeet) = {
-        let value = $0 as! String
+    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+        let value = val as! String
         let data = Data(value.utf8)
         return .init(value: .scalar(FixedSizeUtf8String(stringByteLength: UInt(data.count))))
     }

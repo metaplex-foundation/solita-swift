@@ -128,7 +128,7 @@ protocol FixableBeet: BeetBase {
    * @param offset the offset at which the data starts
    *
    */
-    var toFixedFromData: ((_ buf: Data, _ offset: Int) -> FixedSizeBeet) { get }
+    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet
 
   /**
    * Provides a fixed size version of `this` by walking the provided value in
@@ -136,7 +136,7 @@ protocol FixableBeet: BeetBase {
    *
    * @param val the instance for which to adapt this beet to fixed size
    */
-    var toFixedFromValue: ((_ val: Any) -> FixedSizeBeet) { get }
+    func toFixedFromValue(val: Any) -> FixedSizeBeet
 }
 
 
@@ -229,3 +229,37 @@ struct SupportedTypeDefinition {
 }
 
 typealias Enum = CaseIterable
+
+// -----------------
+// Guards
+// -----------------
+/**
+ * @private
+ */
+func isFixedSizeBeet(x: Beet) -> Bool {
+    switch x {
+    case .fixedBeet:
+        return true
+    case .fixableBeat:
+        return false
+    }
+}
+
+/**
+ * @private
+ */
+func assertFixedSizeBeet(x: Beet) {
+    assert(isFixedSizeBeet(x: x), "\(x) should have been a fixed beet")
+}
+
+/**
+ * @private
+ */
+func isFixableBeet(x: Beet) -> Bool {
+    switch x {
+    case .fixedBeet:
+        return false
+    case .fixableBeat:
+        return true
+    }
+}

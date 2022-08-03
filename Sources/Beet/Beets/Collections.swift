@@ -72,12 +72,12 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
     func read<T>(buf: Data, offset: Int) -> T {
         var mutableoffset = offset
         if lenPrefix {
-            let size: UInt32 = u32().read(buf: buf, offset: offset)
+            let size: UInt32 = u32().read(buf: buf, offset: mutableoffset)
             assert(size == length, "invalid byte size")
             mutableoffset += 4
         }
-        var arr: [V] = []
         
+        var arr: [V] = []
         switch element.value {
         case .scalar(let type):
             for i in 0..<Int(length) {
@@ -92,4 +92,238 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
         
         return arr as! T
     }
+}
+
+/**
+ * De/Serializes an array with a specific number of elements of type {@link T}
+ * which do not all have the same size.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param elements the De/Serializers for the element types
+ * @param elementsByteSize size of all elements in the array combined
+ *
+ * @category beet/collection
+ */
+
+class FixedSizeArray<V>: ScalarFixedSizeBeet {
+    let description: String
+    let byteSize: UInt
+
+    let elements: [FixedSizeBeet]
+    let elementsByteSize: Int32
+    let length: Int
+    let firstElement: String
+    
+    init(elements: [FixedSizeBeet], elementsByteSize: Int32){
+        self.elements = elements
+        self.elementsByteSize = elementsByteSize
+        self.length = elements.count
+        switch elements.first?.value {
+        case .scalar(let type):
+            firstElement = type.description
+        case .collection(let type):
+            firstElement = type.description
+        case .none:
+            firstElement = "<EMPTY>"
+        }
+        
+        self.description = "Array<\(firstElement)>(\(length)[ 4 + \(elementsByteSize)]"
+        self.byteSize = UInt(4 + elementsByteSize)
+    }
+    
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+        let x = value as! [V]
+        assert(x.count == length, "array length \(x.count) should match len \(length)")
+        u32().write(buf: &buf, offset: offset, value: length)
+        
+        var cursor: UInt = UInt(offset + 4)
+        for i in 0..<length {
+            let element = elements[i]
+            switch element.value {
+            case .scalar(let type):
+                type.write(buf: &buf, offset: Int(cursor), value: x[i])
+                cursor += type.byteSize
+            case .collection(let type):
+                type.write(buf: &buf, offset: Int(cursor), value: x[i])
+                cursor += type.byteSize
+            }
+            
+        }
+    }
+    
+    func read<T>(buf: Data, offset: Int) -> T {
+        let size: UInt32 = u32().read(buf: buf, offset: offset)
+        assert(size == length, "invalid byte size")
+        
+        var cursor: UInt = UInt(offset + 4)
+        var arr: [V] = []
+        for i in 0..<length {
+            let element = elements[i]
+            switch element.value {
+            case .scalar(let type):
+                arr.append(type.read(buf: buf, offset: Int(cursor)))
+                cursor += type.byteSize
+            case .collection(let type):
+                arr.append(type.read(buf: buf, offset: Int(cursor)))
+                cursor += type.byteSize
+            }
+        }
+        return arr as! T
+    }
+}
+
+/**
+ * Wraps an array De/Serializer with with elements of type {@link T} which do
+ * not all have the same size.
+ *
+ * @template T type of elements held in the array
+ *
+ * @param element the De/Serializer for the element types
+ *
+ * @category beet/collection
+ */
+class array: FixableBeet {
+
+    let element: Beet
+    let description: String = "array"
+
+    init(element: Beet){
+        self.element = element
+    }
+    
+    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+        let len: UInt32 = u32().read(buf: buf, offset: offset)
+        let cursorStart = offset + 4
+        var cursor = cursorStart
+
+        var fixedElements: [FixedSizeBeet] = []
+        for _ in 0..<len {
+            let fixedElement = fixBeetFromData(beet: element, buf: buf, offset: offset)
+            fixedElements.append(fixedElement)
+            switch fixedElement.value {
+            case .collection(let type):
+                cursor += Int(type.byteSize)
+            case .scalar(let type):
+                cursor += Int(type.byteSize)
+            }
+        }
+        return FixedSizeBeet(value: .scalar(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(cursor) - Int32(cursorStart))))
+    }
+    
+    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+        let v = val as! [Any]
+        var elementsSize = 0
+        var fixedElements: [FixedSizeBeet] = []
+        for i in 0..<v.count {
+            let fixedElement = fixBeetFromValue(beet: element, val: v[i])
+            fixedElements.append(fixedElement)
+            
+            switch fixedElement.value {
+            case .collection(let type):
+                elementsSize += Int(type.byteSize)
+            case .scalar(let type):
+                elementsSize += Int(type.byteSize)
+            }
+        }
+        return FixedSizeBeet(value: .scalar(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(elementsSize))))
+    }
+}
+
+/**
+ * A De/Serializer for raw {@link Buffer}s that just copies/reads the buffer bytes
+ * to/from the provided buffer.
+ *
+ * @param bytes the byte size of the buffer to de/serialize
+ * @category beet/collection
+ */
+class FixedSizeBuffer: ScalarFixedSizeBeet{
+    let description: String
+    let byteSize: UInt
+    let bytes: UInt
+    init(bytes: UInt){
+        self.bytes = bytes
+        self.byteSize = bytes
+        self.description = "Buffer (\(bytes))"
+    }
+    
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+        var advanced = buf
+        let data = value as! Data
+        advanced.replaceSubrange(offset..<offset+data.count, with: data)
+        buf = advanced
+    }
+    
+    func read<T>(buf: Data, offset: Int) -> T {
+        return buf.subdata(in: offset..<(offset + Int(bytes))) as! T
+    }
+}
+
+/**
+ * A De/Serializer for {@link Uint8Array}s of known size that just copies/reads
+ * the array bytes to/from the provided buffer.
+ *
+ * @category beet/collection
+ */
+class FixedSizeUint8Array: ScalarFixedSizeBeet {
+    let description: String
+    let byteSize: UInt
+    let len: UInt
+    let lenPrefix: Bool
+    let arrayBufferBeet: FixedSizeBuffer
+    init(lenPrefix: Bool = false, len: UInt){
+        self.lenPrefix = lenPrefix
+        self.len = len
+        self.description = "Uint8Array(\(len)"
+        if lenPrefix {
+            self.byteSize = len + 4
+        } else {
+            self.byteSize = len
+        }
+        self.arrayBufferBeet = FixedSizeBuffer(bytes: len)
+    }
+    
+    func write<T>(buf: inout Data, offset: Int, value: T) {
+        let d = value as! Data
+        var mutableOffset = offset
+        assert(d.count == len, "Uint8Array length \(d.count) should match len \(len)")
+        if lenPrefix {
+            u32().write(buf: &buf, offset: mutableOffset, value: len)
+            mutableOffset += 4
+        }
+        let valueBuf = d
+        arrayBufferBeet.write(buf: &buf, offset: offset, value: valueBuf)
+    }
+    
+    func read<T>(buf: Data, offset: Int) -> T {
+        var mutableOffset = offset
+        if lenPrefix {
+            let size: UInt32 = u32().read(buf: buf, offset: mutableOffset)
+            assert(size == len, "invalid byte size")
+            mutableOffset += 4
+        }
+        let arrayBuffer: Data = arrayBufferBeet.read(buf: buf, offset: offset)
+        return arrayBuffer as! T
+    }
+}
+
+/**
+ * A De/Serializer for {@link Uint8Array}s that just copies/reads the array bytes
+ * to/from the provided buffer.
+ *
+ * @category beet/collection
+ */
+class Uint8Array: FixableBeet {
+    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+        let len: UInt32 = u32().read(buf: buf, offset: offset)
+        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(lenPrefix: true, len: UInt(len))))
+    }
+    
+    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+        let d = val as! Data
+        let len = d.count
+        return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(lenPrefix: true, len: UInt(len))))
+    }
+    
+    var description: String = "Uint8Array"
 }

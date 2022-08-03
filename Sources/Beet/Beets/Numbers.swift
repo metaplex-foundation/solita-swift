@@ -20,8 +20,8 @@ class u8: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: UInt8.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: UInt8.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -48,8 +48,8 @@ class u16: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: UInt16.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: UInt16.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -76,8 +76,8 @@ class u32: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: UInt32.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: UInt32.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -225,8 +225,8 @@ class i8: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: Int8.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: Int8.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -252,8 +252,8 @@ class i16: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: Int16.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: Int16.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -280,8 +280,8 @@ class i32: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: Int32.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: Int32.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -308,8 +308,8 @@ class i64: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: Int64.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: Int64.self)
         })
         print("read x: \(x)")
         return x as! T
@@ -345,8 +345,8 @@ class bool: ScalarFixedSizeBeet {
     
     func read<T>(buf: Data, offset: Int) -> T {
 
-        let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
-            return rawPtr.load(fromByteOffset: offset, as: UInt8.self)
+        let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
+            return rawPtr.load(fromByteOffset: 0, as: UInt8.self)
         })
         print("read x: \(x)")
         return (x == 1) as! T
@@ -372,8 +372,6 @@ class i128: ScalarFixedSizeBeet {
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
-
-        
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int128(from: &binaryReader)
