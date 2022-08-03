@@ -135,7 +135,7 @@ class FixedSizeArray<V>: ScalarFixedSizeBeet {
     func write<T>(buf: inout Data, offset: Int, value: T) {
         let x = value as! [V]
         assert(x.count == length, "array length \(x.count) should match len \(length)")
-        u32().write(buf: &buf, offset: offset, value: length)
+        u32().write(buf: &buf, offset: offset, value: UInt32(length))
         
         var cursor: UInt = UInt(offset + 4)
         for i in 0..<length {

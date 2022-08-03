@@ -248,7 +248,11 @@ func isFixedSizeBeet(x: Beet) -> Bool {
 /**
  * @private
  */
-func assertFixedSizeBeet(x: Beet) {
+func assertFixedSizeBeet(x: Beet, description: String?) {
+    if let description = description {
+        assert(isFixedSizeBeet(x: x), description)
+
+    }
     assert(isFixedSizeBeet(x: x), "\(x) should have been a fixed beet")
 }
 
