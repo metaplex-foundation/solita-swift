@@ -17,14 +17,14 @@ class FixedScalarEnum<C>: ScalarFixedSizeBeet where C : CaseIterable & Equatable
         if (value is Int) {
             u8().write(buf: &buf, offset: offset, value: value)
         } else {
-            let enumValue: Int = keys.firstIndex{ $0 == value as! C }! as! Int
-            u8().write(buf: &buf, offset: offset, value: UInt8(enumValue))
+            let e = value as! C
+            u8().write(buf: &buf, offset: offset, value: e.rawValue)
         }
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
         let uInt: UInt8 = u8().read(buf: buf, offset: offset)
-        return C.init(rawValue: uInt as! C.RawValue) as! T
+        return C.init(rawValue: uInt as! C.RawValue)! as! T
     }
 }
 
