@@ -155,7 +155,7 @@ enum Beet {
  *
  * @category beet
  */
-typealias FixedBeetField = Dictionary<AnyHashable, FixedSizeBeet>
+typealias FixedBeetField = (type: AnyHashable, beet: FixedSizeBeet)
 
 
 /**
@@ -165,7 +165,7 @@ typealias FixedBeetField = Dictionary<AnyHashable, FixedSizeBeet>
  *
  * @category beet
  */
-typealias BeetField = Dictionary<AnyHashable,Beet>
+typealias BeetField = (type: AnyHashable, beet: Beet)
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
