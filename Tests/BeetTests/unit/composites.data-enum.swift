@@ -11,7 +11,7 @@ final class CompositesDataEnumsTests: XCTestCase {
             UniformDataEnumData(kind: Color.blue, data: "blue+" ),
           ]
         let offsets: [Int] = [0, 4]
-        let beet = FixedSizeBeet(value: .scalar(UniformDataEnum<Color, String>(inner: FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 5))))))
+        let beet = FixedSizeBeet(value: .scalar(UniformDataEnum<Color, String>(inner: FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 5))))))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
     

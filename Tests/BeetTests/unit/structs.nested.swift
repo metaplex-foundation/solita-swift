@@ -32,7 +32,7 @@ struct Trader: Equatable {
     
     static let `struct` = BeetStruct(
         fields: [
-            ("name", FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 4)))),
+            ("name", FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 4)))),
             ("results", FixedSizeBeet(value:.scalar(Results.struct))),
             ("age", FixedSizeBeet(value: .scalar(u8())))
         ],

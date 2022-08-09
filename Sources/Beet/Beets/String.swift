@@ -9,18 +9,18 @@ import XCTest
  *
  * @category beet/collection
  */
-class FixedSizeUtf8String: ScalarFixedSizeBeet {
+class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
+    var length: UInt32
     let stringByteLength: UInt
     let byteSize: UInt
-    let length: UInt
-    let elementByteSize: UInt = 1
-    let lenPrefixByteSize: UInt = 4
+    var elementByteSize: UInt = 1
+    var lenPrefixByteSize: UInt = 4
     let description: String
     
     init(stringByteLength: UInt){
-        self.length = stringByteLength
+        self.length = UInt32(stringByteLength)
         self.stringByteLength = stringByteLength
-        self.byteSize = stringByteLength + 4
+        self.byteSize = 4 + stringByteLength
         self.description = "Utf8String(4 + \(stringByteLength)}"
     }
     
@@ -49,14 +49,17 @@ class FixedSizeUtf8String: ScalarFixedSizeBeet {
  */
 class Utf8String: FixableBeet {
     func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
-        let size: UInt32 = u32().read(buf: buf, offset: offset)
-        return .init(value: .scalar(FixedSizeUtf8String(stringByteLength: UInt(size))))
+        let len: UInt32 = u32().read(buf: buf, offset: offset)
+        debugPrint("\(self.description)[\(len)]")
+        return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
     
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! String
         let data = Data(value.utf8)
-        return .init(value: .scalar(FixedSizeUtf8String(stringByteLength: UInt(data.count))))
+        let len = data.bytes.count
+        debugPrint("\(self.description)[\(len)]")
+        return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
     
     var description: String = "Utf8String"

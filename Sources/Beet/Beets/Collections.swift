@@ -106,19 +106,19 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
  * @category beet/collection
  */
 
-class FixedSizeArray<V>: ScalarFixedSizeBeet {
+class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
+    var length: UInt32
+    var lenPrefixByteSize: UInt = 4
     let description: String
     let byteSize: UInt
-
     let elements: [FixedSizeBeet]
-    let elementsByteSize: Int32
-    let length: Int
+    var elementByteSize: UInt
     let firstElement: String
     
     init(elements: [FixedSizeBeet], elementsByteSize: Int32){
         self.elements = elements
-        self.elementsByteSize = elementsByteSize
-        self.length = elements.count
+        self.elementByteSize = UInt(elementsByteSize)
+        self.length = UInt32(elements.count)
         switch elements.first?.value {
         case .scalar(let type):
             firstElement = type.description
@@ -138,7 +138,7 @@ class FixedSizeArray<V>: ScalarFixedSizeBeet {
         u32().write(buf: &buf, offset: offset, value: UInt32(length))
         
         var cursor: UInt = UInt(offset + 4)
-        for i in 0..<length {
+        for i in 0..<Int(length) {
             let element = elements[i]
             switch element.value {
             case .scalar(let type):
@@ -158,7 +158,7 @@ class FixedSizeArray<V>: ScalarFixedSizeBeet {
         
         var cursor: UInt = UInt(offset + 4)
         var arr: [V] = []
-        for i in 0..<length {
+        for i in 0..<Int(length) {
             let element = elements[i]
             switch element.value {
             case .scalar(let type):
@@ -208,7 +208,7 @@ class array: FixableBeet {
                 cursor += Int(type.byteSize)
             }
         }
-        return FixedSizeBeet(value: .scalar(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(cursor) - Int32(cursorStart))))
+        return FixedSizeBeet(value: .collection(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(cursor) - Int32(cursorStart))))
     }
     
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
@@ -226,7 +226,7 @@ class array: FixableBeet {
                 elementsSize += Int(type.byteSize)
             }
         }
-        return FixedSizeBeet(value: .scalar(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(elementsSize))))
+        return FixedSizeBeet(value: .collection(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(elementsSize))))
     }
 }
 

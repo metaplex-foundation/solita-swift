@@ -52,21 +52,21 @@ final class stringTests: XCTestCase {
     func testCollectionsFixedSizeUtf8StringsSize1() {
         let cases = ["a", "b", "z"]
         let offsets: [Int] = [0, 4]
-        let beet = FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 1)))
+        let beet = FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 1)))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
     
     func testCollectionsFixedSizeUtf8StringsSize3() {
         let cases = ["abc", "xYz"]
         let offsets: [Int] = [0, 4]
-        let beet = FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 3)))
+        let beet = FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 3)))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
     
     func testCollectionsFixedSizeUtf8StringsSize4() {
         let cases = ["abcd", "😁"]
         let offsets: [Int] = [0, 4]
-        let beet = FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 4)))
+        let beet = FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 4)))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
     

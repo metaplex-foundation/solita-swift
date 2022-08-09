@@ -30,7 +30,7 @@ class BeetWriter {
         // self.buf = Buffer.concat([this.buf, Buffer.alloc(this.allocateBytes)])
     }
     
-    func write<T>(beet: FixedSizeBeet, value: T) {
+    func write<T>(beet: FixedSizeBeet, value: T?) {
         switch beet.value{
         case .scalar(let type):
             self.maybeResize(bytesNeeded: Int(type.byteSize))
@@ -49,7 +49,7 @@ class BeetWriter {
             let reflectedField = m.children.first { (label: String?, value: Any) in
                 label! == field.type as! String
             }
-            self.write(beet: field.beet, value: reflectedField!.value)
+            self.write(beet: field.beet, value: reflectedField?.value)
         }
     }
 }

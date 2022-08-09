@@ -7,7 +7,7 @@ class BeetStruct<Class> : ScalarFixedSizeBeet {
     let description: String
     var byteSize: UInt { getByteSize() }
     
-    private let construct: (_ args: Args) -> Class
+    let construct: (_ args: Args) -> Class
     
     init(fields: [FixedBeetField],
          construct: @escaping (_ args: Args) -> Class,

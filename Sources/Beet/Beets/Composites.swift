@@ -80,7 +80,9 @@ class coptionSome: ScalarFixedSizeBeet {
     }
 
     func write<T>(buf: inout Data, offset: Int, value: T) {
-        assert(value != nil, "coptionSome cannot handle `nil` values")
+        if case Optional<Any>.none = value as Any {
+            assertionFailure("coptionSome cannot handle `nil` values")
+        }
         var mutableBytes = buf.bytes
         mutableBytes[offset] = UInt8(SOME)
         buf = Data(mutableBytes)
@@ -134,7 +136,7 @@ class coption: FixableBeet {
     
     func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         if isSomeBuffer(buf: buf, offset: offset) {
-            let innerFixed = fixBeetFromData(beet: inner, buf: buf, offset: offset)
+            let innerFixed = fixBeetFromData(beet: inner, buf: buf, offset: offset + 1)
             return FixedSizeBeet(value: .scalar(coptionSome(inner: innerFixed)))
         } else {
             assert(isNoneBuffer(buf: buf, offset: offset), "Expected \(buf) to hold a COption")

@@ -30,7 +30,7 @@ final class collectionArrayUniformTests: XCTestCase {
             ["aaaa", "bbbb", "*&#@"],
           ]
         let offsets: [Int] = [0, 3]
-        let beet = FixedSizeBeet(value: .collection(UniformFixedSizeArray<String>(element: FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 4))), len: 3, lenPrefix: true)))
+        let beet = FixedSizeBeet(value: .collection(UniformFixedSizeArray<String>(element: FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 4))), len: 3, lenPrefix: true)))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
     
@@ -40,7 +40,7 @@ final class collectionArrayUniformTests: XCTestCase {
             ["aaaa", "bbbb", "*&#@"],
           ]
         let offsets: [Int] = [0, 3]
-        let beet = FixedSizeBeet(value: .collection(UniformFixedSizeArray<String>(element: FixedSizeBeet(value: .scalar(FixedSizeUtf8String(stringByteLength: 4))), len: 3)))
+        let beet = FixedSizeBeet(value: .collection(UniformFixedSizeArray<String>(element: FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 4))), len: 3)))
         checkCases(offsets: offsets, cases: cases, beet: beet)
     }
 }
