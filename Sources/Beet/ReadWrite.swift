@@ -31,25 +31,26 @@ class BeetWriter {
     }
     
     func write<T>(beet: FixedSizeBeet, value: T?) {
-        switch beet.value{
-        case .scalar(let type):
-            self.maybeResize(bytesNeeded: Int(type.byteSize))
-            type.write(buf: &self.buf, offset: self._offset, value: value)
-            self._offset += Int(type.byteSize)
-        case .collection(let type):
-            self.maybeResize(bytesNeeded: Int(type.byteSize))
-            type.write(buf: &self.buf, offset: self._offset, value: value)
-            self._offset += Int(type.byteSize)
-        }
-      }
+        self.maybeResize(bytesNeeded: Int(beet.byteSize))
+        beet.write(buf: &self.buf, offset: self._offset, value: value)
+        self._offset += Int(beet.byteSize)
+    }
 
     func writeStruct<T>(instance: T, fields: [FixedBeetField]) {
         for field in fields {
             let m = Mirror(reflecting: instance)
-            let reflectedField = m.children.first { (label: String?, value: Any) in
-                label! == field.type as! String
+            if m.displayStyle == Swift.Mirror.DisplayStyle.dictionary {
+                for children in m.children {
+                    if let hassed = children.value as? (key: AnyHashable, value: Any), hassed.key == field.type {
+                        self.write(beet: field.beet, value: hassed.value)
+                    }
+                }
+            } else {
+                let reflectedField = m.children.first { (label: String?, value: Any) in
+                    label! == field.type as! String
+                }
+                self.write(beet: field.beet, value: reflectedField?.value)
             }
-            self.write(beet: field.beet, value: reflectedField?.value)
         }
     }
 }

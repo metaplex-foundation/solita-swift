@@ -71,7 +71,6 @@ class FixableBeetStruct<Class>: FixableBeet {
             }
         }
         if self.description != FixableBeetStruct_TYPE {
-            
             return FixedSizeBeet(value: .scalar(BeetStruct(fields: fixedFields, construct: self.construct, description: description)))
         } else {
             return FixedSizeBeet(value: .scalar(BeetStruct(fields: fixedFields, construct: self.construct)))
@@ -98,5 +97,38 @@ class FixableBeetStruct<Class>: FixableBeet {
         } else {
             return FixedSizeBeet(value: .scalar(BeetStruct(fields: fixedFields, construct: self.construct)))
         }
+    }
+}
+
+
+class FixableBeetArgsStruct<Class: ConstructableWithDiscriminator>: FixableBeetStruct<Args> {
+    init(fields: [BeetField],
+         description: String = "FixableBeetArgsStruct"
+    ){
+        super.init(fields: fields) { args in
+            args
+        }
+    }
+    
+    override func toFixedFromValue(val: Any) -> FixedSizeBeet {
+        let value = val as! Class
+        let mirror = value.mirror()
+        
+        var dictionary: [AnyHashable: Any] = [:]
+        for param in mirror.params{
+            dictionary[param.key] = param.value
+        }
+        
+        var fixedFields: [FixedBeetField] = []
+        for f in fields {
+            switch f.beet {
+            case .fixedBeet(let type):
+                fixedFields.append((f.type, type))
+            case .fixableBeat(let type):
+                fixedFields.append((f.type, type.toFixedFromValue(val: dictionary[f.type]!)))
+            }
+        }
+        
+        return FixedSizeBeet(value: .scalar(BeetArgsStruct(fields: fixedFields)))
     }
 }

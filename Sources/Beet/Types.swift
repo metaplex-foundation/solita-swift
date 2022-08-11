@@ -102,6 +102,42 @@ class FixedSizeBeet {
     init(value: FixedSizeBeetType){
         self.value = value
     }
+    
+    var byteSize: UInt {
+        switch value {
+        case .scalar(let scalarFixedSizeBeet):
+            return scalarFixedSizeBeet.byteSize
+        case .collection(let elementCollectionFixedSizeBeet):
+            return elementCollectionFixedSizeBeet.byteSize
+        }
+    }
+    
+    var description: String {
+        switch value {
+        case .scalar(let scalarFixedSizeBeet):
+            return scalarFixedSizeBeet.description
+        case .collection(let elementCollectionFixedSizeBeet):
+            return elementCollectionFixedSizeBeet.description
+        }
+    }
+    
+    func read<T>(buf: Data, offset: Int) -> T {
+        switch value {
+        case .scalar(let scalarFixedSizeBeet):
+            return scalarFixedSizeBeet.read(buf: buf, offset: offset)
+        case .collection(let elementCollectionFixedSizeBeet):
+            return elementCollectionFixedSizeBeet.read(buf: buf, offset: offset)
+        }
+    }
+    
+    func write<T>(buf: inout Data, offset: Int, value: T){
+        switch self.value {
+        case .scalar(let scalarFixedSizeBeet):
+            scalarFixedSizeBeet.write(buf: &buf, offset: offset, value: value)
+        case .collection(let elementCollectionFixedSizeBeet):
+            elementCollectionFixedSizeBeet.write(buf: &buf, offset: offset, value: value)
+        }
+    }
 }
 
 /**
@@ -267,3 +303,5 @@ func isFixableBeet(x: Beet) -> Bool {
         return true
     }
 }
+
+typealias DataEnumBeet<RawRepresentable> = (label: String, beet: Beet)

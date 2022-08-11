@@ -47,7 +47,7 @@ struct UniformDataEnumData<K: Equatable, D: Equatable>: Equatable {
     
     static func == (lhs: UniformDataEnumData<K, D>, rhs: UniformDataEnumData<K, D>) -> Bool {
         return lhs.kind == rhs.kind
-            && lhs.data == rhs.data
+        && lhs.data == rhs.data
     }
 }
 
@@ -104,10 +104,42 @@ class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatab
     }
 }
 
+enum ParamkeyTypes {
+    case key(String)
+    case noKey
+}
+protocol ConstructableWithDiscriminator {
+    init?(discriminator: UInt8, params: [String: Any])
+    static func paramsOrderedKeys(discriminator: UInt8) -> [ParamkeyTypes]
+    func mirror() -> (label: String, params: [String: Any])
+}
+
+extension ConstructableWithDiscriminator {
+    
+    func mirror() -> (label: String, params: [String: Any]) {
+        let reflection = Mirror(reflecting: self)
+        guard reflection.displayStyle == .enum,
+              let associated = reflection.children.first else {
+            return ("\(self)", [:])
+        }
+        let values = Mirror(reflecting: associated.value).children
+        var valuesArray = [String: Any]()
+        if values.count > 0 {
+            for case let item in values where item.label != nil {
+                valuesArray[item.label!] = item.value
+            }
+            return (associated.label!, valuesArray)
+        } else {
+            valuesArray[associated.label!] = associated.value
+            return (associated.label!, valuesArray)
+        }
+    }
+}
+
 // -----------------
 // Data Enum
 // -----------------
-class EnumDataVariantBeet: ScalarFixedSizeBeet{
+class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBeet{
     let description: String
     let byteSize: UInt
     let inner: FixedSizeBeet
@@ -125,25 +157,100 @@ class EnumDataVariantBeet: ScalarFixedSizeBeet{
             description = "EnumData<\(type.description)>"
         }
     }
-
+    
     func write<T>(buf: inout Data, offset: Int, value: T) {
         u8().write(buf: &buf, offset: offset, value: discriminant)
+        let val = value as! E
+        let mirror = val.mirror()
+        
+        var dictionary: [AnyHashable: Any] = [:]
+        for param in mirror.params{
+            dictionary[param.key] = param.value
+        }
+        // If the fixed value is a struct we need to separate it pass the whole dict so keys can match.
+        // it is the only whay I found to separate this logic and support same .ts features
         switch inner.value {
-        case .scalar(let type):
-            type.write(buf: &buf, offset: offset + Int(u8().byteSize), value: value)
-        case .collection(let type):
-            type.write(buf: &buf, offset: offset + Int(u8().byteSize), value: value)
+        case .scalar(let scalar):
+            if scalar is BeetArgsStruct {
+                inner.write(buf: &buf, offset: offset + Int(u8().byteSize), value: dictionary)
+            } else {
+                inner.write(buf: &buf, offset: offset + Int(u8().byteSize), value: mirror.params.values.first)
+            }
+        case .collection:
+            inner.write(buf: &buf, offset: offset + Int(u8().byteSize), value: mirror.params.values.first)
         }
         
     }
     
     func read<T>(buf: Data, offset: Int) -> T {
-        switch inner.value {
-        case .scalar(let type):
-            return type.read(buf: buf, offset: offset + Int(u8().byteSize))
-        case .collection(let type):
-            return type.read(buf: buf, offset: offset + Int(u8().byteSize))
+        let discriminator: UInt8 = u8().read(buf: buf, offset: offset)
+        
+        let param: Any = inner.read(buf: buf, offset: offset + Int(u8().byteSize))
+        if param is [String: Any] {
+            return E.init(discriminator: discriminator, params: param as! [String : Any]) as! T
+        } else {
+            var dictionary: [String: Any] = [:]
+            for paramkeyType in E.paramsOrderedKeys(discriminator: discriminator) {
+                switch paramkeyType {
+                case .key(let key):
+                    dictionary[key] = inner.read(buf: buf, offset: offset + Int(u8().byteSize)) as Any
+                case .noKey:
+                    dictionary[UUID().uuidString] = inner.read(buf: buf, offset: offset + Int(u8().byteSize)) as Any
+                }
+                
+            }
+            return E.init(discriminator: discriminator, params: dictionary) as! T
+
+        }
+    }
+}
+
+class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
+    var description: String
+    let variants: [DataEnumBeet<E>]
+    
+    init(variants: [DataEnumBeet<E>]){
+        self.description = "DataEnum<\(variants.count) variants>"
+        self.variants = variants
+    }
+    
+    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+        let discriminant: UInt8 = u8().read(buf: buf, offset: offset)
+        let variant = variants[Int(discriminant)]
+        let (_, dataBeet) = variant
+        switch dataBeet {
+        case .fixedBeet(let type):
+            return FixedSizeBeet(value: .scalar(EnumDataVariantBeet<E>(inner: type, discriminant: discriminant)))
+        case .fixableBeat(let type):
+            return FixedSizeBeet(value: .scalar(EnumDataVariantBeet<E>(inner: type.toFixedFromData(buf: buf, offset: (offset + 1)), discriminant: discriminant)))
+        }
+    }
+    
+    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+        let value = val as! E
+        let mirror = value.mirror()
+        let variant = self.variants.first { $0.label == mirror.label}!
+        let discriminant = self.variants.firstIndex { $0.label == mirror.label }!
+        var fixedBeats: [FixedSizeBeet] = []
+                
+        switch variant.beet {
+        case .fixedBeet(let fixedBeet):
+            fixedBeats.append(fixedBeet)
+        case .fixableBeat(let fixableBeat):
+            for param in mirror.params {
+                if fixableBeat is FixableBeetStruct<Args> {
+                    fixedBeats.append(fixableBeat.toFixedFromValue(val: val))
+                    break
+                } else {
+                    fixedBeats.append(fixableBeat.toFixedFromValue(val: param.value))
+                }
+            }
         }
         
+        if fixedBeats.count > 0 {
+            return FixedSizeBeet(value: .scalar(EnumDataVariantBeet<E>(inner: fixedBeats.first!, discriminant: UInt8(discriminant))))
+        } else {
+            return FixedSizeBeet(value: .scalar(EnumDataVariantBeet<E>(inner: FixedSizeBeet(value: .scalar(coptionNone(description: "none"))), discriminant: UInt8(discriminant))))
+        }
     }
 }

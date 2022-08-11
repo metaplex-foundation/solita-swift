@@ -83,3 +83,13 @@ class BeetStruct<Class> : ScalarFixedSizeBeet {
         return TYPE
     }
 }
+
+class BeetArgsStruct: BeetStruct<Args> {
+    init(fields: [FixedBeetField],
+         description: String = "BeetArgsStruct"
+    ){
+        super.init(fields: fields) { args in
+            args
+        }
+    }
+}

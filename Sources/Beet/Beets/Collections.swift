@@ -133,7 +133,7 @@ class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
     }
     
     func write<T>(buf: inout Data, offset: Int, value: T) {
-        let x = value as! [V]
+        let x = value as! [Any]
         assert(x.count == length, "array length \(x.count) should match len \(length)")
         u32().write(buf: &buf, offset: offset, value: UInt32(length))
         
