@@ -101,7 +101,7 @@ class FixableBeetStruct<Class>: FixableBeet {
 }
 
 
-class FixableBeetArgsStruct<Class: ConstructableWithDiscriminator>: FixableBeetStruct<Args> {
+class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
     init(fields: [BeetField],
          description: String = "FixableBeetArgsStruct"
     ){
@@ -112,7 +112,7 @@ class FixableBeetArgsStruct<Class: ConstructableWithDiscriminator>: FixableBeetS
     
     override func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! Class
-        let mirror = value.mirror()
+        let mirror = mirrored(value: value)
         
         var dictionary: [AnyHashable: Any] = [:]
         for param in mirror.params{

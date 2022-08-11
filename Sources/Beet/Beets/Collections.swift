@@ -199,7 +199,7 @@ class array: FixableBeet {
 
         var fixedElements: [FixedSizeBeet] = []
         for _ in 0..<len {
-            let fixedElement = fixBeetFromData(beet: element, buf: buf, offset: offset)
+            let fixedElement = fixBeetFromData(beet: element, buf: buf, offset: cursor)
             fixedElements.append(fixedElement)
             switch fixedElement.value {
             case .collection(let type):

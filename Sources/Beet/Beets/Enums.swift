@@ -117,22 +117,7 @@ protocol ConstructableWithDiscriminator {
 extension ConstructableWithDiscriminator {
     
     func mirror() -> (label: String, params: [String: Any]) {
-        let reflection = Mirror(reflecting: self)
-        guard reflection.displayStyle == .enum,
-              let associated = reflection.children.first else {
-            return ("\(self)", [:])
-        }
-        let values = Mirror(reflecting: associated.value).children
-        var valuesArray = [String: Any]()
-        if values.count > 0 {
-            for case let item in values where item.label != nil {
-                valuesArray[item.label!] = item.value
-            }
-            return (associated.label!, valuesArray)
-        } else {
-            valuesArray[associated.label!] = associated.value
-            return (associated.label!, valuesArray)
-        }
+        mirrored(value: self)
     }
 }
 
@@ -228,7 +213,7 @@ class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
     
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! E
-        let mirror = value.mirror()
+        let mirror = mirrored(value: value)
         let variant = self.variants.first { $0.label == mirror.label}!
         let discriminant = self.variants.firstIndex { $0.label == mirror.label }!
         var fixedBeats: [FixedSizeBeet] = []
@@ -252,5 +237,24 @@ class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
         } else {
             return FixedSizeBeet(value: .scalar(EnumDataVariantBeet<E>(inner: FixedSizeBeet(value: .scalar(coptionNone(description: "none"))), discriminant: UInt8(discriminant))))
         }
+    }
+}
+
+func mirrored(value: Any) -> (label: String, params: [String: Any]) {
+    let reflection = Mirror(reflecting: value)
+    guard reflection.displayStyle == .enum,
+          let associated = reflection.children.first else {
+        return ("\(value)", [:])
+    }
+    let values = Mirror(reflecting: associated.value).children
+    var valuesArray = [String: Any]()
+    if values.count > 0 {
+        for case let item in values where item.label != nil {
+            valuesArray[item.label!] = item.value
+        }
+        return (associated.label!, valuesArray)
+    } else {
+        valuesArray[associated.label!] = associated.value
+        return (associated.label!, valuesArray)
     }
 }
