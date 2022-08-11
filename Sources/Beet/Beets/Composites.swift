@@ -155,7 +155,7 @@ class coption: FixableBeet {
     }
     
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
-        if case Optional<Any>.none = val {
+        if case Optional<UInt8>.none = val {
             switch inner{
             case .fixedBeet(let beet):
                 switch beet.value{

@@ -30,8 +30,6 @@ func verify<X : Equatable, B>(
         let deserializedArgs: X = type.read(buf: data, offset: 0)
         XCTAssertEqual(deserializedArgs, beet.construct(args))
     }
-    
-    
 }
 
 final class structsFixableTests: XCTestCase {
@@ -52,13 +50,10 @@ final class structsFixableTests: XCTestCase {
         )
         _ = xStruct.toFixedFromValue(val: ["ids": [], "count" : 1])
         
-        let expected = BeetStruct<X>(fields: [
+        let expected = BeetArgsStruct(fields: [
             ( "ids", FixedSizeBeet(value: .collection(UniformFixedSizeArray<UInt32>(element: .init(value: .scalar(u32())), len: 4, lenPrefix: true)))),
             ("count", FixedSizeBeet(value: .scalar(u32()))),
-        ], construct: {
-            X(ids: $0["ids"] as! [UInt32],
-              count: $0["count"] as! UInt32)
-        }, description: "VecStruct")
+        ], description: "VecStruct")
         
         verify(beet: xStruct, args: ["ids": [UInt32(1), UInt32(2), UInt32(3), UInt32(4)], "count" : UInt32(1)], expected: expected)
         
@@ -82,13 +77,10 @@ final class structsFixableTests: XCTestCase {
         )
         _ = yStruct.toFixedFromValue(val: ["name": "XXXX", "age" : 1])
         
-        let expected = BeetStruct<Y>(fields: [
+        let expected = BeetArgsStruct(fields: [
             ( "name", FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(11))))),
             ("age", FixedSizeBeet(value: .scalar(u32()))),
-        ], construct: {
-            Y(name: $0["name"] as! String,
-              age: $0["age"] as! UInt32)
-        }, description: "CustomerStruct")
+        ], description: "CustomerStruct")
         
         verify(beet: yStruct, args: ["name": "Hello World", "age" : UInt32(18)], expected: expected)
     }
@@ -122,7 +114,7 @@ final class structsFixableTests: XCTestCase {
         verify(beet: zStruct, args:  ["maybeIds": [UInt32(1), UInt32(2), UInt32(3)], "contributors" : ["bob", "alice"]], expected: expected)
     }
     
-    func testFixableStructWithTopLevelStringNestedInsideOtherStruct() {
+    func testFixableStructWithTopLevelString() {
         struct InnerArgs: Equatable {
             let name: String
             let age: UInt8
@@ -140,16 +132,120 @@ final class structsFixableTests: XCTestCase {
             description: "InnerStruct"
         )
                 
-        let expected = BeetStruct<InnerArgs>(fields: [
+        let expected = BeetArgsStruct(fields: [
             ( "name", FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(3))))),
             ("age", FixedSizeBeet(value: .scalar(u8()))),
-        ], construct: {
-            InnerArgs(
-                name: $0["name"] as! String,
-                age: $0["age"] as! UInt8)
-        }, description: "InnerStruct")
+        ], description: "InnerStruct")
         
         verify(beet: innerStruct, args: ["name": "bob", "age": UInt8(18)], expected: expected)
+    }
+    
+    func testFixableStructWithTopLevelStringNestedInsideOtherStruct() {
+        struct InnerArgs: Equatable {
+            let name: String
+            let age: UInt8
+        }
         
+        struct ArgsX: Equatable {
+            let innerArgs: InnerArgs
+        }
+        
+        let innerStruct = FixableBeetStruct<InnerArgs>(
+            fields: [
+                ("name", Beet.fixableBeat(Utf8String())),
+                ("age", Beet.fixedBeet(FixedSizeBeet(value: .scalar(u8()))))
+            ], construct: {
+                InnerArgs(
+                    name: $0["name"] as! String,
+                    age: $0["age"] as! UInt8)
+            },
+            description: "InnerStruct"
+        )
+    
+        let argStruct = FixableBeetStruct<ArgsX>(
+            fields: [
+                ("innerArgs", Beet.fixableBeat(innerStruct))
+            ], construct: {
+                if $0["innerArgs"] is [String: Any]{
+                    return ArgsX(innerArgs: InnerArgs(name: ($0["innerArgs"] as! [String: Any])["name"] as! String, age: ($0["innerArgs"] as! [String: Any])["age"] as! UInt8))
+                } else {
+                    return ArgsX(innerArgs: $0["innerArgs"] as! InnerArgs)
+                }
+            },
+            description: "Args"
+        )
+                
+        let expected = BeetArgsStruct(fields: [
+            ( "innerArgs", innerStruct.toFixedFromValue(val: ["name": "bob", "age": UInt8(18)]))
+        ], description: "Args")
+        verify(beet: argStruct, args: ["innerArgs": ["name": "bob", "age": UInt8(18)]], expected: expected)
+    }
+    
+    func testToFixedStructWithNestedStructAndMixedNestedFixableAndFixedBeets() {
+        struct InnerArgs: Equatable {
+            let housePrices: [Int16]?
+            let age: UInt8
+        }
+        
+        struct ArgsX: Equatable {
+            let innerArgs: InnerArgs
+            let name: String
+            let symbol: String
+            let count: UInt8
+        }
+        
+        let innerStruct = FixableBeetStruct<InnerArgs>(
+            fields: [
+                ("housePrices", Beet.fixableBeat(coption(inner: .fixableBeat(array(element: .fixedBeet(.init(value: .scalar(u16())))))))),
+                ("age", Beet.fixedBeet(FixedSizeBeet(value: .scalar(u8()))))
+            ], construct: {
+                InnerArgs(
+                    housePrices: $0["housePrices"] as! [Int16]?,
+                    age: $0["age"] as! UInt8)
+            },
+            description: "InnerStruct"
+        )
+    
+        let argStruct = FixableBeetStruct<ArgsX>(
+            fields: [
+                ("innerArgs", Beet.fixableBeat(innerStruct)),
+                ("name", Beet.fixableBeat(Utf8String())),
+                ("symbol", Beet.fixableBeat(Utf8String())),
+                ("count", Beet.fixedBeet(FixedSizeBeet(value: .scalar(u8()))))
+            ], construct: {
+                if $0["innerArgs"] is [String: Any]{
+                    return ArgsX(innerArgs: InnerArgs(housePrices: ($0["innerArgs"] as! [String: Any])["housePrices"] as! [Int16]?,
+                                                      age: ($0["innerArgs"] as! [String: Any])["age"] as! UInt8),
+                                 name: $0["name"] as! String,
+                                 symbol: $0["symbol"] as! String,
+                                 count: $0["count"] as! UInt8
+                    )
+                } else {
+                    return ArgsX(innerArgs: $0["innerArgs"] as! InnerArgs,
+                                 name: $0["name"] as! String,
+                                 symbol: $0["symbol"] as! String,
+                                 count: $0["count"] as! UInt8
+                    )
+                }
+            },
+            description: "ArgsX"
+        )
+        
+ 
+                
+        let expected = BeetArgsStruct(fields: [
+            ("innerArgs", innerStruct.toFixedFromValue(val: ["housePrices": [], "age": UInt8(20)])),
+            ("name", FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 5)))),
+            ("symbol", FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: 3)))),
+            ("count", FixedSizeBeet(value: .scalar(u8())))
+        ], description: "Argsx")
+        
+        verify(beet: argStruct,
+               args: ["innerArgs": ["housePrices": [], "age": UInt8(20)],
+                                       "name": "ABC",
+                                       "count": UInt8(2),
+                                       "symbol": "CCC"
+                                    ],
+               expected: expected)
     }
 }
