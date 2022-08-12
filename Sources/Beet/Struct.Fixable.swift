@@ -110,6 +110,29 @@ class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
         }
     }
     
+    override func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+        var cursor = offset
+        var fixedFields: [FixedBeetField] = []
+        
+        for i in 0..<self.fields.count {
+            let (key, beet) = self.fields[i]
+            let fixedBeet = fixBeetFromData(beet: beet, buf: buf, offset: cursor)
+            fixedFields.append((key, fixedBeet))
+            
+            switch fixedBeet.value {
+            case .scalar(let type):
+                cursor += Int(type.byteSize)
+            case .collection(let type):
+                cursor += Int(type.byteSize)
+            }
+        }
+        if self.description != FixableBeetStruct_TYPE {
+            return FixedSizeBeet(value: .scalar(BeetArgsStruct(fields: fixedFields, description: description)))
+        } else {
+            return FixedSizeBeet(value: .scalar(BeetArgsStruct(fields: fixedFields)))
+        }
+    }
+    
     override func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! Class
         let mirror = mirrored(value: value)
