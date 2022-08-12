@@ -13,13 +13,13 @@ import Foundation
  *
  * @category beet/collection
  */
-class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSizeBeet {
-    var lenPrefixByteSize: UInt = 4
+public class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSizeBeet {
+    public var lenPrefixByteSize: UInt = 4
     let element: FixedSizeBeet
-    let byteSize: UInt
-    var elementByteSize: UInt
-    var length: UInt32
-    var description: String
+    public let byteSize: UInt
+    public var elementByteSize: UInt
+    public var length: UInt32
+    public var description: String
     let lenPrefix: Bool
 
     init(element: FixedSizeBeet, len: UInt32, lenPrefix: Bool = false) {
@@ -48,7 +48,7 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
         }
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         let x = value as! [V]
         var mutableoffset = offset
         assert(x.count == length, "array length \(x.count) should match len \(length)")
@@ -69,7 +69,7 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
         }
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         var mutableoffset = offset
         if lenPrefix {
             let size: UInt32 = u32().read(buf: buf, offset: mutableoffset)
@@ -105,13 +105,13 @@ class UniformFixedSizeArray<V>: ElementCollectionBeet & ElementCollectionFixedSi
  * @category beet/collection
  */
 
-class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
-    var length: UInt32
-    var lenPrefixByteSize: UInt = 4
-    let description: String
-    let byteSize: UInt
+public class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
+    public var length: UInt32
+    public var lenPrefixByteSize: UInt = 4
+    public let description: String
+    public let byteSize: UInt
     let elements: [FixedSizeBeet]
-    var elementByteSize: UInt
+    public var elementByteSize: UInt
     let firstElement: String
 
     init(elements: [FixedSizeBeet], elementsByteSize: Int32) {
@@ -131,7 +131,7 @@ class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
         self.byteSize = UInt(4 + elementsByteSize)
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         let x = value as! [Any]
         assert(x.count == length, "array length \(x.count) should match len \(length)")
         u32().write(buf: &buf, offset: offset, value: UInt32(length))
@@ -151,7 +151,7 @@ class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
         }
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let size: UInt32 = u32().read(buf: buf, offset: offset)
         assert(size == length, "invalid byte size")
 
@@ -182,16 +182,16 @@ class FixedSizeArray<V>: ElementCollectionFixedSizeBeet {
  *
  * @category beet/collection
  */
-class array: FixableBeet {
+public class array: FixableBeet {
 
     let element: Beet
-    let description: String = "array"
+    public let description: String = "array"
 
     init(element: Beet) {
         self.element = element
     }
 
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let len: UInt32 = u32().read(buf: buf, offset: offset)
         let cursorStart = offset + 4
         var cursor = cursorStart
@@ -210,7 +210,7 @@ class array: FixableBeet {
         return FixedSizeBeet(value: .collection(FixedSizeArray<Any>(elements: fixedElements, elementsByteSize: Int32(cursor) - Int32(cursorStart))))
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let v = val as! [Any]
         var elementsSize = 0
         var fixedElements: [FixedSizeBeet] = []
@@ -236,9 +236,9 @@ class array: FixableBeet {
  * @param bytes the byte size of the buffer to de/serialize
  * @category beet/collection
  */
-class FixedSizeBuffer: ScalarFixedSizeBeet {
-    let description: String
-    let byteSize: UInt
+public class FixedSizeBuffer: ScalarFixedSizeBeet {
+    public let description: String
+    public let byteSize: UInt
     let bytes: UInt
     init(bytes: UInt) {
         self.bytes = bytes
@@ -246,14 +246,14 @@ class FixedSizeBuffer: ScalarFixedSizeBeet {
         self.description = "Buffer (\(bytes))"
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let data = value as! Data
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         return buf.subdata(in: offset..<(offset + Int(bytes))) as! T
     }
 }
@@ -264,13 +264,13 @@ class FixedSizeBuffer: ScalarFixedSizeBeet {
  *
  * @category beet/collection
  */
-class FixedSizeUint8Array: ScalarFixedSizeBeet {
-    let description: String
-    let byteSize: UInt
+public class FixedSizeUint8Array: ScalarFixedSizeBeet {
+    public let description: String
+    public let byteSize: UInt
     let len: UInt
     let lenPrefix: Bool
     let arrayBufferBeet: FixedSizeBuffer
-    init(len: UInt, lenPrefix: Bool = false) {
+    public init(len: UInt, lenPrefix: Bool = false) {
         self.lenPrefix = lenPrefix
         self.len = len
         self.description = "Uint8Array(\(len)"
@@ -282,7 +282,7 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
         self.arrayBufferBeet = FixedSizeBuffer(bytes: len)
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         let d = value as! Data
         var mutableOffset = offset
         assert(d.count == len, "Uint8Array length \(d.count) should match len \(len)")
@@ -294,7 +294,7 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
         arrayBufferBeet.write(buf: &buf, offset: mutableOffset, value: valueBuf)
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         var mutableOffset = offset
         if lenPrefix {
             let size: UInt32 = u32().read(buf: buf, offset: mutableOffset)
@@ -312,17 +312,17 @@ class FixedSizeUint8Array: ScalarFixedSizeBeet {
  *
  * @category beet/collection
  */
-class Uint8Array: FixableBeet {
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+public class Uint8Array: FixableBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let len: UInt32 = u32().read(buf: buf, offset: offset)
         return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(len: UInt(len), lenPrefix: true)))
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let d = val as! Data
         let len = d.count
         return FixedSizeBeet(value: .scalar(FixedSizeUint8Array(len: UInt(len), lenPrefix: true)))
     }
 
-    var description: String = "Uint8Array"
+    public var description: String = "Uint8Array"
 }
