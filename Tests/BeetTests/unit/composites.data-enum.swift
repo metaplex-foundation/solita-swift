@@ -5,7 +5,7 @@ import Solana
 
 final class CompositesDataEnumsTests: XCTestCase {
     func testCompositesDataEnumColorString() {
-        let cases: [UniformDataEnumData] = [
+        let cases: [UniformDataEnumData<Color, String>] = [
             UniformDataEnumData(kind: Color.red, data: "red++" ),
             UniformDataEnumData(kind: Color.green, data: "green" ),
             UniformDataEnumData(kind: Color.blue, data: "blue+" ),

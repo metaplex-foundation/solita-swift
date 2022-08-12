@@ -8,7 +8,6 @@
 import Foundation
 import Solana
 
-
 /**
  * Base Beet type.
  * @category beet
@@ -22,7 +21,7 @@ protocol BeetBase {
 }
 
 protocol BeetReadWrite {
-    
+
     /**
    * Writes the value of type {@link T} to the provided buffer.
    *
@@ -46,7 +45,6 @@ protocol BeetReadWrite {
    */
     var byteSize: UInt { get }
 }
-
 
 protocol ElementCollectionBeet {
   /**
@@ -74,7 +72,6 @@ protocol ElementCollectionBeet {
  */
 protocol ScalarFixedSizeBeet: BeetBase & BeetReadWrite {}
 
-
 /**
  * Beet for Collections
  * @category beet
@@ -99,10 +96,10 @@ enum FixedSizeBeetType {
 
 class FixedSizeBeet {
     let value: FixedSizeBeetType
-    init(value: FixedSizeBeetType){
+    init(value: FixedSizeBeetType) {
         self.value = value
     }
-    
+
     var byteSize: UInt {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
@@ -111,7 +108,7 @@ class FixedSizeBeet {
             return elementCollectionFixedSizeBeet.byteSize
         }
     }
-    
+
     var description: String {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
@@ -120,7 +117,7 @@ class FixedSizeBeet {
             return elementCollectionFixedSizeBeet.description
         }
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
@@ -129,8 +126,8 @@ class FixedSizeBeet {
             return elementCollectionFixedSizeBeet.read(buf: buf, offset: offset)
         }
     }
-    
-    func write<T>(buf: inout Data, offset: Int, value: T){
+
+    func write<T>(buf: inout Data, offset: Int, value: T) {
         switch self.value {
         case .scalar(let scalarFixedSizeBeet):
             scalarFixedSizeBeet.write(buf: &buf, offset: offset, value: value)
@@ -175,7 +172,6 @@ protocol FixableBeet: BeetBase {
     func toFixedFromValue(val: Any) -> FixedSizeBeet
 }
 
-
 /**
  * @category beet
  */
@@ -192,7 +188,6 @@ enum Beet {
  * @category beet
  */
 typealias FixedBeetField = (type: AnyHashable, beet: FixedSizeBeet)
-
 
 /**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
@@ -226,7 +221,7 @@ let BEET_TYPE_ARG_INNER = "Beet<{innner}>"
 enum BeetTypeArg {
     case len
     case inner
-    
+
     func value() -> String {
         switch self {
         case .len: return BEET_TYPE_ARG_LEN

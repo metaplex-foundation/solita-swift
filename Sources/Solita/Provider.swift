@@ -1,33 +1,33 @@
 import Foundation
 import Solana
- 
+
 class Provider {
     let solana: Solana
-    init(solana: Solana, wallet: Wallet){
+    init(solana: Solana, wallet: Wallet) {
         self.solana = solana
     }
-    
+
     func send(
         tx: TransactionInstruction,
-        signers: Array<Account>?,
+        signers: [Account]?,
         opts: RequestConfiguration?
-    ){
-        
+    ) {
+
     }
-    
+
     func sendAll(
-        reqs: Array<SendTxRequest>,
+        reqs: [SendTxRequest],
         opts: RequestConfiguration?
-    ){
-        
+    ) {
+
     }
-    
+
     func simulate(
         tx: TransactionInstruction,
-        signers: Array<Account>?,
+        signers: [Account]?,
         opts: RequestConfiguration?
-    ){
-        
+    ) {
+
     }
 }
 
@@ -39,5 +39,5 @@ protocol Wallet {
 
 struct SendTxRequest {
   let tx: TransactionInstruction
-  let signers: Array<Account>
-};
+  let signers: [Account]
+}
