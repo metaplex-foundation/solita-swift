@@ -1,44 +1,44 @@
 import Foundation
 
 struct Idl: Codable {
-    let version: String;
-    let name: String;
-    let instructions: [IdlInstruction];
-    let state: IdlState?;
-    let accounts: [IdlTypeDef]?;
-    let types: [IdlTypeDef]?;
-    let events: [IdlEvent]?;
-    let errors: [IdlErrorCode]?;
+    let version: String
+    let name: String
+    let instructions: [IdlInstruction]
+    let state: IdlState?
+    let accounts: [IdlTypeDef]?
+    let types: [IdlTypeDef]?
+    let events: [IdlEvent]?
+    let errors: [IdlErrorCode]?
 }
 
 struct IdlEvent: Codable {
-    let name: String;
-    let fields: [IdlEventField];
+    let name: String
+    let fields: [IdlEventField]
 }
 
 struct IdlEventField: Codable {
-    let name: String;
-    let type: IdlType;
-    let index: Bool;
+    let name: String
+    let type: IdlType
+    let index: Bool
 }
 
 struct IdlInstruction: Codable {
-    let name: String;
-    let accounts: [IdlAccountItem];
-    let args: [IdlField];
+    let name: String
+    let accounts: [IdlAccountItem]
+    let args: [IdlField]
 }
 
 struct IdlState: Codable {
-    let `struct`: IdlTypeDef;
-    let methods: [IdlStateMethod];
+    let `struct`: IdlTypeDef
+    let methods: [IdlStateMethod]
 }
 
-typealias IdlStateMethod = IdlInstruction;
+typealias IdlStateMethod = IdlInstruction
 
 enum IdlAccountItem: Codable {
     case idlAccount(IdlAccount)
     case idlAccounts(IdlAccounts)
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let x = try? container.decode(IdlAccount.self) {
@@ -51,7 +51,7 @@ enum IdlAccountItem: Codable {
         }
         throw DecodingError.typeMismatch(IdlAccountItem.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for TypeUnion"))
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -63,26 +63,25 @@ enum IdlAccountItem: Codable {
     }
 }
 
-
 struct IdlAccount: Codable {
-    let name: String;
-    let isMut: Bool;
-    let isSigner: Bool;
+    let name: String
+    let isMut: Bool
+    let isSigner: Bool
 }
 
 struct IdlAccounts: Codable {
-    let name: String;
-    let accounts: [IdlAccountItem];
+    let name: String
+    let accounts: [IdlAccountItem]
 }
 
 struct IdlField: Codable {
-    let name: String;
-    let type: IdlType;
+    let name: String
+    let type: IdlType
 }
 
 struct IdlTypeDef: Codable {
-    let name: String;
-    let type: IdlTypeDefTy;
+    let name: String
+    let type: IdlTypeDefTy
 }
 
 enum IdlTypeDefTyKind: String, Codable {
@@ -91,12 +90,12 @@ enum IdlTypeDefTyKind: String, Codable {
 }
 
 struct IdlTypeDefTy: Codable {
-    let kind: IdlTypeDefTyKind;
-    let fields: IdlTypeDefStruct?;
-    let variants: [IdlEnumVariant]?;
+    let kind: IdlTypeDefTyKind
+    let fields: IdlTypeDefStruct?
+    let variants: [IdlEnumVariant]?
 }
 
-typealias IdlTypeDefStruct = Array<IdlField>;
+typealias IdlTypeDefStruct = [IdlField]
 
 indirect enum IdlType: Codable {
     case bool
@@ -116,7 +115,7 @@ indirect enum IdlType: Codable {
     case idlTypeVec(IdlTypeVec)
     case idlTypeOption(IdlTypeOption)
     case idlTypeDefined(IdlTypeDefined)
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let x = try? container.decode(String.self), x == "bool" {
@@ -189,7 +188,7 @@ indirect enum IdlType: Codable {
         }
         throw DecodingError.typeMismatch(IdlType.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for TypeUnion"))
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -232,27 +231,27 @@ indirect enum IdlType: Codable {
 }
 
 struct IdlTypeVec: Codable {
-    let vec: IdlType;
+    let vec: IdlType
 }
 
 struct IdlTypeOption: Codable {
-    let option: IdlType;
+    let option: IdlType
 }
 
 // User defined type.
 struct IdlTypeDefined: Codable {
-    let defined: String;
+    let defined: String
 }
 
 struct IdlEnumVariant: Codable {
-    let name: String;
-    let fields: IdlEnumFields?;
+    let name: String
+    let fields: IdlEnumFields?
 }
 
 enum IdlEnumFields: Codable {
     case idlEnumFieldsNamed(IdlEnumFieldsNamed)
     case idlEnumFieldsTuple(IdlEnumFieldsTuple)
-    
+
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let x = try? container.decode(IdlEnumFieldsNamed.self) {
@@ -265,7 +264,7 @@ enum IdlEnumFields: Codable {
         }
         throw DecodingError.typeMismatch(IdlEnumFields.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for TypeUnion"))
     }
-    
+
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -277,12 +276,12 @@ enum IdlEnumFields: Codable {
     }
 }
 
-typealias IdlEnumFieldsNamed = Array<IdlField>;
+typealias IdlEnumFieldsNamed = [IdlField]
 
-typealias IdlEnumFieldsTuple = Array<IdlType>;
+typealias IdlEnumFieldsTuple = [IdlType]
 
 struct IdlErrorCode: Codable {
-    let code: Int;
-    let name: String;
-    let msg: String?;
+    let code: Int
+    let name: String
+    let msg: String?
 }

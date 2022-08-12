@@ -9,7 +9,7 @@ import Solana
 class u8: ScalarFixedSizeBeet {
     let byteSize: UInt = 1
     let description: String = "u8"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let uint = value as! UInt8
@@ -17,7 +17,7 @@ class u8: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -36,16 +36,16 @@ class u8: ScalarFixedSizeBeet {
 class u16: ScalarFixedSizeBeet {
     let byteSize: UInt = 2
     let description: String = "u16"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let uint = value as! UInt16
         let data = uint.data()
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -64,16 +64,16 @@ class u16: ScalarFixedSizeBeet {
 class u32: ScalarFixedSizeBeet {
     let byteSize: UInt = 4
     let description: String = "u32"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let uint = value as! UInt32
         let data = uint.data()
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -92,16 +92,16 @@ class u32: ScalarFixedSizeBeet {
 class u64: ScalarFixedSizeBeet {
     let byteSize: UInt = 8
     let description: String = "u64"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let uint = value as! UInt64
         let data = uint.data()
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -120,9 +120,9 @@ class u64: ScalarFixedSizeBeet {
 class u128: ScalarFixedSizeBeet {
     let byteSize: UInt = 16
     let description: String = "u128"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
 
         let bigInt = value as! UInt128
@@ -131,10 +131,9 @@ class u128: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
-        
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt128(from: &binaryReader)
@@ -150,9 +149,9 @@ class u128: ScalarFixedSizeBeet {
 class u256: ScalarFixedSizeBeet {
     let byteSize: UInt = 32
     let description: String = "u256"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
 
         let bigInt = value as! UInt256
@@ -161,10 +160,9 @@ class u256: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
-        
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt256(from: &binaryReader)
@@ -180,9 +178,9 @@ class u256: ScalarFixedSizeBeet {
 class u512: ScalarFixedSizeBeet {
     let byteSize: UInt = 64
     let description: String = "u512"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
 
         let bigInt = value as! UInt512
@@ -191,10 +189,9 @@ class u512: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
-        
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! UInt512(from: &binaryReader)
@@ -213,16 +210,16 @@ class u512: ScalarFixedSizeBeet {
 class i8: ScalarFixedSizeBeet {
     let byteSize: UInt = 1
     let description: String = "i8"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let int = value as! Int8
         let data = int.data()
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -241,7 +238,7 @@ class i8: ScalarFixedSizeBeet {
 class i16: ScalarFixedSizeBeet {
     let byteSize: UInt = 2
     let description: String = "i16"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int16
@@ -249,7 +246,7 @@ class i16: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -260,7 +257,6 @@ class i16: ScalarFixedSizeBeet {
     }
 }
 
-
 /**
  * De/Serializer 32-bit signed integers aka `i32`.
  *
@@ -269,7 +265,7 @@ class i16: ScalarFixedSizeBeet {
 class i32: ScalarFixedSizeBeet {
     let byteSize: UInt = 4
     var description: String = "i32"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int32
@@ -277,7 +273,7 @@ class i32: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -296,16 +292,16 @@ class i32: ScalarFixedSizeBeet {
 class i64: ScalarFixedSizeBeet {
     let byteSize: UInt = 8
     let description: String = "i64"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let int = value as! Int64
         let data = int.data()
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -315,7 +311,6 @@ class i64: ScalarFixedSizeBeet {
         return x as! T
     }
 }
-
 
 // -----------------
 // Boolean
@@ -328,9 +323,9 @@ class i64: ScalarFixedSizeBeet {
 class bool: ScalarFixedSizeBeet {
     let byteSize: UInt = 1
     let description: String = "bool"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
         let bool = value as! Bool
         let data: Data
@@ -342,7 +337,7 @@ class bool: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
@@ -361,7 +356,7 @@ class bool: ScalarFixedSizeBeet {
 class i128: ScalarFixedSizeBeet {
     let byteSize: UInt = 16
     let description: String = "i128"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int128
@@ -370,7 +365,7 @@ class i128: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
@@ -387,9 +382,9 @@ class i128: ScalarFixedSizeBeet {
 class i256: ScalarFixedSizeBeet {
     let byteSize: UInt = 32
     let description: String = "i256"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
-       
+
         var advanced = buf
 
         let bigInt = value as! Int256
@@ -398,7 +393,7 @@ class i256: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
@@ -415,7 +410,7 @@ class i256: ScalarFixedSizeBeet {
 class i512: ScalarFixedSizeBeet {
     let byteSize: UInt = 64
     let description: String = "i256"
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int512
@@ -424,7 +419,7 @@ class i512: ScalarFixedSizeBeet {
         advanced.replaceSubrange(offset..<offset+data.count, with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)

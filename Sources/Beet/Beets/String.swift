@@ -16,14 +16,14 @@ class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
     var elementByteSize: UInt = 1
     var lenPrefixByteSize: UInt = 4
     let description: String
-    
-    init(stringByteLength: UInt){
+
+    init(stringByteLength: UInt) {
         self.length = UInt32(stringByteLength)
         self.stringByteLength = stringByteLength
         self.byteSize = 4 + stringByteLength
         self.description = "Utf8String(4 + \(stringByteLength)}"
     }
-    
+
     func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let string = value as! String
@@ -33,7 +33,7 @@ class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
         advanced.replaceSubrange((offset+4)..<(offset+4+data.count), with: data)
         buf = advanced
     }
-    
+
     func read<T>(buf: Data, offset: Int) -> T {
         let size: UInt32 = u32().read(buf: buf, offset: offset)
         assert(size == stringByteLength, "invalid byte size")
@@ -53,7 +53,7 @@ class Utf8String: FixableBeet {
         debugPrint("\(self.description)[\(len)]")
         return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
-    
+
     func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! String
         let data = Data(value.utf8)
@@ -61,6 +61,6 @@ class Utf8String: FixableBeet {
         debugPrint("\(self.description)[\(len)]")
         return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
-    
+
     var description: String = "Utf8String"
 }
