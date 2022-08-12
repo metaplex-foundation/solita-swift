@@ -11,17 +11,28 @@ let package = Package(
         .library(
             name: "Beet",
             targets: ["Beet"]),
+        .library(
+            name: "BeetSolana",
+            targets: ["Beet"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "master"),
+        .package(url: "https://github.com/SwiftGen/StencilSwiftKit.git", from: "2.7.2"),
     ],
     targets: [
         .target(
             name: "Solita",
-            dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet"]),
+            dependencies: [.product(name: "StencilSwiftKit", package: "StencilSwiftKit"), .product(name: "Solana", package: "Solana.Swift"), "Beet", "BeetSolana"]),
         .target(
             name: "Beet",
             dependencies: [.product(name: "Solana", package: "Solana.Swift")]),
+        .target(
+            name: "BeetSolana",
+            dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet"]),
+        .testTarget(
+            name: "BeetSolanaTests",
+            dependencies: ["Solita", "Beet"],
+            resources: [ .process("Resources")]),
         .testTarget(
             name: "BeetTests",
             dependencies: ["Solita"],

@@ -12,7 +12,7 @@ import Solana
  * Base Beet type.
  * @category beet
  */
-protocol BeetBase {
+public protocol BeetBase {
   /**
    * Describes the type of data that is de/serialized and serves for debugging
    * and diagnostics only.
@@ -20,7 +20,7 @@ protocol BeetBase {
     var description: String { get }
 }
 
-protocol BeetReadWrite {
+public protocol BeetReadWrite {
 
     /**
    * Writes the value of type {@link T} to the provided buffer.
@@ -46,7 +46,7 @@ protocol BeetReadWrite {
     var byteSize: UInt { get }
 }
 
-protocol ElementCollectionBeet {
+public protocol ElementCollectionBeet {
   /**
    * For arrays and strings this indicates the byte size of each element.
    */
@@ -70,13 +70,13 @@ protocol ElementCollectionBeet {
  * Scalar Beet
  * @category beet
  */
-protocol ScalarFixedSizeBeet: BeetBase & BeetReadWrite {}
+public protocol ScalarFixedSizeBeet: BeetBase & BeetReadWrite {}
 
 /**
  * Beet for Collections
  * @category beet
  */
-protocol ElementCollectionFixedSizeBeet: BeetBase & BeetReadWrite & ElementCollectionBeet {}
+public protocol ElementCollectionFixedSizeBeet: BeetBase & BeetReadWrite & ElementCollectionBeet {}
 
 /**
  * Template for De/Serializer which is of fixed size, meaning its Buffer size
@@ -89,18 +89,18 @@ protocol ElementCollectionFixedSizeBeet: BeetBase & BeetReadWrite & ElementColle
  * @category beet
  */
 
-enum FixedSizeBeetType {
+public enum FixedSizeBeetType {
     case scalar(ScalarFixedSizeBeet)
     case collection (ElementCollectionFixedSizeBeet)
 }
 
-class FixedSizeBeet {
-    let value: FixedSizeBeetType
-    init(value: FixedSizeBeetType) {
+public class FixedSizeBeet {
+    public let value: FixedSizeBeetType
+    public init(value: FixedSizeBeetType) {
         self.value = value
     }
 
-    var byteSize: UInt {
+    public var byteSize: UInt {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
             return scalarFixedSizeBeet.byteSize
@@ -109,7 +109,7 @@ class FixedSizeBeet {
         }
     }
 
-    var description: String {
+    public var description: String {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
             return scalarFixedSizeBeet.description
@@ -118,7 +118,7 @@ class FixedSizeBeet {
         }
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         switch value {
         case .scalar(let scalarFixedSizeBeet):
             return scalarFixedSizeBeet.read(buf: buf, offset: offset)
@@ -127,7 +127,7 @@ class FixedSizeBeet {
         }
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         switch self.value {
         case .scalar(let scalarFixedSizeBeet):
             scalarFixedSizeBeet.write(buf: &buf, offset: offset, value: value)
@@ -151,7 +151,7 @@ class FixedSizeBeet {
  *
  * @category beet
  */
-protocol FixableBeet: BeetBase {
+public protocol FixableBeet: BeetBase {
   /**
    * Provides a fixed size version of `this` by walking the provided data in
    * order to discover the sizes of the root beet and all nested beets.
@@ -175,7 +175,7 @@ protocol FixableBeet: BeetBase {
 /**
  * @category beet
  */
-enum Beet {
+public enum Beet {
     case fixedBeet(FixedSizeBeet)
     case fixableBeat(FixableBeet)
 }
@@ -187,7 +187,7 @@ enum Beet {
  *
  * @category beet
  */
-typealias FixedBeetField = (type: AnyHashable, beet: FixedSizeBeet)
+public typealias FixedBeetField = (type: AnyHashable, beet: FixedSizeBeet)
 
 /**
  * Specifies a field that is part of the type {@link T} along with its De/Serializer.
@@ -196,7 +196,7 @@ typealias FixedBeetField = (type: AnyHashable, beet: FixedSizeBeet)
  *
  * @category beet
  */
-typealias BeetField = (type: AnyHashable, beet: Beet)
+public typealias BeetField = (type: AnyHashable, beet: Beet)
 
 /**
  * Represents a number that can be larger than the builtin Integer type.
@@ -204,21 +204,21 @@ typealias BeetField = (type: AnyHashable, beet: Beet)
  *
  * @category beet
  */
-typealias bignum = Bignum
+public typealias bignum = Bignum
 
 /**
  * @private
  * @category beet
  */
-let BEET_TYPE_ARG_LEN = "len"
+public let BEET_TYPE_ARG_LEN = "len"
 
 /**
  * @private
  * @category beet
  */
-let BEET_TYPE_ARG_INNER = "Beet<{innner}>"
+public let BEET_TYPE_ARG_INNER = "Beet<{innner}>"
 
-enum BeetTypeArg {
+public enum BeetTypeArg {
     case len
     case inner
 
@@ -250,7 +250,7 @@ enum BeetTypeArg {
  *
  * @category TypeDefinition
  */
-struct SupportedTypeDefinition {
+public struct SupportedTypeDefinition {
     let beet: String
     let isFixable: Bool
     let sourcePack: String
@@ -259,7 +259,7 @@ struct SupportedTypeDefinition {
     let letpack: String?
 }
 
-typealias Enum = CaseIterable
+public typealias Enum = CaseIterable
 
 // -----------------
 // Guards
