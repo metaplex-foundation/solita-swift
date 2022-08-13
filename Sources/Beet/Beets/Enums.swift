@@ -7,12 +7,12 @@ import Foundation
  *
  * @category beet/enum
  */
-class FixedScalarEnum<C>: ScalarFixedSizeBeet where C: CaseIterable & Equatable & RawRepresentable {
-    let byteSize: UInt = u8().byteSize
-    let description: String = "Enum"
+public class FixedScalarEnum<C>: ScalarFixedSizeBeet where C: CaseIterable & Equatable & RawRepresentable {
+    public let byteSize: UInt = u8().byteSize
+    public let description: String = "Enum"
     private let keys: C.AllCases = C.allCases
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         if value is Int {
             u8().write(buf: &buf, offset: offset, value: value)
         } else {
@@ -21,7 +21,7 @@ class FixedScalarEnum<C>: ScalarFixedSizeBeet where C: CaseIterable & Equatable 
         }
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let uInt: UInt8 = u8().read(buf: buf, offset: offset)
         return C.init(rawValue: uInt as! C.RawValue)! as! T
     }
@@ -40,11 +40,11 @@ class FixedScalarEnum<C>: ScalarFixedSizeBeet where C: CaseIterable & Equatable 
  *
  * @category beet/composite
  */
-struct UniformDataEnumData<K: Equatable, D: Equatable>: Equatable {
+public struct UniformDataEnumData<K: Equatable, D: Equatable>: Equatable {
     let kind: K
     let data: D
 
-    static func == (lhs: UniformDataEnumData<K, D>, rhs: UniformDataEnumData<K, D>) -> Bool {
+    public static func == (lhs: UniformDataEnumData<K, D>, rhs: UniformDataEnumData<K, D>) -> Bool {
         return lhs.kind == rhs.kind
         && lhs.data == rhs.data
     }
@@ -61,10 +61,10 @@ struct UniformDataEnumData<K: Equatable, D: Equatable>: Equatable {
  *
  * @category beet/enum
  */
-class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatable>: ScalarFixedSizeBeet {
+public class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatable>: ScalarFixedSizeBeet {
     let inner: FixedSizeBeet
-    var description: String
-    let byteSize: UInt
+    public var description: String
+    public let byteSize: UInt
 
     init(inner: FixedSizeBeet) {
         self.inner = inner
@@ -78,7 +78,7 @@ class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatab
         }
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         let x = value as! UniformDataEnumData<K, D>
         u8().write(buf: &buf, offset: offset, value: x.kind.rawValue)
         switch inner.value {
@@ -89,7 +89,7 @@ class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatab
         }
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let kindRawValue: UInt8 = u8().read(buf: buf, offset: offset)
         let kind = K.init(rawValue: kindRawValue as! K.RawValue)!
         switch inner.value {
@@ -103,11 +103,11 @@ class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: Equatab
     }
 }
 
-enum ParamkeyTypes {
+public enum ParamkeyTypes {
     case key(String)
     case noKey
 }
-protocol ConstructableWithDiscriminator {
+public protocol ConstructableWithDiscriminator {
     init?(discriminator: UInt8, params: [String: Any])
     static func paramsOrderedKeys(discriminator: UInt8) -> [ParamkeyTypes]
     func mirror() -> (label: String, params: [String: Any])
@@ -123,9 +123,9 @@ extension ConstructableWithDiscriminator {
 // -----------------
 // Data Enum
 // -----------------
-class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBeet {
-    let description: String
-    let byteSize: UInt
+public class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBeet {
+    public let description: String
+    public let byteSize: UInt
     let inner: FixedSizeBeet
     let discriminant: UInt8
 
@@ -142,7 +142,7 @@ class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBee
         }
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         u8().write(buf: &buf, offset: offset, value: discriminant)
         let val = value as! E
         let mirror = val.mirror()
@@ -166,7 +166,7 @@ class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBee
 
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let discriminator: UInt8 = u8().read(buf: buf, offset: offset)
 
         let param: Any = inner.read(buf: buf, offset: offset + Int(u8().byteSize))
@@ -189,8 +189,8 @@ class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixedSizeBee
     }
 }
 
-class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
-    var description: String
+public class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
+    public var description: String
     let variants: [DataEnumBeet<E>]
 
     init(variants: [DataEnumBeet<E>]) {
@@ -198,7 +198,7 @@ class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
         self.variants = variants
     }
 
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let discriminant: UInt8 = u8().read(buf: buf, offset: offset)
         let variant = variants[Int(discriminant)]
         let (_, dataBeet) = variant
@@ -210,7 +210,7 @@ class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
         }
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! E
         let mirror = mirrored(value: value)
         let variant = self.variants.first { $0.label == mirror.label}!
@@ -257,3 +257,15 @@ func mirrored(value: Any) -> (label: String, params: [String: Any]) {
         return (associated.label!, valuesArray)
     }
 }
+
+public enum EnumsTypeMapKey: String {
+    case fixedScalarEnum
+    case dataEnum
+}
+
+public typealias EnumsTypeMap = (EnumsTypeMapKey, SupportedTypeDefinition)
+
+let enumsTypeMap: [EnumsTypeMap] = [
+    (EnumsTypeMapKey.fixedScalarEnum, SupportedTypeDefinition(beet: "FixedScalarEnum", isFixable: false, sourcePack: BEET_PACKAGE, swift: "FixedScalarEnum<C>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
+    (EnumsTypeMapKey.dataEnum, SupportedTypeDefinition(beet: "DataEnum", isFixable: false, sourcePack: BEET_PACKAGE, swift: "DataEnum<Kind, Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE))
+]

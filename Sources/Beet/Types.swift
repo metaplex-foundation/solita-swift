@@ -213,6 +213,13 @@ public typealias bignum = Bignum
 public let BEET_TYPE_ARG_LEN = "len"
 
 /**
+* Matches name in package.json
+*
+* @private
+*/
+public let BEET_PACKAGE = "beet"
+
+/**
  * @private
  * @category beet
  */
@@ -255,7 +262,7 @@ public struct SupportedTypeDefinition {
     let isFixable: Bool
     let sourcePack: String
     let swift: String
-    let arg: BeetTypeArg
+    let arg: BeetTypeArg?
     let letpack: String?
 }
 
