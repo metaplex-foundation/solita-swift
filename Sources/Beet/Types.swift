@@ -229,7 +229,7 @@ public enum BeetTypeArg {
     case len
     case inner
 
-    func value() -> String {
+    public func value() -> String {
         switch self {
         case .len: return BEET_TYPE_ARG_LEN
         case .inner: return BEET_TYPE_ARG_INNER
@@ -264,6 +264,21 @@ public struct SupportedTypeDefinition {
     let swift: String
     let arg: BeetTypeArg?
     let letpack: String?
+    
+    public init(beet: String,
+         isFixable: Bool,
+         sourcePack: String,
+         swift: String,
+         arg: BeetTypeArg? = nil,
+         letpack: String? = nil
+    ){
+        self.beet = beet
+        self.isFixable = isFixable
+        self.sourcePack = sourcePack
+        self.swift = swift
+        self.arg = arg
+        self.letpack = letpack
+    }
 }
 
 public typealias Enum = CaseIterable

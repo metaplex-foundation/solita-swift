@@ -72,4 +72,6 @@ public enum StringTypeMapKey: String {
 
 public typealias StringTypeMap = (StringTypeMapKey, SupportedTypeDefinition)
 
-let stringTypeMap: [StringTypeMap] = [(StringTypeMapKey.string, SupportedTypeDefinition(beet: "FixedSizeUtf8String", isFixable: false, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len, letpack: nil))]
+public let stringTypeMap: [StringTypeMap] = [
+    (StringTypeMapKey.string, SupportedTypeDefinition(beet: "FixedSizeUtf8String", isFixable: false, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len))
+]
