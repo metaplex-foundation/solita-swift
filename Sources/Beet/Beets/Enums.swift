@@ -265,7 +265,7 @@ public enum EnumsTypeMapKey: String {
 
 public typealias EnumsTypeMap = (EnumsTypeMapKey, SupportedTypeDefinition)
 
-let enumsTypeMap: [EnumsTypeMap] = [
+public let enumsTypeMap: [EnumsTypeMap] = [
     (EnumsTypeMapKey.fixedScalarEnum, SupportedTypeDefinition(beet: "FixedScalarEnum", isFixable: false, sourcePack: BEET_PACKAGE, swift: "FixedScalarEnum<C>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
     (EnumsTypeMapKey.dataEnum, SupportedTypeDefinition(beet: "DataEnum", isFixable: false, sourcePack: BEET_PACKAGE, swift: "DataEnum<Kind, Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE))
 ]

@@ -27,3 +27,13 @@ public class BeetPublicKey: ScalarFixedSizeBeet {
         return PublicKey(data: data) as! T
     }
 }
+
+public enum KeysTypeMapKey: String {
+    case publicKey
+}
+
+public typealias KeysTypeMap = (KeysTypeMapKey, SupportedTypeDefinition)
+
+public let keysTypeMap: [KeysTypeMap] = [
+    (KeysTypeMapKey.publicKey, SupportedTypeDefinition(beet: "BeetPublicKey", isFixable: false, sourcePack: BEET_PACKAGE, swift: "PublicKey")),
+]

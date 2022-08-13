@@ -61,7 +61,7 @@ public class Solita {
         // -----------------
         let instructions: Dictionary<String, String> = [:]
         for ix in self.idl.instructions {
-            debugPrint("Rendering instruction ${ix.name}")
+            debugPrint("Rendering instruction \(ix.name)")
             debugPrint("args: \(ix.args)")
             debugPrint("accounts: \(ix.accounts)")
         }
