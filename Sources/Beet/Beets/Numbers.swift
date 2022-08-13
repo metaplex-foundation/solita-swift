@@ -6,11 +6,11 @@ import Solana
  *
  * @category beet/primitive
  */
-class u8: ScalarFixedSizeBeet {
-    let byteSize: UInt = 1
-    let description: String = "u8"
+public class u8: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 1
+    public let description: String = "u8"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let uint = value as! UInt8
         let data = uint.data()
@@ -18,7 +18,7 @@ class u8: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: UInt8.self)
@@ -33,11 +33,11 @@ class u8: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u16: ScalarFixedSizeBeet {
-    let byteSize: UInt = 2
-    let description: String = "u16"
+public class u16: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 2
+    public let description: String = "u16"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let uint = value as! UInt16
@@ -46,7 +46,7 @@ class u16: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: UInt16.self)
@@ -61,11 +61,11 @@ class u16: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u32: ScalarFixedSizeBeet {
-    let byteSize: UInt = 4
-    let description: String = "u32"
+public class u32: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 4
+    public let description: String = "u32"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let uint = value as! UInt32
@@ -74,7 +74,7 @@ class u32: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: UInt32.self)
@@ -89,11 +89,11 @@ class u32: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u64: ScalarFixedSizeBeet {
-    let byteSize: UInt = 8
-    let description: String = "u64"
+public class u64: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 8
+    public let description: String = "u64"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let uint = value as! UInt64
@@ -102,7 +102,7 @@ class u64: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = buf.withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: offset, as: UInt64.self)
@@ -117,11 +117,11 @@ class u64: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u128: ScalarFixedSizeBeet {
-    let byteSize: UInt = 16
-    let description: String = "u128"
+public class u128: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 16
+    public let description: String = "u128"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
 
@@ -132,7 +132,7 @@ class u128: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
@@ -146,11 +146,11 @@ class u128: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u256: ScalarFixedSizeBeet {
-    let byteSize: UInt = 32
-    let description: String = "u256"
+public class u256: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 32
+    public let description: String = "u256"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
 
@@ -161,7 +161,7 @@ class u256: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
@@ -175,11 +175,11 @@ class u256: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class u512: ScalarFixedSizeBeet {
-    let byteSize: UInt = 64
-    let description: String = "u512"
+public class u512: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 64
+    public let description: String = "u512"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
 
@@ -190,7 +190,7 @@ class u512: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
@@ -207,11 +207,11 @@ class u512: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i8: ScalarFixedSizeBeet {
-    let byteSize: UInt = 1
-    let description: String = "i8"
+public class i8: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 1
+    public let description: String = "i8"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let int = value as! Int8
@@ -220,7 +220,7 @@ class i8: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: Int8.self)
@@ -235,11 +235,11 @@ class i8: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i16: ScalarFixedSizeBeet {
-    let byteSize: UInt = 2
-    let description: String = "i16"
+public class i16: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 2
+    public let description: String = "i16"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int16
         let data = int.data()
@@ -247,7 +247,7 @@ class i16: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: Int16.self)
@@ -262,11 +262,11 @@ class i16: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i32: ScalarFixedSizeBeet {
-    let byteSize: UInt = 4
-    var description: String = "i32"
+public class i32: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 4
+    public var description: String = "i32"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int32
         let data = int.data()
@@ -274,7 +274,7 @@ class i32: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: Int32.self)
@@ -289,11 +289,11 @@ class i32: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i64: ScalarFixedSizeBeet {
-    let byteSize: UInt = 8
-    let description: String = "i64"
+public class i64: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 8
+    public let description: String = "i64"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let int = value as! Int64
@@ -302,7 +302,7 @@ class i64: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: Int64.self)
@@ -320,11 +320,11 @@ class i64: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class bool: ScalarFixedSizeBeet {
-    let byteSize: UInt = 1
-    let description: String = "bool"
+public class bool: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 1
+    public let description: String = "bool"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
         let bool = value as! Bool
@@ -338,7 +338,7 @@ class bool: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
 
         let x = Data(buf.bytes[offset..<(offset + Int(byteSize))]).withUnsafeBytes({ (rawPtr: UnsafeRawBufferPointer) in
             return rawPtr.load(fromByteOffset: 0, as: UInt8.self)
@@ -353,11 +353,11 @@ class bool: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i128: ScalarFixedSizeBeet {
-    let byteSize: UInt = 16
-    let description: String = "i128"
+public class i128: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 16
+    public let description: String = "i128"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int128
         var data = Data()
@@ -366,7 +366,7 @@ class i128: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int128(from: &binaryReader)
@@ -379,11 +379,11 @@ class i128: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i256: ScalarFixedSizeBeet {
-    let byteSize: UInt = 32
-    let description: String = "i256"
+public class i256: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 32
+    public let description: String = "i256"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
 
@@ -394,7 +394,7 @@ class i256: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int256(from: &binaryReader)
@@ -407,11 +407,11 @@ class i256: ScalarFixedSizeBeet {
  *
  * @category beet/primitive
  */
-class i512: ScalarFixedSizeBeet {
-    let byteSize: UInt = 64
-    let description: String = "i256"
+public class i512: ScalarFixedSizeBeet {
+    public let byteSize: UInt = 64
+    public let description: String = "i256"
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int512
         var data = Data()
@@ -420,7 +420,7 @@ class i512: ScalarFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let bytes = buf.subdata(in: offset..<offset+Int(byteSize)).bytes
         var binaryReader = BinaryReader(bytes: bytes)
         let r = try! Int512(from: &binaryReader)
@@ -434,3 +434,43 @@ extension FixedWidthInteger {
         return data
     }
 }
+
+public enum NumbersTypeMapKey: String {
+    case u8
+    case u16
+    case u32
+    case u64
+    case u128
+    case u256
+    case u512
+    case i8
+    case i16
+    case i32
+    case i64
+    case i128
+    case i256
+    case i512
+    case bool
+}
+
+public typealias NumbersTypeMap = (NumbersTypeMapKey, SupportedTypeDefinition)
+
+let numbersTypeMap: [NumbersTypeMap] = [
+    (NumbersTypeMapKey.u8, SupportedTypeDefinition(beet: "u8", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt8", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.u16, SupportedTypeDefinition(beet: "u16", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt16", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.u32, SupportedTypeDefinition(beet: "u32", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt32", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.u64, SupportedTypeDefinition(beet: "u64", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt64", arg: nil, letpack: nil)),
+    
+    (NumbersTypeMapKey.i8, SupportedTypeDefinition(beet: "i8", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int8", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i16, SupportedTypeDefinition(beet: "i16", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int16", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i32, SupportedTypeDefinition(beet: "i32", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int32", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i64, SupportedTypeDefinition(beet: "i64", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int64", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.bool, SupportedTypeDefinition(beet: "bool", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Bool", arg: nil, letpack: nil)),
+
+    (NumbersTypeMapKey.u128, SupportedTypeDefinition(beet: "u128", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt128", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.u256, SupportedTypeDefinition(beet: "u256", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt256", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.u512, SupportedTypeDefinition(beet: "u512", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt512", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i128, SupportedTypeDefinition(beet: "i128", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int128", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i256, SupportedTypeDefinition(beet: "i256", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int256", arg: nil, letpack: nil)),
+    (NumbersTypeMapKey.i512, SupportedTypeDefinition(beet: "i512", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int512", arg: nil, letpack: nil)),
+]

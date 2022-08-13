@@ -172,3 +172,13 @@ class coption: FixableBeet {
         }
     }
 }
+
+public enum CompositesTypeMapKey: String {
+    case option
+}
+
+public typealias CompositesTypeMap = (CompositesTypeMapKey, SupportedTypeDefinition)
+
+let compositesTypeMap: [CompositesTypeMap] = [
+    (CompositesTypeMapKey.option, SupportedTypeDefinition(beet: "coption", isFixable: true, sourcePack: BEET_PACKAGE, swift: "COption<Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
+]

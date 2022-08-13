@@ -326,3 +326,24 @@ public class Uint8Array: FixableBeet {
 
     public var description: String = "Uint8Array"
 }
+
+public enum CollectionsTypeMapKey: String {
+    case Array
+    case FixedSizeArray
+    case UniformFixedSizeArray
+    case Buffer
+    case FixedSizeUint8Array
+    case Uint8Array
+}
+
+public typealias CollectionsTypeMap = (CollectionsTypeMapKey, SupportedTypeDefinition)
+
+let collectionsTypeMap: [CollectionsTypeMap] = [
+    (CollectionsTypeMapKey.Array, SupportedTypeDefinition(beet: "array", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len, letpack: nil)),
+    (CollectionsTypeMapKey.FixedSizeArray, SupportedTypeDefinition(beet: "FixedSizeArray", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len, letpack: nil)),
+    (CollectionsTypeMapKey.UniformFixedSizeArray, SupportedTypeDefinition(beet: "uniformFixedSizeArray", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len, letpack: nil)),
+    (CollectionsTypeMapKey.Buffer, SupportedTypeDefinition(beet: "FixedSizeBuffer", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len, letpack: nil)),
+    (CollectionsTypeMapKey.FixedSizeUint8Array, SupportedTypeDefinition(beet: "FixedSizeUint8Array", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len, letpack: nil)),
+    (CollectionsTypeMapKey.Uint8Array, SupportedTypeDefinition(beet: "uint8Array", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len, letpack: nil)),
+
+]

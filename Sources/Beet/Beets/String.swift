@@ -9,22 +9,22 @@ import XCTest
  *
  * @category beet/collection
  */
-class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
-    var length: UInt32
+public class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
+    public var length: UInt32
     let stringByteLength: UInt
-    let byteSize: UInt
-    var elementByteSize: UInt = 1
-    var lenPrefixByteSize: UInt = 4
-    let description: String
+    public let byteSize: UInt
+    public var elementByteSize: UInt = 1
+    public var lenPrefixByteSize: UInt = 4
+    public let description: String
 
-    init(stringByteLength: UInt) {
+    public init(stringByteLength: UInt) {
         self.length = UInt32(stringByteLength)
         self.stringByteLength = stringByteLength
         self.byteSize = 4 + stringByteLength
         self.description = "Utf8String(4 + \(stringByteLength)}"
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let string = value as! String
         let data = Data(string.utf8)
@@ -34,7 +34,7 @@ class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
         buf = advanced
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let size: UInt32 = u32().read(buf: buf, offset: offset)
         assert(size == stringByteLength, "invalid byte size")
         let stringSlice = buf.bytes[(offset+4)..<(offset+4+Int(stringByteLength))]
@@ -47,14 +47,14 @@ class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
  *
  * @category beet/collection
  */
-class Utf8String: FixableBeet {
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+public class Utf8String: FixableBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let len: UInt32 = u32().read(buf: buf, offset: offset)
         debugPrint("\(self.description)[\(len)]")
         return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! String
         let data = Data(value.utf8)
         let len = data.bytes.count
@@ -62,5 +62,14 @@ class Utf8String: FixableBeet {
         return .init(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(len))))
     }
 
-    var description: String = "Utf8String"
+    public var description: String = "Utf8String"
 }
+
+public enum StringTypeMapKey: String {
+    case string
+    case fixedSizeString
+}
+
+public typealias StringTypeMap = (StringTypeMapKey, SupportedTypeDefinition)
+
+let stringTypeMap: [StringTypeMap] = [(StringTypeMapKey.string, SupportedTypeDefinition(beet: "FixedSizeUtf8String", isFixable: false, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len, letpack: nil))]
