@@ -52,7 +52,7 @@ public class Solita {
             
             for ty in types {
                 debugPrint("Rendering type \(ty.name)")
-                debugPrint("kind: \(ty.type.kind)")
+                debugPrint("kind: \(ty.kind)")
             }
         }
         

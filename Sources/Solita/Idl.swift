@@ -2,6 +2,17 @@ import Foundation
 import Beet
 import BeetSolana
 
+protocol ParseableIDL: Decodable {
+    var version: String { get }
+    var name: String { get }
+    var instructions: [IdlInstruction] { get }
+    var state: IdlState? { get }
+    var accounts: [IdlAccount]? { get }
+    var types: [IdlDefinedTypeDefinition]? { get }
+    var events: [IdlEvent]? { get }
+    var errors: [IdlError]? { get }
+}
+
 public struct Idl: Decodable {
     let version: String
     let name: String
@@ -12,6 +23,23 @@ public struct Idl: Decodable {
     let events: [IdlEvent]?
     let errors: [IdlError]?
     let metadata: IdlMetadata?
+}
+
+public struct ShankIdl: ParseableIDL {
+    let version: String
+    let name: String
+    let instructions: [IdlInstruction]
+    let state: IdlState?
+    let accounts: [IdlAccount]?
+    let types: [IdlDefinedTypeDefinition]?
+    let events: [IdlEvent]?
+    let errors: [IdlError]?
+    let metadata: ShankMetadata?
+}
+
+public struct ShankMetadata: Decodable {
+    let address: String
+    var origin: String = "shank"
 }
 
 public struct IdlMetadata: Decodable {
@@ -89,9 +117,46 @@ public struct IdlAccount: Decodable {
     let type: IdlDefinedType
 }
 
+enum IdlDefinedTypeDefinitionType {
+    case idlDefinedType(IdlDefinedType)
+    case idlTypeEnum(IdlTypeEnum)
+    case idlTypeDataEnum(IdlTypeDataEnum)
+}
+
 public struct IdlDefinedTypeDefinition: Decodable {
     let name: String
-    let type: IdlDefinedType
+    let type: IdlDefinedTypeDefinitionType
+    private enum CodingKeys: String, CodingKey { case name, type}
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let x = try? container.decode(IdlDefinedType.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlDefinedType(x)
+            return
+        }
+        if let x = try? container.decode(IdlTypeEnum.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlTypeEnum(x)
+            return
+        }
+        if let x = try? container.decode(IdlTypeDataEnum.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlTypeDataEnum(x)
+            return
+        }
+        throw DecodingError.typeMismatch(IdlDefinedTypeDefinition.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for IdlDefinedTypeDefinition"))
+    }
+    
+    var kind: String {
+        switch self.type {
+        case .idlDefinedType(let type):
+            return type.kind.rawValue
+        case .idlTypeEnum(let e):
+            return e.kind
+        case .idlTypeDataEnum(let de):
+            return de.kind
+        }
+    }
 }
 
 public enum IdlTypeDefTyKind: String, Decodable {
@@ -102,7 +167,6 @@ public enum IdlTypeDefTyKind: String, Decodable {
 public struct IdlDefinedType: Decodable {
     let kind: IdlTypeDefTyKind
     let fields: IdlTypeDefStruct?
-    let variants: [IdlEnumVariant]?
 }
 
 public typealias IdlTypeDefStruct = [IdlField]
@@ -110,6 +174,15 @@ public typealias IdlTypeDefStruct = [IdlField]
 public enum IdlTypeEnum: Decodable {
     case IdlTypeScalarEnum
     case IdlTypeDataEnum
+    
+    var kind: String {
+        switch self {
+        case .IdlTypeScalarEnum:
+            return "enum"
+        case .IdlTypeDataEnum:
+            return "enum"
+        }
+    }
 }
 
 public struct IdlTypeScalarEnum: Decodable {
