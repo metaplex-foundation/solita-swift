@@ -7,7 +7,7 @@ final class IdlTests: XCTestCase {
         return decoder
     }
     
-    func testJsonParsedSuccess() {
+    func testSerumMultisigJsonParsedSuccess() {
         let json = stubbedResponse("serum_multisig")
         let idl = try! getDencoder().decode(Idl.self, from: json)
         XCTAssertEqual(idl.name, "serum_multisig")
@@ -20,6 +20,27 @@ final class IdlTests: XCTestCase {
         } else {
             XCTFail()
         }
+    }
+    
+    func testActionHouseJsonParsedSuccess() {
+        let json = stubbedResponse("action_house")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        XCTAssertEqual(idl.instructions.count, 28)
+        XCTAssertEqual(idl.accounts!.count, 5)
+        XCTAssertEqual(idl.types!.count, 5)
+        XCTAssertEqual(idl.errors!.count, 44)
+        XCTAssertEqual(idl.name, "auction_house")
+
+    }
+    
+    func testCandyMachineJsonParsedSuccess() {
+        let json = stubbedResponse("candy_machine")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        XCTAssertEqual(idl.instructions.count, 9)
+        XCTAssertEqual(idl.accounts!.count, 2)
+        XCTAssertEqual(idl.types!.count, 9)
+        XCTAssertEqual(idl.errors!.count, 36)
+        XCTAssertEqual(idl.name, "candy_machine")
     }
 }
 
