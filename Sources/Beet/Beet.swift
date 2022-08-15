@@ -1,8 +1,13 @@
-//
-//  File.swift
-//  
-//
-//  Created by Arturo Jamaica on 7/21/22.
-//
-
 import Foundation
+
+/**
+ * @category TypeDefinition
+ */
+public enum BeetTypeMapKey {
+    case collectionsTypeMapKey(CollectionsTypeMapKey)
+    case stringTypeMapKey(StringTypeMapKey)
+    case compositesTypeMapKey(CompositesTypeMapKey)
+    case enumsTypeMapKey(EnumsTypeMapKey)
+    case numbersTypeMapKey(NumbersTypeMapKey)
+    case aliasesTypeMapKey(AliasesTypeMapKey)
+}
