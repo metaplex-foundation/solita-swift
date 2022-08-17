@@ -1,8 +1,5 @@
-//
-//  File.swift
-//  
-//
-//  Created by Arturo Jamaica on 8/15/22.
-//
-
 import Foundation
+
+func withoutTsExtension(p: String) -> String {
+    return p.replacingOccurrences(of: ".swift", with: "")
+}
