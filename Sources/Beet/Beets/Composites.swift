@@ -32,20 +32,20 @@ func isNoneBuffer(buf: Data, offset: Int) -> Bool {
  *
  * @category beet/option
  */
-class coptionNone: ScalarFixedSizeBeet {
-    let description: String
-    let byteSize: UInt = 1
-    init(description: String ) {
+public class coptionNone: ScalarFixedSizeBeet {
+    public let description: String
+    public let byteSize: UInt = 1
+    public init(description: String ) {
         self.description = "COption<None(\(description)>"
     }
 
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         var mutableBytes = buf.bytes
         mutableBytes[offset] = UInt8(NONE)
         buf = Data(mutableBytes)
     }
 
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         return Optional<Any>.none as! T
     }
 }
@@ -116,10 +116,10 @@ class coptionSome: ScalarFixedSizeBeet {
  *
  * @category beet/composite
  */
-class coption: FixableBeet {
-    let  description: String
+public class coption: FixableBeet {
+    public let  description: String
     let inner: Beet
-    init(inner: Beet) {
+    public init(inner: Beet) {
         self.inner = inner
         switch inner {
         case .fixedBeet(let beet):
@@ -134,7 +134,7 @@ class coption: FixableBeet {
         }
     }
 
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         if isSomeBuffer(buf: buf, offset: offset) {
             let innerFixed = fixBeetFromData(beet: inner, buf: buf, offset: offset + 1)
             return FixedSizeBeet(value: .scalar(coptionSome(inner: innerFixed)))
@@ -154,7 +154,7 @@ class coption: FixableBeet {
         }
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         if case Optional<UInt8>.none = val {
             switch inner {
             case .fixedBeet(let beet):

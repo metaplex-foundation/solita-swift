@@ -48,6 +48,7 @@ public class FixedSizeUtf8String: ElementCollectionFixedSizeBeet {
  * @category beet/collection
  */
 public class Utf8String: FixableBeet {
+    public init(){}
     public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         let len: UInt32 = u32().read(buf: buf, offset: offset)
         debugPrint("\(self.description)[\(len)]")

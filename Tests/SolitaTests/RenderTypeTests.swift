@@ -18,7 +18,7 @@ func checkRenderedType(ty: IdlDefinedTypeDefinition,
         ty: ty,
         fullFileDir: TYPE_FILE_DIR,
         accountFilesByType: [:],
-        customFilesByType: ["Creator": "/module/of/creator.ts"],
+        customFilesByType: ["Creator": "/module/of/creator.swift"],
         typeAliases: [:],
         forceFixable: FORCE_FIXABLE_NEVER
     )

@@ -1,12 +1,12 @@
 import Foundation
 
-let FixableBeetStruct_TYPE: String = "FixableBeetStruct"
+public let FixableBeetStruct_TYPE: String = "FixableBeetStruct"
 public class FixableBeetStruct<Class>: FixableBeet {
     let fields: [BeetField]
     public let description: String
     let construct: (_ args: Args) -> Class
 
-    init(fields: [BeetField],
+    public init(fields: [BeetField],
          construct: @escaping (_ args: Args) -> Class,
          description: String = FixableBeetStruct_TYPE
     ) {
@@ -101,7 +101,7 @@ public class FixableBeetStruct<Class>: FixableBeet {
 }
 
 public class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
-    init(fields: [BeetField],
+    public init(fields: [BeetField],
          description: String = "FixableBeetArgsStruct"
     ) {
         super.init(fields: fields) { args in
