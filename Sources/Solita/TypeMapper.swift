@@ -3,23 +3,23 @@ import Beet
 import BeetSolana
 import PathKit
 
-typealias ForceFixable = (IdlType) -> Bool
+public typealias ForceFixable = (IdlType) -> Bool
 let FORCE_FIXABLE_NEVER: ForceFixable = { _ in return false }
 
 let NO_NAME_PROVIDED = "<no name provided>"
 
-class TypeMapper {
-    var serdePackagesUsed: Set<SerdePackage> = Set()
-    var localImportsByPath: Dictionary<String, Set<String>> = [:]
-    var scalarEnumsUsed: Dictionary<String, [String]> = [:]
-    var usedFixableSerde: Bool = false
+public class TypeMapper {
+    public var serdePackagesUsed: Set<SerdePackage> = Set()
+    public var localImportsByPath: Dictionary<String, Set<String>> = [:]
+    public var scalarEnumsUsed: Dictionary<String, [String]> = [:]
+    public var usedFixableSerde: Bool = false
     
     private let accountTypesPaths: Dictionary<String, String>
     private let customTypesPaths: Dictionary<String, String>
     private let typeAliases: Dictionary<String, PrimitiveTypeKey>
     private let forceFixable: ForceFixable
     private let primaryTypeMap: PrimaryTypeMap
-    init(accountTypesPaths: Dictionary<String, String>? = nil,
+    public init(accountTypesPaths: Dictionary<String, String>? = nil,
          customTypesPaths: Dictionary<String, String>? = nil,
          typeAliases: Dictionary<String, PrimitiveTypeKey>? = nil,
          forceFixable: ForceFixable? = nil,
@@ -32,7 +32,7 @@ class TypeMapper {
         self.primaryTypeMap = primaryTypeMap ?? TypeMapper.defaultPrimaryTypeMap
     }
     
-    static var defaultPrimaryTypeMap: PrimaryTypeMap {
+    public static var defaultPrimaryTypeMap: PrimaryTypeMap {
         var supported: Dictionary<String, SupportedTypeDefinition> = [:]
         BeetSupportedTypeMap.forEach { supported[$0.0] = $0.1 }
         BeetSolanaSupportedTypeMap.forEach { supported[$0.0] = $0.1 }
@@ -107,7 +107,7 @@ class TypeMapper {
         return ty.defined
     }
     
-    private func mapEnumType(ty: IdlTypeEnum, name: String) -> String{
+    private func mapEnumType(ty: IdlTypeScalarEnum, name: String) -> String{
         assert(
             name != NO_NAME_PROVIDED,
             "Need to provide name for enum types"
@@ -135,31 +135,16 @@ class TypeMapper {
         self.usedFixableSerde = self.usedFixableSerde || ty.isFixable
     }
     
-    private func updateScalarEnumsUsed(name: String, ty: IdlTypeEnum) {
-        switch ty {
-            
-        case .IdlTypeScalarEnum(let e):
-            let variants = e.variants.map{ $0.name }
-            let currentUsed = self.scalarEnumsUsed[name]
-            
-            if (currentUsed != nil) {
-                assert( variants == currentUsed,
-                        "Found two enum variant specs for ${name}, ${variants} and ${currentUsed}"
-                )
-            } else {
-                self.scalarEnumsUsed[name] = variants
-            }
-            
-        case .IdlTypeDataEnum(let de):
-            let variants = de.variants.map{ $0.name }
-            let currentUsed = self.scalarEnumsUsed[name]
-            if (currentUsed != nil) {
-                assert( variants == currentUsed,
-                        "Found two enum variant specs for ${name}, ${variants} and ${currentUsed}"
-                )
-            } else {
-                self.scalarEnumsUsed[name] = variants
-            }
+    private func updateScalarEnumsUsed(name: String, ty: IdlTypeScalarEnum) {
+        let variants = ty.variants.map{ $0.name }
+        let currentUsed = self.scalarEnumsUsed[name]
+        
+        if (currentUsed != nil) {
+            assert( variants == currentUsed,
+                    "Found two enum variant specs for ${name}, ${variants} and ${currentUsed}"
+            )
+        } else {
+            self.scalarEnumsUsed[name] = variants
         }
     }
     
@@ -226,7 +211,7 @@ class TypeMapper {
     }
 
     
-    private func mapEnumSerde(ty: IdlTypeEnum, name: String) -> String {
+    private func mapEnumSerde(ty: IdlTypeScalarEnum, name: String) -> String {
         assert(
             name != NO_NAME_PROVIDED,
             "Need to provide name for enum types"

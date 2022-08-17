@@ -17,13 +17,12 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "master"),
-        .package(url: "https://github.com/SwiftGen/StencilSwiftKit.git", from: "2.7.2"),
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.9.0"),
     ],
     targets: [
         .target(
             name: "Solita",
-            dependencies: [.product(name: "StencilSwiftKit", package: "StencilSwiftKit"), .product(name: "Solana", package: "Solana.Swift"), "Beet", "PathKit", "BeetSolana"]),
+            dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet", "PathKit", "BeetSolana"]),
         .target(
             name: "Beet",
             dependencies: [.product(name: "Solana", package: "Solana.Swift")]),

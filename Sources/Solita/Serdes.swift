@@ -81,3 +81,25 @@ func assertKnownSerdePackage(
         "\(pack) is an unknown and thus not yet supported de/serializer package"
     )
 }
+
+/**
+ * Renders DataStruct for user defined types
+ */
+public func renderTypeDataStruct(
+    fields: [TypeMappedSerdeField],
+    beetVarName: String,
+    typeName: String,
+    isFixable: Bool
+) -> String {
+    assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
+    let fieldDecls = fields.map{ "(\($0.name) : \($0.type))" }.joined(separator: ",\n")
+    let beetArgsStructType = isFixable
+        ? "FixableBeetArgsStruct"
+        : "BeetArgsStruct"
+
+return """
+\(beetArgsStructType)(fields: [
+    \(fieldDecls)
+], description: "\(typeName)")
+"""
+}
