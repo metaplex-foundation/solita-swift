@@ -1,11 +1,11 @@
 import Foundation
 
-typealias Args = [AnyHashable: Any]
-class BeetStruct<Class>: ScalarFixedSizeBeet {
+public typealias Args = [AnyHashable: Any]
+public class BeetStruct<Class>: ScalarFixedSizeBeet {
     let TYPE: String = "BeetStruct"
     let fields: [FixedBeetField]
-    let description: String
-    var byteSize: UInt { getByteSize() }
+    public let description: String
+    public var byteSize: UInt { getByteSize() }
 
     let construct: (_ args: Args) -> Class
 
@@ -36,7 +36,7 @@ class BeetStruct<Class>: ScalarFixedSizeBeet {
      * thus supports composing/nesting them the same way.
      * @private
      */
-    func write<T>(buf: inout Data, offset: Int, value: T) {
+    public func write<T>(buf: inout Data, offset: Int, value: T) {
         let (innerBuf, innerOffset) = self.serialize(instance: value as! Class)
         var advanced = buf
         let data = innerBuf.bytes[0..<innerOffset]
@@ -49,7 +49,7 @@ class BeetStruct<Class>: ScalarFixedSizeBeet {
      * thus supports composing/nesting them the same way.
      * @private
      */
-    func read<T>(buf: Data, offset: Int) -> T {
+    public func read<T>(buf: Data, offset: Int) -> T {
         let k: (Class, Int) = self.deserialize(buffer: buf, offset: offset)
         return k.0 as! T
     }
@@ -84,7 +84,7 @@ class BeetStruct<Class>: ScalarFixedSizeBeet {
     }
 }
 
-class BeetArgsStruct: BeetStruct<Args> {
+public class BeetArgsStruct: BeetStruct<Args> {
     init(fields: [FixedBeetField],
          description: String = "BeetArgsStruct"
     ) {
