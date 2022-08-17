@@ -172,8 +172,8 @@ public struct IdlDefinedType: Decodable {
 public typealias IdlTypeDefStruct = [IdlField]
 
 public enum IdlTypeEnum: Decodable {
-    case IdlTypeScalarEnum
-    case IdlTypeDataEnum
+    case IdlTypeScalarEnum(IdlTypeScalarEnum)
+    case IdlTypeDataEnum(IdlTypeDataEnum)
     
     var kind: String {
         switch self {
@@ -270,6 +270,27 @@ public indirect enum IdlType: Decodable {
         }
         throw DecodingError.typeMismatch(IdlType.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Not a valid Key: \(fromKey)"))
     }
+    
+    var key: String {
+        switch self {
+        case .beetTypeMapKey(let beetType):
+            return beetType.key
+        case .publicKey(let publicKey):
+            return publicKey.key
+        case .idlTypeDefined(_):
+            fatalError("Not implemented")
+        case .idlTypeOption(_):
+            fatalError("Not implemented")
+        case .idlTypeVec(_):
+            fatalError("Not implemented")
+        case .idlTypeArray(_):
+            fatalError("Not implemented")
+        case .idlTypeEnum(_):
+            fatalError("Not implemented")
+        case .idlTypeDataEnum(_):
+            fatalError("Not implemented")
+        }
+    }
 }
 
 public struct IdlTypeArrayInner: Decodable {
@@ -277,8 +298,11 @@ public struct IdlTypeArrayInner: Decodable {
     let size: Int
 }
 
-public struct IdlTypeArray: Decodable {
+public struct IdlTypeArray {
     let array: [IdlTypeArrayInner]
+}
+
+extension IdlTypeArray: Decodable {
     private enum CodingKeys: String, CodingKey { case array }
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

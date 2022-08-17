@@ -210,7 +210,7 @@ public let BEET_TYPE_ARG_LEN = "len"
 *
 * @private
 */
-public let BEET_PACKAGE = "beet"
+public let BEET_PACKAGE = "Beet"
 
 /**
  * @private
@@ -251,12 +251,12 @@ public enum BeetTypeArg {
  * @category TypeDefinition
  */
 public struct SupportedTypeDefinition {
-    let beet: String
-    let isFixable: Bool
-    let sourcePack: String
-    let swift: String
-    let arg: BeetTypeArg?
-    let letpack: String?
+    public let beet: String
+    public let isFixable: Bool
+    public let sourcePack: String
+    public let swift: String
+    public  let arg: BeetTypeArg?
+    public let letpack: String?
     
     public init(beet: String,
          isFixable: Bool,

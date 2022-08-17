@@ -2,6 +2,9 @@ import Foundation
 import Beet
 import Solana
 
+public let BEET_SOLANA_PACKAGE = "BeetSolana"
+public let SOLANA_WEB3_PACKAGE = "Solana"
+
 /**
  * De/Serializer for solana {@link PublicKey}s aka `publicKey`.
  *
@@ -35,5 +38,5 @@ public enum KeysTypeMapKey: String {
 public typealias KeysTypeMap = (KeysTypeMapKey, SupportedTypeDefinition)
 
 public let keysTypeMap: [KeysTypeMap] = [
-    (KeysTypeMapKey.publicKey, SupportedTypeDefinition(beet: "BeetPublicKey", isFixable: false, sourcePack: BEET_PACKAGE, swift: "PublicKey")),
+    (KeysTypeMapKey.publicKey, SupportedTypeDefinition(beet: "BeetPublicKey", isFixable: false, sourcePack: BEET_SOLANA_PACKAGE, swift: "PublicKey", letpack: SOLANA_WEB3_PACKAGE)),
 ]
