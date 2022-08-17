@@ -314,4 +314,4 @@ func isFixableBeet(x: Beet) -> Bool {
     }
 }
 
-typealias DataEnumBeet<RawRepresentable> = (label: String, beet: Beet)
+public typealias DataEnumBeet<RawRepresentable> = (label: String, beet: Beet)

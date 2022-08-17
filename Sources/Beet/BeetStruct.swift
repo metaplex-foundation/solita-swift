@@ -9,7 +9,7 @@ public class BeetStruct<Class>: ScalarFixedSizeBeet {
 
     let construct: (_ args: Args) -> Class
 
-    init(fields: [FixedBeetField],
+    public init(fields: [FixedBeetField],
          construct: @escaping (_ args: Args) -> Class,
          description: String = "BeetStruct"
     ) {

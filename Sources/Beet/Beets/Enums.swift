@@ -193,7 +193,7 @@ public class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
     public var description: String
     let variants: [DataEnumBeet<E>]
 
-    init(variants: [DataEnumBeet<E>]) {
+    public init(variants: [DataEnumBeet<E>]) {
         self.description = "DataEnum<\(variants.count) variants>"
         self.variants = variants
     }

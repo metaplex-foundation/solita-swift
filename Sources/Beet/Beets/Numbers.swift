@@ -9,7 +9,7 @@ import Solana
 public class u8: ScalarFixedSizeBeet {
     public let byteSize: UInt = 1
     public let description: String = "u8"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let uint = value as! UInt8
@@ -36,7 +36,7 @@ public class u8: ScalarFixedSizeBeet {
 public class u16: ScalarFixedSizeBeet {
     public let byteSize: UInt = 2
     public let description: String = "u16"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -64,7 +64,7 @@ public class u16: ScalarFixedSizeBeet {
 public class u32: ScalarFixedSizeBeet {
     public let byteSize: UInt = 4
     public let description: String = "u32"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -92,7 +92,7 @@ public class u32: ScalarFixedSizeBeet {
 public class u64: ScalarFixedSizeBeet {
     public let byteSize: UInt = 8
     public let description: String = "u64"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -120,7 +120,7 @@ public class u64: ScalarFixedSizeBeet {
 public class u128: ScalarFixedSizeBeet {
     public let byteSize: UInt = 16
     public let description: String = "u128"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -149,7 +149,7 @@ public class u128: ScalarFixedSizeBeet {
 public class u256: ScalarFixedSizeBeet {
     public let byteSize: UInt = 32
     public let description: String = "u256"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -178,7 +178,7 @@ public class u256: ScalarFixedSizeBeet {
 public class u512: ScalarFixedSizeBeet {
     public let byteSize: UInt = 64
     public let description: String = "u512"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -210,7 +210,7 @@ public class u512: ScalarFixedSizeBeet {
 public class i8: ScalarFixedSizeBeet {
     public let byteSize: UInt = 1
     public let description: String = "i8"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -238,7 +238,7 @@ public class i8: ScalarFixedSizeBeet {
 public class i16: ScalarFixedSizeBeet {
     public let byteSize: UInt = 2
     public let description: String = "i16"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int16
@@ -265,7 +265,7 @@ public class i16: ScalarFixedSizeBeet {
 public class i32: ScalarFixedSizeBeet {
     public let byteSize: UInt = 4
     public var description: String = "i32"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let int = value as! Int32
@@ -292,7 +292,7 @@ public class i32: ScalarFixedSizeBeet {
 public class i64: ScalarFixedSizeBeet {
     public let byteSize: UInt = 8
     public let description: String = "i64"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -323,7 +323,7 @@ public class i64: ScalarFixedSizeBeet {
 public class bool: ScalarFixedSizeBeet {
     public let byteSize: UInt = 1
     public let description: String = "bool"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -356,7 +356,7 @@ public class bool: ScalarFixedSizeBeet {
 public class i128: ScalarFixedSizeBeet {
     public let byteSize: UInt = 16
     public let description: String = "i128"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int128
@@ -382,7 +382,7 @@ public class i128: ScalarFixedSizeBeet {
 public class i256: ScalarFixedSizeBeet {
     public let byteSize: UInt = 32
     public let description: String = "i256"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
 
         var advanced = buf
@@ -410,7 +410,7 @@ public class i256: ScalarFixedSizeBeet {
 public class i512: ScalarFixedSizeBeet {
     public let byteSize: UInt = 64
     public let description: String = "i256"
-
+    public init(){}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         var advanced = buf
         let bigInt = value as! Int512
