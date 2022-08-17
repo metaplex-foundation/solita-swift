@@ -1,9 +1,9 @@
 import Foundation
 
 let FixableBeetStruct_TYPE: String = "FixableBeetStruct"
-class FixableBeetStruct<Class>: FixableBeet {
+public class FixableBeetStruct<Class>: FixableBeet {
     let fields: [BeetField]
-    let description: String
+    public let description: String
     let construct: (_ args: Args) -> Class
 
     init(fields: [BeetField],
@@ -21,7 +21,7 @@ class FixableBeetStruct<Class>: FixableBeet {
      *
      * @returns `[instance of Class, offset into buffer after deserialization completed]`
      */
-    func deserialize(buffer: Data, offset: Int = 0) -> (Class, Int) {
+    public func deserialize(buffer: Data, offset: Int = 0) -> (Class, Int) {
         switch self.toFixedFromData(buf: buffer, offset: offset).value {
         case .scalar(let value):
             let beetStruct = value as! BeetStruct<Class>
@@ -44,7 +44,7 @@ class FixableBeetStruct<Class>: FixableBeet {
      * @param byteSize allows to override the size fo the created Buffer and
      * defaults to the size of the struct to serialize
      */
-    func serialize(instance: Args, byteSize: Int?) -> (Data, Int) {
+    public func serialize(instance: Args, byteSize: Int?) -> (Data, Int) {
         switch self.toFixedFromValue(val: instance).value {
         case .scalar(let value):
             let beetStruct = value as! BeetStruct<Class>
@@ -54,7 +54,7 @@ class FixableBeetStruct<Class>: FixableBeet {
         }
     }
 
-    func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+    public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         var cursor = offset
         var fixedFields: [FixedBeetField] = []
 
@@ -77,7 +77,7 @@ class FixableBeetStruct<Class>: FixableBeet {
         }
     }
 
-    func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! Args
         let argsKeys = value.keys
         var fixedFields: [FixedBeetField] = []
@@ -100,7 +100,7 @@ class FixableBeetStruct<Class>: FixableBeet {
     }
 }
 
-class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
+public class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
     init(fields: [BeetField],
          description: String = "FixableBeetArgsStruct"
     ) {
@@ -109,7 +109,7 @@ class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
         }
     }
 
-    override func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
+    override public func toFixedFromData(buf: Data, offset: Int) -> FixedSizeBeet {
         var cursor = offset
         var fixedFields: [FixedBeetField] = []
 
@@ -132,7 +132,7 @@ class FixableBeetArgsStruct<Class>: FixableBeetStruct<Args> {
         }
     }
 
-    override func toFixedFromValue(val: Any) -> FixedSizeBeet {
+    override public func toFixedFromValue(val: Any) -> FixedSizeBeet {
         let value = val as! Class
         let mirror = mirrored(value: value)
 

@@ -9,19 +9,19 @@ let package =
 import PackageDescription
 
 let package = Package(
-    name: "Test",
+    name: "Generated",
     platforms: [.iOS(.v11), .macOS(.v10_12)],
     products: [
         .library(
-            name: "Test",
-            targets: ["Test"]),
+            name: "Generated",
+            targets: ["Generated"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/solita-swift.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "Test",
+            name: "Generated",
             dependencies: [.product(name: "Beet", package: "solita-swift"), .product(name: "BeetSolana", package: "solita-swift")]),
     ]
 )
@@ -71,7 +71,7 @@ func analyzeCode(swift: String) -> AnalyzedCode {
     let hash = createHash(s: (swift + UUID().uuidString).data(using: .utf8)!)
     let temporaryFolderURL = URL(fileURLWithPath: NSTemporaryDirectory())
     let tempDir = Path(temporaryFolderURL.path) + Path("\(hash)")
-    let sourcesPath = tempDir + Path("Sources")
+    let sourcesPath = tempDir + Path("Sources/Generated")
     let filePath = sourcesPath + Path("\(hash).swift")
     let packagePath = tempDir + Path("Package.swift")
     if !filePath.exists {
@@ -80,7 +80,7 @@ func analyzeCode(swift: String) -> AnalyzedCode {
     }
     try! swift.write(to: filePath.url, atomically: true, encoding: String.Encoding.utf8)
     try! package.write(to: packagePath.url, atomically: true, encoding: String.Encoding.utf8)
-    let output = try! shell(command: "swift build \(tempDir.string)")
+    let output = try! shell(command: "cd \(tempDir.string); swift build")
     return AnalyzedCode(swift: swift, errors: output.filter{ $0.contains("error")}, warnings: output.filter{ $0.contains("warning") })
 }
 
