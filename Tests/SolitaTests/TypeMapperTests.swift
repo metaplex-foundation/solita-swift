@@ -96,7 +96,7 @@ final class TypeMapperTests: XCTestCase {
         
         for type in types {
             let serde = tm.mapSerde(ty: type)
-            XCTAssert(serde == "Beet.Utf8String", "'\(type)' maps to '\(serde)' serde")
+            XCTAssert(serde == "Beet.fixableBeat(Utf8String())", "'\(type)' maps to '\(serde)' serde")
         }
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.usedFixableSerde, "did not use fixable serde")
@@ -107,11 +107,11 @@ final class TypeMapperTests: XCTestCase {
     // -----------------
     func testTypeMapperEnumsScalar() {
         let tm = TypeMapper()
-        let type: IdlType = .idlTypeEnum(.IdlTypeScalarEnum(IdlTypeScalarEnum(variants: [
+        let type: IdlType = .idlTypeEnum(IdlTypeScalarEnum(variants: [
             IdlEnumVariant(name: "Wallet", fields: nil),
             IdlEnumVariant(name: "Token", fields: nil),
             IdlEnumVariant(name: "NFT", fields: nil)
-        ])))
+        ]))
         tm.clearUsages()
         let ty = tm.map(ty: type, name: "MembershipModel")
         XCTAssert(ty == "MembershipModel", "name as type")

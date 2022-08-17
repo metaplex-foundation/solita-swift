@@ -47,24 +47,6 @@
         }
       },
       {
-        "package": "Stencil",
-        "repositoryURL": "https://github.com/stencilproject/Stencil.git",
-        "state": {
-          "branch": null,
-          "revision": "0e9a78d6584e3812cd9c09494d5c7b483e8f533c",
-          "version": "0.13.1"
-        }
-      },
-      {
-        "package": "StencilSwiftKit",
-        "repositoryURL": "https://github.com/SwiftGen/StencilSwiftKit.git",
-        "state": {
-          "branch": null,
-          "revision": "dbf02bd6afe71b65ead2bd250aaf974abc688094",
-          "version": "2.7.2"
-        }
-      },
-      {
         "package": "TweetNacl",
         "repositoryURL": "https://github.com/bitmark-inc/tweetnacl-swiftwrap.git",
         "state": {

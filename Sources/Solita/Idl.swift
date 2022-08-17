@@ -117,35 +117,16 @@ public struct IdlAccount: Decodable {
     let type: IdlDefinedType
 }
 
-enum IdlDefinedTypeDefinitionType {
+public enum IdlDefinedTypeDefinitionType {
     case idlDefinedType(IdlDefinedType)
-    case idlTypeEnum(IdlTypeEnum)
+    case idlTypeEnum(IdlTypeScalarEnum)
     case idlTypeDataEnum(IdlTypeDataEnum)
 }
 
-public struct IdlDefinedTypeDefinition: Decodable {
+public struct IdlDefinedTypeDefinition {
     let name: String
     let type: IdlDefinedTypeDefinitionType
     private enum CodingKeys: String, CodingKey { case name, type}
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        if let x = try? container.decode(IdlDefinedType.self, forKey: .type) {
-            self.name = try container.decode(String.self, forKey: .name)
-            self.type = .idlDefinedType(x)
-            return
-        }
-        if let x = try? container.decode(IdlTypeEnum.self, forKey: .type) {
-            self.name = try container.decode(String.self, forKey: .name)
-            self.type = .idlTypeEnum(x)
-            return
-        }
-        if let x = try? container.decode(IdlTypeDataEnum.self, forKey: .type) {
-            self.name = try container.decode(String.self, forKey: .name)
-            self.type = .idlTypeDataEnum(x)
-            return
-        }
-        throw DecodingError.typeMismatch(IdlDefinedTypeDefinition.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for IdlDefinedTypeDefinition"))
-    }
     
     var kind: String {
         switch self.type {
@@ -156,6 +137,28 @@ public struct IdlDefinedTypeDefinition: Decodable {
         case .idlTypeDataEnum(let de):
             return de.kind
         }
+    }
+}
+
+extension IdlDefinedTypeDefinition: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let x = try? container.decode(IdlDefinedType.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlDefinedType(x)
+            return
+        }
+        if let x = try? container.decode(IdlTypeScalarEnum.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlTypeEnum(x)
+            return
+        }
+        if let x = try? container.decode(IdlTypeDataEnum.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlTypeDataEnum(x)
+            return
+        }
+        throw DecodingError.typeMismatch(IdlDefinedTypeDefinition.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for IdlDefinedTypeDefinition"))
     }
 }
 
@@ -170,20 +173,6 @@ public struct IdlDefinedType: Decodable {
 }
 
 public typealias IdlTypeDefStruct = [IdlField]
-
-public enum IdlTypeEnum: Decodable {
-    case IdlTypeScalarEnum(IdlTypeScalarEnum)
-    case IdlTypeDataEnum(IdlTypeDataEnum)
-    
-    var kind: String {
-        switch self {
-        case .IdlTypeScalarEnum:
-            return "enum"
-        case .IdlTypeDataEnum:
-            return "enum"
-        }
-    }
-}
 
 public struct IdlTypeScalarEnum: Decodable {
     let kind: String = "enum"
@@ -207,7 +196,7 @@ public indirect enum IdlType: Decodable {
     case idlTypeOption(IdlTypeOption)
     case idlTypeVec(IdlTypeVec)
     case idlTypeArray(IdlTypeArray)
-    case idlTypeEnum(IdlTypeEnum)
+    case idlTypeEnum(IdlTypeScalarEnum)
     case idlTypeDataEnum(IdlTypeDataEnum)
 
     public init(from decoder: Decoder) throws {
