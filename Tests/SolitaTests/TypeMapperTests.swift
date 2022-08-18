@@ -213,7 +213,7 @@ final class TypeMapperTests: XCTestCase {
         XCTAssert(tm.serdePackagesUsed.count == 0, "no serdePackagesUsed")
         
         tm.clearUsages()
-        
+
         let serde = tm.mapSerde(ty: type)
         XCTAssert(serde == "Beet.fixedBeet(.init(value: .collection(UniformFixedSizeArray<UInt16>(element: .init(value: .scalar(u16())), len: 4))))", "array<u16> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
@@ -247,7 +247,7 @@ final class TypeMapperTests: XCTestCase {
         let type: IdlType = .publicKey(.keysTypeMapKey(.publicKey))
         
         let ty = tm.map(ty: type)
-        XCTAssert(ty == "Solana.PublicKey", "publicKey")
+        XCTAssert(ty == "PublicKey", "publicKey")
         XCTAssert(tm.serdePackagesUsed.contains(.SOLANA_WEB3_PACKAGE))
         
         tm.clearUsages()
@@ -266,7 +266,7 @@ final class TypeMapperTests: XCTestCase {
         let type: IdlType = .idlTypeOption(.init(option: .publicKey(.keysTypeMapKey(.publicKey))))
         
         let ty = tm.map(ty: type)
-        XCTAssert(ty == "Beet.COption<Solana.PublicKey>", "option<publicKey>")
+        XCTAssert(ty == "Beet.COption<PublicKey>", "option<publicKey>")
         XCTAssert(tm.serdePackagesUsed.contains(.SOLANA_WEB3_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         tm.clearUsages()
@@ -302,7 +302,7 @@ final class TypeMapperTests: XCTestCase {
         let type: IdlType = .idlTypeOption(.init(option: .idlTypeOption(.init(option: .publicKey(.keysTypeMapKey(.publicKey))))))
         
         let ty = tm.map(ty: type)
-        XCTAssert(ty == "Beet.COption<Beet.COption<Solana.PublicKey>>", "option<option<publicKey>>")
+        XCTAssert(ty == "Beet.COption<Beet.COption<PublicKey>>", "option<option<publicKey>>")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.SOLANA_WEB3_PACKAGE))
         tm.clearUsages()

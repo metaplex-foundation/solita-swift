@@ -38,5 +38,5 @@ public enum KeysTypeMapKey: String {
 public typealias KeysTypeMap = (KeysTypeMapKey, SupportedTypeDefinition)
 
 public let keysTypeMap: [KeysTypeMap] = [
-    (KeysTypeMapKey.publicKey, SupportedTypeDefinition(beet: "Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))", isFixable: false, sourcePack: BEET_SOLANA_PACKAGE, swift: "PublicKey", letpack: SOLANA_WEB3_PACKAGE)),
+    (KeysTypeMapKey.publicKey, SupportedTypeDefinition(beet: ".init(value: .scalar(BeetPublicKey()))", isFixable: false, sourcePack: BEET_SOLANA_PACKAGE, swift: "PublicKey", letpack: SOLANA_WEB3_PACKAGE)),
 ]

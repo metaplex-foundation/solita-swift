@@ -180,5 +180,5 @@ public enum CompositesTypeMapKey: String {
 public typealias CompositesTypeMap = (CompositesTypeMapKey, SupportedTypeDefinition)
 
 public let compositesTypeMap: [CompositesTypeMap] = [
-    (CompositesTypeMapKey.option, SupportedTypeDefinition(beet: "fixableBeat(coption(inner: {inner}))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "COption<Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
+    (CompositesTypeMapKey.option, SupportedTypeDefinition(beet: "coption(inner: {inner})", isFixable: true, sourcePack: BEET_PACKAGE, swift: "COption<Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
 ]

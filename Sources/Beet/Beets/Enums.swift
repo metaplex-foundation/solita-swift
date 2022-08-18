@@ -113,8 +113,7 @@ public protocol ConstructableWithDiscriminator {
     func mirror() -> (label: String, params: [String: Any])
 }
 
-extension ConstructableWithDiscriminator {
-
+public extension ConstructableWithDiscriminator {
     func mirror() -> (label: String, params: [String: Any]) {
         mirrored(value: self)
     }
@@ -239,7 +238,7 @@ public class DataEnum<E: ConstructableWithDiscriminator>: FixableBeet {
     }
 }
 
-func mirrored(value: Any) -> (label: String, params: [String: Any]) {
+public func mirrored(value: Any) -> (label: String, params: [String: Any]) {
     let reflection = Mirror(reflecting: value)
     guard reflection.displayStyle == .enum,
           let associated = reflection.children.first else {

@@ -18,7 +18,7 @@ public class TypeMapper {
     private let customTypesPaths: Dictionary<String, String>
     private let typeAliases: Dictionary<String, PrimitiveTypeKey>
     private let forceFixable: ForceFixable
-    private let primaryTypeMap: PrimaryTypeMap
+    public let primaryTypeMap: PrimaryTypeMap
     public init(accountTypesPaths: Dictionary<String, String>? = nil,
          customTypesPaths: Dictionary<String, String>? = nil,
          typeAliases: Dictionary<String, PrimitiveTypeKey>? = nil,
@@ -78,6 +78,24 @@ public class TypeMapper {
         return swiftType!
     }
     
+    private func mapKeyType(ty: PrimitiveTypeKey, name: String) -> String {
+        self.assertBeetSupported(serde: ty, context: "map primitive type")
+        let mapped = self.primaryTypeMap[ty]
+        var swiftType = mapped?.swift
+        
+        if swiftType == nil {
+            debugPrint("No mapped type found for ${name}: ${ty}, using any")
+            swiftType = "Any"
+        }
+        
+        if mapped?.letpack != nil {
+            assertKnownSerdePackage(pack: mapped!.letpack!)
+            swiftType = "\(swiftType!)"
+            self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped!.letpack!)!)
+        }
+        return swiftType!
+    }
+    
     private func mapOptionType(ty: IdlTypeOption, name: String) -> String{
         let inner = self.map(ty: ty.option, name: name)
         let optionPackage = BEET_PACKAGE
@@ -128,7 +146,9 @@ public class TypeMapper {
         self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped.sourcePack)!)
         self.updateUsedFixableSerde(ty: mapped)
         
-        return "\(packExportName!.rawValue).\(mapped.beet)"
+        let beet = mapped.isFixable ? "fixableBeat" : "fixedBeet"
+        
+        return "\(packExportName!.rawValue).\(beet)(\(mapped.beet))"
     }
     
     private func mapPublicKeySerde(ty: PrimitiveTypeKey, name: String) -> String{
@@ -140,7 +160,7 @@ public class TypeMapper {
         self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped.sourcePack)!)
         self.updateUsedFixableSerde(ty: mapped)
         
-        return "\(mapped.beet)"
+        return "Beet.fixedBeet(\(mapped.beet))"
     }
     
     private func updateUsedFixableSerde(ty: SupportedTypeDefinition) {
@@ -168,8 +188,9 @@ public class TypeMapper {
         
         self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped.sourcePack)!)
         self.updateUsedFixableSerde(ty: mapped)
-        
-        return "\(packExportName!.rawValue).\(mapped.beet)"
+        let beet = mapped.isFixable ? "fixableBeat" : "fixedBeet"
+
+        return "\(packExportName!.rawValue).\(beet)(\(mapped.beet))"
     }
     
     
@@ -179,7 +200,7 @@ public class TypeMapper {
         }
         
         if case .publicKey(let publicKey) = ty {
-            return self.mapPrimitiveType(ty: publicKey.key, name: name)
+            return self.mapKeyType(ty: publicKey.key, name: name)
         }
         
         if case .idlTypeOption(let option) = ty {
@@ -245,7 +266,7 @@ public class TypeMapper {
         self.usedFixableSerde = true
 
         let exp = serdePackageExportName(pack: optionPackage)
-        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{inner}", with: "\(innerSerde)"))"
+        return "\(exp!.rawValue).fixableBeat(\(mapped.beet.replacingOccurrences(of: "{inner}", with: "\(innerSerde)")))"
     }
     
     private func mapVecSerde(ty: IdlTypeVec, name: String) -> String {
@@ -261,7 +282,9 @@ public class TypeMapper {
     
     private func mapArraySerde(ty: IdlTypeArray, name: String) -> String {
         let inner = self.map(ty: ty.array[0].idlType, name: name)
-        let innerSerde = self.mapSerde(ty: ty.array[0].idlType, name: name)
+        
+        let mappedInner = self.primaryTypeMap[ty.array[0].idlType.key]!
+        
         let size = ty.array[0].size
         let mapped = self.primaryTypeMap["UniformFixedSizeArray"]!
         let arrayPackage = mapped.sourcePack
@@ -271,8 +294,8 @@ public class TypeMapper {
         self.updateUsedFixableSerde(ty: mapped)
         
         let exp = serdePackageExportName(pack: arrayPackage)
-        let fixedInnerSerde = "\(innerSerde)".replacingOccurrences(of: "Beet.fixedBeet(", with: "").dropLast()
-        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{type}", with: "\(inner)").replacingOccurrences(of: "{inner}", with: fixedInnerSerde).replacingOccurrences(of: "{len}", with: "\(size)"))"
+        let fixedInnerSerde = mappedInner.beet
+        return "\(exp!.rawValue).fixedBeet(\(mapped.beet.replacingOccurrences(of: "{type}", with: "\(inner)").replacingOccurrences(of: "{inner}", with: fixedInnerSerde).replacingOccurrences(of: "{len}", with: "\(size)")))"
     }
 
     private func mapDefinedSerde(ty: IdlTypeDefined) -> String{

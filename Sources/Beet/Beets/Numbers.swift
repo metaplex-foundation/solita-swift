@@ -456,21 +456,21 @@ public enum NumbersTypeMapKey: String {
 public typealias NumbersTypeMap = (NumbersTypeMapKey, SupportedTypeDefinition)
 
 public let numbersTypeMap: [NumbersTypeMap] = [
-    (NumbersTypeMapKey.u8, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u8())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt8")),
-    (NumbersTypeMapKey.u16, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u16())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt16")),
-    (NumbersTypeMapKey.u32, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u32())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt32")),
-    (NumbersTypeMapKey.u64, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u64())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt64")),
+    (NumbersTypeMapKey.u8, SupportedTypeDefinition(beet: ".init(value: .scalar(u8()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt8")),
+    (NumbersTypeMapKey.u16, SupportedTypeDefinition(beet: ".init(value: .scalar(u16()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt16")),
+    (NumbersTypeMapKey.u32, SupportedTypeDefinition(beet: ".init(value: .scalar(u32()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt32")),
+    (NumbersTypeMapKey.u64, SupportedTypeDefinition(beet: ".init(value: .scalar(u64()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt64")),
     
-    (NumbersTypeMapKey.i8, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i8())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int8")),
-    (NumbersTypeMapKey.i16, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i16())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int16")),
-    (NumbersTypeMapKey.i32, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i32())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int32")),
-    (NumbersTypeMapKey.i64, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i64())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int64")),
-    (NumbersTypeMapKey.bool, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(bool())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Bool")),
+    (NumbersTypeMapKey.i8, SupportedTypeDefinition(beet: ".init(value: .scalar(i8()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int8")),
+    (NumbersTypeMapKey.i16, SupportedTypeDefinition(beet: ".init(value: .scalar(i16()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int16")),
+    (NumbersTypeMapKey.i32, SupportedTypeDefinition(beet: ".init(value: .scalar(i32()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int32")),
+    (NumbersTypeMapKey.i64, SupportedTypeDefinition(beet: ".init(value: .scalar(i64()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int64")),
+    (NumbersTypeMapKey.bool, SupportedTypeDefinition(beet: ".init(value: .scalar(bool()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Bool")),
 
-    (NumbersTypeMapKey.u128, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u128())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt128")),
-    (NumbersTypeMapKey.u256, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u256())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt256")),
-    (NumbersTypeMapKey.u512, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(u512())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt512")),
-    (NumbersTypeMapKey.i128, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i128())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int128")),
-    (NumbersTypeMapKey.i256, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i256())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int256")),
-    (NumbersTypeMapKey.i512, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(i512())))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int512")),
+    (NumbersTypeMapKey.u128, SupportedTypeDefinition(beet: ".init(value: .scalar(u128()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt128")),
+    (NumbersTypeMapKey.u256, SupportedTypeDefinition(beet: ".init(value: .scalar(u256()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt256")),
+    (NumbersTypeMapKey.u512, SupportedTypeDefinition(beet: ".init(value: .scalar(u512()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "UInt512")),
+    (NumbersTypeMapKey.i128, SupportedTypeDefinition(beet: ".init(value: .scalar(i128()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int128")),
+    (NumbersTypeMapKey.i256, SupportedTypeDefinition(beet: ".init(value: .scalar(i256()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int256")),
+    (NumbersTypeMapKey.i512, SupportedTypeDefinition(beet: ".init(value: .scalar(i512()))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Int512")),
 ]

@@ -340,11 +340,11 @@ public enum CollectionsTypeMapKey: String {
 public typealias CollectionsTypeMap = (CollectionsTypeMapKey, SupportedTypeDefinition)
 
 public let collectionsTypeMap: [CollectionsTypeMap] = [
-    (CollectionsTypeMapKey.Array, SupportedTypeDefinition(beet: "fixableBeat(array(element: {inner})))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
-    (CollectionsTypeMapKey.FixedSizeArray, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .collection(FixedSizeArray<{type}>(elements: [], elementsByteSize: {len}))))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
-    (CollectionsTypeMapKey.UniformFixedSizeArray, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .collection(UniformFixedSizeArray<{type}>(element: {inner}, len: {len}))))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
-    (CollectionsTypeMapKey.Buffer, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .collection(FixedSizeBuffer(bytes: {len}))))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
-    (CollectionsTypeMapKey.FixedSizeUint8Array, SupportedTypeDefinition(beet: "fixedBeet(.init(value: .scalar(FixedSizeUint8Array(len: {len}))))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
-    (CollectionsTypeMapKey.Uint8Array, SupportedTypeDefinition(beet: "fixableBeat(Uint8Array())", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.Array, SupportedTypeDefinition(beet: "array(element: {inner}))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.FixedSizeArray, SupportedTypeDefinition(beet: ".init(value: .collection(FixedSizeArray<{type}>(elements: [], elementsByteSize: {len})))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.UniformFixedSizeArray, SupportedTypeDefinition(beet: ".init(value: .collection(UniformFixedSizeArray<{type}>(element: {inner}, len: {len})))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Array", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.Buffer, SupportedTypeDefinition(beet: ".init(value: .collection(FixedSizeBuffer(bytes: {len})))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.FixedSizeUint8Array, SupportedTypeDefinition(beet: ".init(value: .scalar(FixedSizeUint8Array(len: {len})))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
+    (CollectionsTypeMapKey.Uint8Array, SupportedTypeDefinition(beet: "Uint8Array()", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
 
 ]
