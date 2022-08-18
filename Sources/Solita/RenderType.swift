@@ -106,6 +106,15 @@ public struct \(upperCamelTyName) {
         let dataStruct = self.renderDataStructOrEnum()
         return (renderSwiftType, dataStruct)
     }
+    /**
+       * Performs parts of the render process that is necessary to determine if the
+       * type is fixed or fixable.
+       */
+    func determineIsFixable() -> Bool{
+        self.typeMapper.clearUsages()
+        self.renderDataStructs()
+        return self.typeMapper.usedFixableSerde
+    }
     
     public func render() -> String {
         typeMapper.clearUsages()
@@ -137,6 +146,21 @@ func upperCamelCase(ty: String) -> String {
         .enumerated()
         .map { $0.offset > 0 ? $0.element.capitalized : $0.element.lowercased() }
         .joined()
+}
+
+/**
+ * Performs parts of the render process that is necessary to determine if the
+ * type is fixed or fixable.
+ */
+public func determineTypeIsFixable(
+  ty: IdlDefinedTypeDefinition,
+  fullFileDir: Path,
+  accountFilesByType: Dictionary<String, String>,
+  customFilesByType: Dictionary<String, String>
+) -> Bool {
+    let typeMapper =  TypeMapper(accountTypesPaths: accountFilesByType, customTypesPaths: customFilesByType)
+    let renderer =  TypeRenderer(ty: ty, fullFileDir: fullFileDir, typeMapper: typeMapper)
+    return renderer.determineIsFixable()
 }
 
 public func renderType(
