@@ -84,6 +84,6 @@ final class RenderTypeTests: XCTestCase {
                 .init(name: "collection_mint", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil)
             ])
         ])))
-        checkRenderedType(ty: ty, imports: [.BEET_PACKAGE])
+        checkRenderedType(ty: ty, imports: [.BEET_PACKAGE], opts: Opts(logImports: DIAGNOSTIC_ON, logCode: DIAGNOSTIC_ON, logBuild: true))
     }
 }
