@@ -13,7 +13,7 @@ let package = Package(
             targets: ["Beet"]),
         .library(
             name: "BeetSolana",
-            targets: ["Beet"]),
+            targets: ["BeetSolana"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "master"),

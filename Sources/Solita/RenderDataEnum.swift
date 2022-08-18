@@ -44,26 +44,44 @@ func renderVariant(
     enumRecordName: String,
     variant: IdlDataEnumVariant
 ) -> String {
+    
+    let typeName = "\(enumRecordName)"
     let mappedFields = typeMapper.mapSerdeFields(fields: variant.fields)
+    if typeMapper.usedFixableSerde {
+        return renderVariantFixable(typeName: typeName, mappedFields: mappedFields, variant: variant)
+    } else {
+        return renderVariantFixed(typeMapper: typeMapper, typeName: typeName, variant: variant)
+    }
+}
+
+func renderVariantFixable(typeName: String, mappedFields: [TypeMappedSerdeField], variant: IdlDataEnumVariant) -> String {
     let fieldDecls = mappedFields.map { field -> String in
         let fieldName = upperCamelCase(ty: field.name)
         return "(\"\(fieldName)\", \(field.type))"
     }.joined(separator: ",\n            ")
-    
-    let typeName = "\(enumRecordName)"
-
-    let beetArgsStructType = typeMapper.usedFixableSerde
-    ? "fixableBeat(FixableBeetArgsStruct<\(typeName)>"
-    : "fixedBeet(.init(value: .scalar(BeetArgsStruct"
-    let beet =
-"""
-    (\"\(variant.name)\", \(BEET_EXPORT_NAME_STRING).\(beetArgsStructType)(fields: [
+return """
+    (\"\(variant.name)\", \(BEET_EXPORT_NAME_STRING).fixableBeat(FixableBeetArgsStruct<\(typeName)>(fields: [
             \(fieldDecls)
         ],
         description: \"\(typeName)\"
     )))
 """
-    return beet
+}
+
+func renderVariantFixed(typeMapper: TypeMapper, typeName: String, variant: IdlDataEnumVariant) -> String {
+    
+    let fieldDecls = variant.fields.map { field in
+        let fieldName = upperCamelCase(ty: field.name)
+        let mapped = typeMapper.primaryTypeMap[field.type.key]!
+        return "(\"\(fieldName)\", \(mapped.beet))"
+    }.joined(separator: ",\n            ")
+return """
+    (\"\(variant.name)\", Beet.fixedBeet(.init(value: .scalar(BeetArgsStruct(fields: [
+            \(fieldDecls)
+        ],
+        description: \"\(typeName)\"
+    )))))
+"""
 }
 
 func renderDataEnumRecord(
