@@ -215,7 +215,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.fixedBeet(.init(value: .collection(UniformFixedSizeArray<UInt16>(element: Beet.fixedBeet(.init(value: .scalar(u16()))), len: 4))))", "array<u16> serde")
+        XCTAssert(serde == "Beet.fixedBeet(.init(value: .collection(UniformFixedSizeArray<UInt16>(element: .init(value: .scalar(u16())), len: 4))))", "array<u16> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(!tm.usedFixableSerde, "did not use fixable serde")

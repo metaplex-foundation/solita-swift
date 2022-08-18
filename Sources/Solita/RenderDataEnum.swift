@@ -28,12 +28,12 @@ func renderTypeDataEnumBeet(
         .joined(separator: ",\n")
     // The size of a data enum is considered non-deterministic even though exceptions
     // exist, i.e. when they have a single variant
-    let beetType = "FixableBeet"
+    let beetType = "fixableBeat"
     typeMapper.usedFixableSerde = true
     
     return
 """
-public let \(beetVarName) = \(BEET_EXPORT_NAME_STRING).fixableBeat(DataEnum<\(enumRecordName)>(variants: [
+public let \(beetVarName) = \(BEET_EXPORT_NAME_STRING).\(beetType)(DataEnum<\(enumRecordName)>(variants: [
 \(renderedBeets)
 ]))
 """
