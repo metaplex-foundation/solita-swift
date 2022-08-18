@@ -18,8 +18,8 @@ public class TypeRenderer {
         self.fullFileDir = fullFileDir
         self.typeMapper = typeMapper
         
-        self.upperCamelTyName = camelCase(ty: ty.name)
-        self.camelTyName = camelCase(ty: ty.name)
+        self.upperCamelTyName = ty.name.first!.uppercased() + ty.name.dropFirst()
+        self.camelTyName = ty.name.first!.lowercased() + ty.name.dropFirst()
         self.beetArgName = beetVarNameFromTypeName(ty: ty.name)
     }
     
@@ -42,7 +42,7 @@ public class TypeRenderer {
         
         if case .idlDefinedType(let d) = ty.type {
             if d.fields?.count == 0 { return "" }
-            let fields = d.fields!.map{ renderTypeField(field: $0) }.joined(separator: "\n ")
+            let fields = d.fields!.map{ renderTypeField(field: $0) }.joined(separator: "\n    ")
             return
 """
 public struct \(upperCamelTyName) {
@@ -122,14 +122,13 @@ func beetVarNameFromTypeName(ty: String) -> String {
     return "\(camelTyName)Beet"
 }
 
-func camelCase(ty: String) -> String {
+func upperCamelCase(ty: String) -> String {
     return ty.lowercased()
         .split(separator: " ")
         .enumerated()
         .map { $0.element.capitalized}
         .joined()
 }
-
 
 public func renderType(
   ty: IdlDefinedTypeDefinition,

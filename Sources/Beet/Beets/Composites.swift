@@ -7,7 +7,7 @@ import Foundation
  *
  * @category beet/option
  */
-typealias COption<T> = T?
+public typealias COption<T> = T?
 
 let NONE: UInt8 = 0
 let SOME: UInt8 = 1
@@ -180,5 +180,5 @@ public enum CompositesTypeMapKey: String {
 public typealias CompositesTypeMap = (CompositesTypeMapKey, SupportedTypeDefinition)
 
 public let compositesTypeMap: [CompositesTypeMap] = [
-    (CompositesTypeMapKey.option, SupportedTypeDefinition(beet: "coption", isFixable: true, sourcePack: BEET_PACKAGE, swift: "COption<Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
+    (CompositesTypeMapKey.option, SupportedTypeDefinition(beet: "fixableBeat(coption(inner: {inner}))", isFixable: true, sourcePack: BEET_PACKAGE, swift: "COption<Inner>", arg: BeetTypeArg.inner, letpack: BEET_PACKAGE)),
 ]

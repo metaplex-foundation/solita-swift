@@ -92,13 +92,13 @@ public func renderTypeDataStruct(
     isFixable: Bool
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
-    let fieldDecls = fields.map{ "(\($0.name) : \($0.type))" }.joined(separator: ",\n")
+    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
     let beetArgsStructType = isFixable
         ? "FixableBeetArgsStruct"
         : "BeetArgsStruct"
 
 return """
-\(beetArgsStructType)(fields: [
+public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
     \(fieldDecls)
 ], description: "\(typeName)")
 """

@@ -128,7 +128,19 @@ public class TypeMapper {
         self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped.sourcePack)!)
         self.updateUsedFixableSerde(ty: mapped)
         
-        return "\(packExportName!.rawValue).\(ty)"
+        return "\(packExportName!.rawValue).\(mapped.beet)"
+    }
+    
+    private func mapPublicKeySerde(ty: PrimitiveTypeKey, name: String) -> String{
+        assertBeetSupported(serde: ty, context: "account field \(name)")
+               
+        let mapped = self.primaryTypeMap[ty]!
+        
+        assertKnownSerdePackage(pack: mapped.sourcePack)
+        self.serdePackagesUsed.insert(SerdePackage(rawValue: mapped.sourcePack)!)
+        self.updateUsedFixableSerde(ty: mapped)
+        
+        return "\(mapped.beet)"
     }
     
     private func updateUsedFixableSerde(ty: SupportedTypeDefinition) {
@@ -225,14 +237,15 @@ public class TypeMapper {
     }
     
     private func mapOptionSerde(ty: IdlTypeOption, name: String) -> String {
-        let inner = self.mapSerde(ty: ty.option, name: name)
+        let innerSerde = self.mapSerde(ty: ty.option, name: name)
         let optionPackage = BEET_PACKAGE
-
+        
+        let mapped = self.primaryTypeMap["option"]!
         self.serdePackagesUsed.insert(SerdePackage(rawValue: optionPackage)!)
         self.usedFixableSerde = true
 
         let exp = serdePackageExportName(pack: optionPackage)
-        return "\(exp!.rawValue).coption(\(inner))"
+        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{inner}", with: "\(innerSerde)"))"
     }
     
     private func mapVecSerde(ty: IdlTypeVec, name: String) -> String {
@@ -243,11 +256,12 @@ public class TypeMapper {
         self.usedFixableSerde = true
 
         let exp = serdePackageExportName(pack: arrayPackage)
-        return "\(exp!.rawValue).array(\(inner))"
+        return "\(exp!.rawValue).fixableBeat(array(element: \(inner)))"
     }
     
     private func mapArraySerde(ty: IdlTypeArray, name: String) -> String {
-        let inner = self.mapSerde(ty: ty.array[0].idlType, name: name)
+        let inner = self.map(ty: ty.array[0].idlType, name: name)
+        let innerSerde = self.mapSerde(ty: ty.array[0].idlType, name: name)
         let size = ty.array[0].size
         let mapped = self.primaryTypeMap["UniformFixedSizeArray"]!
         let arrayPackage = mapped.sourcePack
@@ -255,9 +269,9 @@ public class TypeMapper {
 
         self.serdePackagesUsed.insert(SerdePackage(rawValue: arrayPackage)!)
         self.updateUsedFixableSerde(ty: mapped)
-
+        
         let exp = serdePackageExportName(pack: arrayPackage)
-        return "\(exp!.rawValue).\(mapped.beet)(\(inner), \(size))"
+        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{type}", with: "\(inner)").replacingOccurrences(of: "{inner}", with: "\(innerSerde)").replacingOccurrences(of: "{len}", with: "\(size)"))"
     }
 
     private func mapDefinedSerde(ty: IdlTypeDefined) -> String{
@@ -282,7 +296,7 @@ public class TypeMapper {
         }
         
         if case .publicKey(let publicKey) = ty {
-            return self.mapPrimitiveSerde(ty: publicKey.key, name: name)
+            return self.mapPublicKeySerde(ty: publicKey.key, name: name)
         }
         
         if case .idlTypeArray(let array) = ty {
@@ -339,11 +353,7 @@ public class TypeMapper {
         var renderedImports: [String] = []
         for x in self.localImportsByPath {
             let originPath = x.key
-            let imports = x.value
-            var relPath = fileDir + Path(originPath)
-            if !relPath.isRelative {
-                relPath = Path("./\(relPath)")
-            }
+            let relPath = Path(originPath)
             let importPath = withoutTsExtension(p: relPath.string)
             renderedImports.append("import \(importPath)")
             return renderedImports

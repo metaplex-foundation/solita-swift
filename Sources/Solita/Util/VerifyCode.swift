@@ -41,6 +41,11 @@ struct AnalyzedCode {
     let warnings: [String]
 }
 
+struct BuildedLogCode {
+    let swift: String
+    let output: [String]
+}
+
 func shell(command: String) throws -> [String] {
     let task = Process()
     let pipe = Pipe()
@@ -67,7 +72,7 @@ func shell(command: String) throws -> [String] {
     return output.split(separator: "\n").map{ "\($0)"}
 }
 
-func analyzeCode(swift: String) -> AnalyzedCode {
+func analyzeCode(swift: String, logBuild: Bool = false) -> BuildedLogCode {
     let hash = createHash(s: (swift + UUID().uuidString).data(using: .utf8)!)
     let temporaryFolderURL = URL(fileURLWithPath: NSTemporaryDirectory())
     let tempDir = Path(temporaryFolderURL.path) + Path("\(hash)")
@@ -81,12 +86,13 @@ func analyzeCode(swift: String) -> AnalyzedCode {
     try! swift.write(to: filePath.url, atomically: true, encoding: String.Encoding.utf8)
     try! package.write(to: packagePath.url, atomically: true, encoding: String.Encoding.utf8)
     let output = try! shell(command: "cd \(tempDir.string); swift build")
-    return AnalyzedCode(swift: swift, errors: output.filter{ $0.contains("error")}, warnings: output.filter{ $0.contains("warning") })
+    if logBuild { print(output) }
+    return BuildedLogCode(swift: swift, output: output)
 }
 
 
 func verifySyntacticCorrectness(swift: String) {
-    let hash = createHash(s: swift.data(using: .utf8)!)
+    let hash = createHash(s: (swift + UUID().uuidString).data(using: .utf8)!)
     let filename = "\(hash).swift"
     let temporaryFolderURL = URL(fileURLWithPath: NSTemporaryDirectory())
     let filePath = Path(temporaryFolderURL.path) + Path(filename)

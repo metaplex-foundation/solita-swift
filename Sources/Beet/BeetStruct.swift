@@ -85,7 +85,7 @@ public class BeetStruct<Class>: ScalarFixedSizeBeet {
 }
 
 public class BeetArgsStruct: BeetStruct<Args> {
-    init(fields: [FixedBeetField],
+    public init(fields: [FixedBeetField],
          description: String = "BeetArgsStruct"
     ) {
         super.init(fields: fields) { args in

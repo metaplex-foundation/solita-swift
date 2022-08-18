@@ -20,7 +20,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         for type in types {
             let serde = tm.mapSerde(ty: type)
-            XCTAssert(serde == "Beet.i8", "'\(type)' maps to '\(serde)' serde")
+            XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(i8())))", "'\(type)' maps to '\(serde)' serde")
         }
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde,"did not use fixable serde")
@@ -39,7 +39,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         for type in types {
             let serde = tm.mapSerde(ty: type)
-            XCTAssert(serde == "Beet.u32", "'\(type)' maps to '\(serde)' serde")
+            XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(u32())))", "'\(type)' maps to '\(serde)' serde")
         }
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde,"did not use fixable serde")
@@ -58,7 +58,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         for type in types {
             let serde = tm.mapSerde(ty: type)
-            XCTAssert(serde == "Beet.u128", "'\(type)' maps to '\(serde)' serde")
+            XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(u128())))", "'\(type)' maps to '\(serde)' serde")
         }
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde,"did not use fixable serde")
@@ -77,7 +77,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         for type in types {
             let serde = tm.mapSerde(ty: type)
-            XCTAssert(serde == "Beet.i512", "'\(type)' maps to '\(serde)' serde")
+            XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(i512())))", "'\(type)' maps to '\(serde)' serde")
         }
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde,"did not use fixable serde")
@@ -141,7 +141,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.coption(Beet.u16)", "option<u16> serde")
+        XCTAssert(serde == "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(u16())))))", "option<u16> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(tm.usedFixableSerde, "used fixable serde")
@@ -157,7 +157,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.coption(Beet.u256)", "option<u256> serde")
+        XCTAssert(serde == "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(u256())))))", "option<u256> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(tm.usedFixableSerde, "used fixable serde")
@@ -178,7 +178,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.array(Beet.u16)", "vec<u16> serde")
+        XCTAssert(serde == "Beet.fixableBeat(array(element: Beet.fixedBeet(.init(value: .scalar(u16())))))", "vec<u16> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(tm.usedFixableSerde, "used fixable serde")
@@ -195,7 +195,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.array(Beet.u256)", "vec<u256> serde")
+        XCTAssert(serde == "Beet.fixableBeat(array(element: Beet.fixedBeet(.init(value: .scalar(u256())))))", "vec<u256> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(tm.usedFixableSerde, "used fixable serde")
@@ -215,7 +215,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.uniformFixedSizeArray(Beet.u16, 4)", "array<u16> serde")
+        XCTAssert(serde == "Beet.fixedBeet(.init(value: .collection(UniformFixedSizeArray<UInt16>(element: Beet.fixedBeet(.init(value: .scalar(u16()))), len: 4))))", "array<u16> serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
         XCTAssert(!tm.usedFixableSerde, "did not use fixable serde")
@@ -253,7 +253,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "BeetSolana.publicKey", "publicKey serde")
+        XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
         XCTAssert(!tm.usedFixableSerde, "did not use fixable serde")
     }
@@ -272,7 +272,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.coption(BeetSolana.publicKey)", "publicKey serde")
+        XCTAssert(serde == "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "no localImports used")
@@ -290,7 +290,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.coption(Beet.coption(Beet.u64))", "publicKey serde")
+        XCTAssert(serde == "Beet.fixableBeat(coption(inner: Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(u64())))))))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "no localImports used")
         
@@ -308,7 +308,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.coption(Beet.coption(BeetSolana.publicKey))", "publicKey serde")
+        XCTAssert(serde == "Beet.fixableBeat(coption(inner: Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))))))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
         XCTAssert(tm.localImportsByPath.count == 0, "no localImports used")
@@ -328,7 +328,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.array(Beet.coption(configDataBeet))", "publicKey serde")
+        XCTAssert(serde == "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: configDataBeet))))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         let expectedImports2: Dictionary<String, Set<String>> = ["/module/of/config-data.swift": Set(["configDataBeet"])]
         XCTAssert(tm.localImportsByPath == expectedImports2)
@@ -346,47 +346,23 @@ final class TypeMapperTests: XCTestCase {
         
         let mappedFields = tm.mapSerdeFields(fields: [u16])
         
-        XCTAssert(mappedFields == [TypeMappedSerdeField(name: "u16", type: "Beet.u16")])
+        XCTAssert(mappedFields == [TypeMappedSerdeField(name: "u16", type: "Beet.fixedBeet(.init(value: .scalar(u16())))")])
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde, "did not use fixable serde")
         tm.clearUsages()
-        
-        
     }
     
     func testTypeMapperSerdeFields2() {
-        let u16 = IdlField(name: "u16", type: .beetTypeMapKey(.numbersTypeMapKey(.u16)), attrs: nil)
-        let configData = IdlField(name: "configData", type: .idlTypeDefined(.init(defined: "ConfigData")), attrs: nil)
         let optionPublicKey = IdlField(name: "optionPublicKey", type: .idlTypeOption(.init(option: .publicKey(.keysTypeMapKey(.publicKey)))), attrs: nil)
-        let vecOptionConfigData = IdlField(name: "vecOptionConfigData", type: .idlTypeVec(.init(vec: .idlTypeOption(.init(option: .idlTypeDefined(.init(defined: "ConfigData")))))), attrs: nil)
         let tm = TypeMapper(customTypesPaths: ["ConfigData": "/module/of/config-data.swift"])
         tm.clearUsages()
         
         let mappedFields2 = tm.mapSerdeFields(fields: [optionPublicKey])
-        XCTAssert(mappedFields2 == [TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.coption(BeetSolana.publicKey)")])
+        XCTAssert(mappedFields2 == [TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))))")])
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.usedFixableSerde, "used fixable serde")
         tm.clearUsages()
-        
-        let mappedFields3 = tm.mapSerdeFields(fields: [
-            u16,
-            optionPublicKey,
-            configData,
-            vecOptionConfigData,
-        ])
-        
-        XCTAssert(mappedFields3 == [
-            TypeMappedSerdeField(name: "u16", type: "Beet.u16"),
-            TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.coption(BeetSolana.publicKey)"),
-            TypeMappedSerdeField(name: "configData", type: "configDataBeet"),
-            TypeMappedSerdeField(name: "vecOptionConfigData", type: "Beet.array(Beet.coption(configDataBeet))"),
-        ])
-        XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
-        XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
-        let expectedImports: Dictionary<String, Set<String>> = ["/module/of/config-data.swift": Set(["configDataBeet"])]
-        XCTAssert(tm.localImportsByPath == expectedImports)
-        XCTAssert(tm.usedFixableSerde, "used fixable serde")
     }
     
     func testTypeMapperSerdeFields3() {
@@ -405,10 +381,10 @@ final class TypeMapperTests: XCTestCase {
         ])
         
         XCTAssert(mappedFields3 == [
-            TypeMappedSerdeField(name: "u16", type: "Beet.u16"),
-            TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.coption(BeetSolana.publicKey)"),
+            TypeMappedSerdeField(name: "u16", type: "Beet.fixedBeet(.init(value: .scalar(u16())))"),
+            TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))))"),
             TypeMappedSerdeField(name: "configData", type: "configDataBeet"),
-            TypeMappedSerdeField(name: "vecOptionConfigData", type: "Beet.array(Beet.coption(configDataBeet))"),
+            TypeMappedSerdeField(name: "vecOptionConfigData", type: "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: configDataBeet))))"),
         ])
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
@@ -466,7 +442,7 @@ final class TypeMapperTests: XCTestCase {
         XCTAssert(ty == "Int64")
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.i64")
+        XCTAssert(serde == "Beet.fixedBeet(.init(value: .scalar(i64())))")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(!tm.usedFixableSerde,"did not use fixable serde")
         XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
