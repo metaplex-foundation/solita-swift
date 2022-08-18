@@ -83,6 +83,7 @@ func analyzeCode(swift: String, logBuild: Bool = false) -> BuildedLogCode {
         try! sourcesPath.mkpath()
         FileManager.default.createFile(atPath: filePath.string, contents: nil, attributes: nil)
     }
+    print("Build Location: \(tempDir.string)" )
     try! swift.write(to: filePath.url, atomically: true, encoding: String.Encoding.utf8)
     try! package.write(to: packagePath.url, atomically: true, encoding: String.Encoding.utf8)
     let output = try! shell(command: "cd \(tempDir.string); swift build")

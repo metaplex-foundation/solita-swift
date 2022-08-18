@@ -153,7 +153,7 @@ public class TypeMapper {
         
         if (currentUsed != nil) {
             assert( variants == currentUsed,
-                    "Found two enum variant specs for ${name}, ${variants} and ${currentUsed}"
+                    "Found two enum variant specs for \(name), \(variants) and \(currentUsed)"
             )
         } else {
             self.scalarEnumsUsed[name] = variants
@@ -271,7 +271,8 @@ public class TypeMapper {
         self.updateUsedFixableSerde(ty: mapped)
         
         let exp = serdePackageExportName(pack: arrayPackage)
-        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{type}", with: "\(inner)").replacingOccurrences(of: "{inner}", with: "\(innerSerde)").replacingOccurrences(of: "{len}", with: "\(size)"))"
+        let fixedInnerSerde = "\(innerSerde)".replacingOccurrences(of: "Beet.fixedBeet(", with: "").dropLast()
+        return "\(exp!.rawValue).\(mapped.beet.replacingOccurrences(of: "{type}", with: "\(inner)").replacingOccurrences(of: "{inner}", with: fixedInnerSerde).replacingOccurrences(of: "{len}", with: "\(size)"))"
     }
 
     private func mapDefinedSerde(ty: IdlTypeDefined) -> String{

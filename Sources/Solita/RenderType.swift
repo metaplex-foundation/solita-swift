@@ -33,7 +33,11 @@ public class TypeRenderer {
     
     private func renderSwiftType() -> String {
         if case .idlTypeDataEnum(let de) = ty.type {
-            fatalError("Not implemented")
+            return renderDataEnumRecord(
+                typeMapper: self.typeMapper,
+                typeName: self.ty.name,
+                variants: de.variants
+            )
         }
         
         if case .idlTypeEnum(let e) = ty.type {
@@ -69,7 +73,12 @@ public struct \(upperCamelTyName) {
     // -----------------
     private func renderDataStructOrEnum() -> String {
         if case .idlTypeDataEnum(let de) = ty.type {
-            fatalError("Not implemented")
+            return renderTypeDataEnumBeet(
+                    typeMapper: self.typeMapper,
+                    dataEnum: de,
+                    beetVarName: self.beetArgName,
+                    typeName: self.upperCamelTyName
+            )
         }
         
         if case .idlTypeEnum(let e) = ty.type {
@@ -123,10 +132,10 @@ func beetVarNameFromTypeName(ty: String) -> String {
 }
 
 func upperCamelCase(ty: String) -> String {
-    return ty.lowercased()
-        .split(separator: " ")
+    return ty.split(separator: " ")
+        .map { String($0) }
         .enumerated()
-        .map { $0.element.capitalized}
+        .map { $0.offset > 0 ? $0.element.capitalized : $0.element.lowercased() }
         .joined()
 }
 

@@ -72,4 +72,18 @@ final class RenderTypeTests: XCTestCase {
         XCTAssert(swift.code.contains("import Creator"))
         XCTAssert(swift.code.contains("Beet.fixableBeat(array(element: creatorBeet))"))
     }
+    
+    func testTypeEnumWithInlineData() {
+        let ty = IdlDefinedTypeDefinition(name: "CollectionInfo", type: .idlTypeDataEnum(.init(variants: [
+            .init(name: "V1", fields: [
+                .init(name: "symbol", type: .beetTypeMapKey(.stringTypeMapKey(.string)), attrs: nil),
+                .init(name: "verified_creators", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil),
+                .init(name: "whitelist_root", type: .idlTypeArray(.init(array: [IdlTypeArrayInner(idlType: .beetTypeMapKey(.numbersTypeMapKey(.u8)), size: 2)])), attrs: nil)
+            ]),
+            .init(name: "V2", fields: [
+                .init(name: "collection_mint", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil)
+            ])
+        ])))
+        //checkRenderedType(ty: ty, imports: [.BEET_PACKAGE])
+    }
 }
