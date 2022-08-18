@@ -11,7 +11,7 @@ public class FixedScalarEnum<C>: ScalarFixedSizeBeet where C: CaseIterable & Equ
     public let byteSize: UInt = u8().byteSize
     public let description: String = "Enum"
     private let keys: C.AllCases = C.allCases
-
+    public init() {}
     public func write<T>(buf: inout Data, offset: Int, value: T) {
         if value is Int {
             u8().write(buf: &buf, offset: offset, value: value)
@@ -66,7 +66,7 @@ public class UniformDataEnum<K: CaseIterable & Equatable & RawRepresentable, D: 
     public var description: String
     public let byteSize: UInt
 
-    init(inner: FixedSizeBeet) {
+    public init(inner: FixedSizeBeet) {
         self.inner = inner
         switch inner.value {
         case .scalar(let type):
@@ -129,7 +129,7 @@ public class EnumDataVariantBeet<E: ConstructableWithDiscriminator>: ScalarFixed
     let inner: FixedSizeBeet
     let discriminant: UInt8
 
-    init(inner: FixedSizeBeet, discriminant: UInt8) {
+    public init(inner: FixedSizeBeet, discriminant: UInt8) {
         self.inner = inner
         self.discriminant = discriminant
         switch inner.value {

@@ -18,8 +18,8 @@ public class TypeRenderer {
         self.fullFileDir = fullFileDir
         self.typeMapper = typeMapper
         
-        self.upperCamelTyName = camelCase(ty: ty.name)
-        self.camelTyName = camelCase(ty: ty.name)
+        self.upperCamelTyName = ty.name.first!.uppercased() + ty.name.dropFirst()
+        self.camelTyName = ty.name.first!.lowercased() + ty.name.dropFirst()
         self.beetArgName = beetVarNameFromTypeName(ty: ty.name)
     }
     
@@ -33,7 +33,11 @@ public class TypeRenderer {
     
     private func renderSwiftType() -> String {
         if case .idlTypeDataEnum(let de) = ty.type {
-            fatalError("Not implemented")
+            return renderDataEnumRecord(
+                typeMapper: self.typeMapper,
+                typeName: self.ty.name,
+                variants: de.variants
+            )
         }
         
         if case .idlTypeEnum(let e) = ty.type {
@@ -42,7 +46,7 @@ public class TypeRenderer {
         
         if case .idlDefinedType(let d) = ty.type {
             if d.fields?.count == 0 { return "" }
-            let fields = d.fields!.map{ renderTypeField(field: $0) }.joined(separator: "\n ")
+            let fields = d.fields!.map{ renderTypeField(field: $0) }.joined(separator: "\n    ")
             return
 """
 public struct \(upperCamelTyName) {
@@ -69,7 +73,12 @@ public struct \(upperCamelTyName) {
     // -----------------
     private func renderDataStructOrEnum() -> String {
         if case .idlTypeDataEnum(let de) = ty.type {
-            fatalError("Not implemented")
+            return renderTypeDataEnumBeet(
+                    typeMapper: self.typeMapper,
+                    dataEnum: de,
+                    beetVarName: self.beetArgName,
+                    typeName: self.upperCamelTyName
+            )
         }
         
         if case .idlTypeEnum(let e) = ty.type {
@@ -122,14 +131,13 @@ func beetVarNameFromTypeName(ty: String) -> String {
     return "\(camelTyName)Beet"
 }
 
-func camelCase(ty: String) -> String {
-    return ty.lowercased()
-        .split(separator: " ")
+func upperCamelCase(ty: String) -> String {
+    return ty.split(separator: " ")
+        .map { String($0) }
         .enumerated()
-        .map { $0.element.capitalized}
+        .map { $0.offset > 0 ? $0.element.capitalized : $0.element.lowercased() }
         .joined()
 }
-
 
 public func renderType(
   ty: IdlDefinedTypeDefinition,

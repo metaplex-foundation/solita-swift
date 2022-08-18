@@ -13,5 +13,5 @@ public enum AliasesTypeMapKey: String {
 public typealias AliasesTypeMap = (AliasesTypeMapKey, SupportedTypeDefinition)
 
 public let aliasesTypeMap: [AliasesTypeMap] = [
-    (AliasesTypeMapKey.Uint8Array, SupportedTypeDefinition(beet: "uint8Array", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
+    (AliasesTypeMapKey.Uint8Array, SupportedTypeDefinition(beet: "fixableBeat(Uint8Array())", isFixable: true, sourcePack: BEET_PACKAGE, swift: "Data", arg: BeetTypeArg.len)),
 ]

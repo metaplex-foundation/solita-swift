@@ -75,5 +75,5 @@ public typealias StringTypeMap = (StringTypeMapKey, SupportedTypeDefinition)
 
 public let stringTypeMap: [StringTypeMap] = [
     (StringTypeMapKey.string, SupportedTypeDefinition(beet: "fixableBeat(Utf8String())", isFixable: true, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len)),
-    (StringTypeMapKey.fixedSizeString, SupportedTypeDefinition(beet: "fixedBeet(FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: UInt(%s))))))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len))
+    (StringTypeMapKey.fixedSizeString, SupportedTypeDefinition(beet: "fixedBeet(FixedSizeBeet(value: .collection(FixedSizeUtf8String(stringByteLength: {len}))))))", isFixable: false, sourcePack: BEET_PACKAGE, swift: "String", arg: BeetTypeArg.len))
 ]
