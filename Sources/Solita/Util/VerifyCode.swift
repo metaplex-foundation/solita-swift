@@ -3,6 +3,12 @@ import PathKit
 import CommonCrypto
 import XCTest
 
+let swiftlint =
+"""
+disabled_rules:
+  - identifier_name
+"""
+
 let package =
 """
 // swift-tools-version: 5.5.0
@@ -97,11 +103,13 @@ func verifySyntacticCorrectness(swift: String) {
     let filename = "\(hash).swift"
     let temporaryFolderURL = URL(fileURLWithPath: NSTemporaryDirectory())
     let filePath = Path(temporaryFolderURL.path) + Path(filename)
+    let swiftLintPath = Path(temporaryFolderURL.path) + Path(".swiftlint.yml")
     if !FileManager.default.fileExists(atPath: filePath.string) {
         FileManager.default.createFile(atPath: filePath.string, contents: nil, attributes: nil)
     }
     try! swift.write(to: filePath.url, atomically: true, encoding: String.Encoding.utf8)
-    
+    try! swiftlint.write(to: swiftLintPath.url, atomically: true, encoding: String.Encoding.utf8)
+
     let output = try! shell(command: "/opt/homebrew/bin/swiftlint lint \(filePath.string)")
     let analizedCode = AnalyzedCode(swift: swift, errors: output.filter{ $0.contains("error")}, warnings: output.filter{ $0.contains("warning") })
     
