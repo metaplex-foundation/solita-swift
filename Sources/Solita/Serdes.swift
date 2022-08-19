@@ -180,9 +180,9 @@ public func renderTypeDataStruct(
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     if isFixable {
-        return renderTypeDataFixableBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName, isFixable: isFixable)
+        return renderTypeDataFixableBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
     } else {
-        return renderTypeDataBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName, isFixable: isFixable)
+        return renderTypeDataBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
     }
 }
 
@@ -190,8 +190,7 @@ public func renderTypeDataStruct(
 func renderTypeDataFixableBeetArgsStruct(
     fields: [TypeMappedSerdeField],
     beetVarName: String,
-    typeName: String,
-    isFixable: Bool
+    typeName: String
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
@@ -207,8 +206,7 @@ public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
 func renderTypeDataBeetArgsStruct(
     fields: [TypeMappedSerdeField],
     beetVarName: String,
-    typeName: String,
-    isFixable: Bool
+    typeName: String
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
