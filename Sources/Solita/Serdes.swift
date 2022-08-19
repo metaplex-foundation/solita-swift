@@ -17,9 +17,9 @@ public enum SerdePackage: RawRepresentable {
     }
     public var rawValue: String {
         switch self {
-            case .BEET_PACKAGE: return BEET_PACKAGE_STRING
-            case .BEET_SOLANA_PACKAGE: return BEET_SOLANA_PACKAGE_STRING
-            case .SOLANA_WEB3_PACKAGE: return SOLANA_WEB3_PACKAGE_STRING
+        case .BEET_PACKAGE: return BEET_PACKAGE_STRING
+        case .BEET_SOLANA_PACKAGE: return BEET_SOLANA_PACKAGE_STRING
+        case .SOLANA_WEB3_PACKAGE: return SOLANA_WEB3_PACKAGE_STRING
         }
     }
 }
@@ -27,7 +27,7 @@ public enum SerdePackageExportName: RawRepresentable {
     case BEET_EXPORT_NAME
     case BEET_SOLANA_EXPORT_NAME
     case SOLANA_WEB3_EXPORT_NAME
-
+    
     public typealias RawValue = String
     public init?(rawValue: String) {
         switch rawValue{
@@ -39,9 +39,9 @@ public enum SerdePackageExportName: RawRepresentable {
     }
     public var rawValue: String {
         switch self {
-            case .BEET_EXPORT_NAME: return BEET_EXPORT_NAME_STRING
-            case .BEET_SOLANA_EXPORT_NAME: return BEET_SOLANA_EXPORT_NAME_STRING
-            case .SOLANA_WEB3_EXPORT_NAME: return SOLANA_WEB3_EXPORT_NAME_STRING
+        case .BEET_EXPORT_NAME: return BEET_EXPORT_NAME_STRING
+        case .BEET_SOLANA_EXPORT_NAME: return BEET_SOLANA_EXPORT_NAME_STRING
+        case .SOLANA_WEB3_EXPORT_NAME: return SOLANA_WEB3_EXPORT_NAME_STRING
         }
     }
 }
@@ -82,6 +82,95 @@ func assertKnownSerdePackage(
     )
 }
 
+// -----------------
+// Rendering processed serdes to struct
+// -----------------
+
+public func renderField(field: TypeMappedSerdeField?, addSeparator: Bool = false) -> String{
+    let sep = addSeparator ? "," : ""
+    return field == nil ? "" : "(\"\(field!.name)\", \(field!.type))\(sep)"
+}
+
+public func renderFields(fields: [TypeMappedSerdeField]?) -> String {
+    return fields == nil || fields!.count == 0 ? "" : fields!.map{ renderField(field: $0) }.joined(separator: ",\n    ")
+}
+
+/**
+ * Renders DataStruct for Instruction Args and Account Args
+ */
+public func serdeRenderDataStruct(
+    discriminatorName: String?,
+    discriminatorField: TypeMappedSerdeField?,
+    discriminatorType: String?,
+    paddingField: (name: String, size: Int)?,
+    fields: [TypeMappedSerdeField],
+    structVarName: String,
+    className: String?,
+    argsTypename: String,
+    isFixable: Bool
+) -> String {
+    
+    let fieldDecls = renderFields(fields: fields)
+    let discriminatorDecl = renderField(field: discriminatorField, addSeparator: true)
+    let discriminatorType = discriminatorType ?? "[UInt8]"
+    var extraFields: [String] = []
+    if let discriminatorName = discriminatorName {
+        extraFields.append("\(discriminatorName): \(discriminatorType)")
+    }
+    
+    if let paddingField = paddingField {
+        extraFields.append(
+            "\(paddingField.name): [UInt8] /* size: \(paddingField.size) */"
+        )
+    }
+    let structType =
+    fields.count == 0 ? "{ \(extraFields.joined(separator: "\n    ")) }"
+    : extraFields.count == 0 ? argsTypename
+    : """
+\(argsTypename) & {
+          \(extraFields.joined(separator: "\n      "))
+      }
+"""
+    
+    // -----------------
+    // Beet Struct (Account)
+    // -----------------
+    if let className = className {
+        let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
+        return
+"""
+public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<
+    \(className),
+    \(structType)
+    >(
+    fields:[
+            \(discriminatorDecl)
+            \(fieldDecls)
+        ],
+         \(className).fromArgs,
+    \"\(className)\"
+    )
+"""
+        
+    } else {
+        let beetArgsStructType = isFixable
+        ? "FixableBeetArgsStruct"
+        : "BeetArgsStruct"
+        // -----------------
+        // Beet Args Struct (Instruction)
+        // -----------------
+        return """
+public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetArgsStructType)<\(structType)>(
+            fields: [
+                \(discriminatorDecl)
+                \(fieldDecls)
+            ],
+            description: "\(argsTypename)"
+        )
+"""
+    }
+}
+
 /**
  * Renders DataStruct for user defined types
  */
@@ -109,8 +198,8 @@ func renderTypeDataFixableBeetArgsStruct(
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
     let beetArgsStructType = "FixableBeetArgsStruct"
-
-return """
+    
+    return """
 public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
     \(fieldDecls)
 ], description: "\(typeName)")
@@ -126,8 +215,8 @@ func renderTypeDataBeetArgsStruct(
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
     let beetArgsStructType = "BeetArgsStruct"
-
-return """
+    
+    return """
 public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
     \(fieldDecls)
 ], description: "\(typeName)")

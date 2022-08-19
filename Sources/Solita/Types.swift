@@ -64,6 +64,13 @@ public struct TypeMappedSerdeField: Equatable{
     let type: String
 }
 
+public func isIdlInstructionAccountWithDesc(
+  ty: ProcessedAccountKey
+) -> Bool {
+  return ty.desc == "string"
+}
+
+
 public let BEET_PACKAGE_STRING = "Beet"
 public let BEET_SOLANA_PACKAGE_STRING = "BeetSolana"
 public let SOLANA_WEB3_PACKAGE_STRING = "Solana"

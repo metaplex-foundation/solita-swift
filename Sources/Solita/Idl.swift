@@ -59,8 +59,8 @@ public struct IdlEventField: Decodable {
 
 public struct IdlInstruction: Decodable {
     let name: String
-    let accounts: [IdlInstructionAccountType]
-    let args: [IdlInstructionArg]
+    let accounts: [IdlInstructionAccount]
+    let args: [IdlField]
 }
 
 public struct IdlState: Decodable {
@@ -88,7 +88,15 @@ public enum IdlInstructionAccountType: Decodable {
     }
 }
 
-public struct IdlInstructionAccount: Decodable {
+protocol IdlInstructionAccountProtocol {
+    var name: String { get }
+    var isMut: Bool { get }
+    var isSigner: Bool { get }
+    var desc: String? { get }
+    var optional: Bool? { get }
+}
+
+public struct IdlInstructionAccount: IdlInstructionAccountProtocol & Decodable{
     let name: String
     let isMut: Bool
     let isSigner: Bool
