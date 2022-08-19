@@ -110,12 +110,12 @@ public struct \(self.argsTypename){
             return
 """
     Account.Meta(
-        publicKey: \(pubkey),
-        isSigner: \(processedKeys.isSigner),
-        isWritable: \(processedKeys.isMut)
-    )
+            publicKey: \(pubkey),
+            isSigner: \(processedKeys.isSigner),
+            isWritable: \(processedKeys.isMut)
+        )
 """
-        }.joined(separator: ",\n    ")
+        }.joined(separator: ",\n")
         var optionalKeys: String
         if optionals.count > 0 {
             optionalKeys = optionals.indices.map { index -> String in
@@ -139,14 +139,13 @@ if accounts.\(key.name) != nil {
         )
     )
 }
-
 """
             }
             .joined(separator: "\n" ) + "\n"
         } else {
             optionalKeys = ""
         }
-        return "[\n    \(requiredKeys)\n  ]\n\(optionalKeys)\n"
+        return "[\n    \(requiredKeys)\n    ]\n\(optionalKeys)"
     }
     
     private func renderAccountsType(processedKeys: [ProcessedAccountKey]) -> String {

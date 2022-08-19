@@ -10,7 +10,7 @@ public class InstructionDiscriminator {
         self.typeMapper = typeMapper
     }
     public func renderValue() -> String {
-        return instructionDiscriminator(name: self.ix.name).bytes.map{ "\($0)" }.joined()
+        return "[ \(instructionDiscriminator(name: self.ix.name).bytes) ]"
      }
     
     public func getField() -> IdlField {
