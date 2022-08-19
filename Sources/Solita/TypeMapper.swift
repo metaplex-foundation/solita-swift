@@ -236,13 +236,12 @@ public class TypeMapper {
         return fields.map(self.mapSerdeField)
     }
     
-    fileprivate func mapSerdeField(
+    public func mapSerdeField(
         field: IdlField
       ) -> TypeMappedSerdeField {
           let ty = self.mapSerde(ty: field.type, name: field.name)
           return TypeMappedSerdeField(name: field.name, type: ty)
     }
-
     
     private func mapEnumSerde(ty: IdlTypeScalarEnum, name: String) -> String {
         assert(

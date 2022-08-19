@@ -60,7 +60,7 @@ public class BeetStruct<Class>: ScalarFixedSizeBeet {
      *
      * @returns `[instance of Class, offset into buffer after deserialization completed]`
      */
-    func deserialize(buffer: Data, offset: Int = 0) -> (Class, Int) {
+    public func deserialize(buffer: Data, offset: Int = 0) -> (Class, Int) {
         let reader = BeetReader(buffer: buffer, offset: offset)
         let args = reader.readStruct(fields: self.fields) as Args
         return (self.construct(args), reader.offset())
@@ -73,13 +73,13 @@ public class BeetStruct<Class>: ScalarFixedSizeBeet {
      * @param byteSize allows to override the size fo the created Buffer and
      * defaults to the size of the struct to serialize
      */
-    func serialize(instance: Class, byteSize: Int?=nil) -> (Data, Int) {
+    public func serialize(instance: Class, byteSize: Int?=nil) -> (Data, Int) {
         let writer = BeetWriter(byteSize: byteSize ?? Int(self.byteSize))
         writer.writeStruct(instance: instance, fields: self.fields)
         return (writer.buffer(), writer.offset())
     }
 
-    func type() -> String {
+    public func type() -> String {
         return TYPE
     }
 }
