@@ -92,7 +92,7 @@ public func renderField(field: TypeMappedSerdeField?, addSeparator: Bool = false
 }
 
 public func renderFields(fields: [TypeMappedSerdeField]?) -> String {
-    return fields == nil || fields!.count == 0 ? "" : fields!.map{ renderField(field: $0) }.joined(separator: ",\n    ")
+    return fields == nil || fields!.count == 0 ? "" : fields!.map { renderField(field: $0) }.joined(separator: ",\n    ")
 }
 
 /**
@@ -125,21 +125,14 @@ public func serdeRenderDataStruct(
     }
     let structType =
     fields.count == 0 ? "{ \(extraFields.joined(separator: "\n    ")) }"
-    : extraFields.count == 0 ? argsTypename
-    : """
-\(argsTypename) & {
-          \(extraFields.joined(separator: "\n      "))
-      }
-"""
+    : extraFields.count == 0 ? "{ \(argsTypename) }"
+    : "{ \(argsTypename) \(extraFields.joined(separator: "\n      ")) } "
     
-    // -----------------
-    // Beet Struct (Account)
-    // -----------------
     if let className = className {
         let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
         return
 """
-public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<\(className)>(
+public let \(structVarName) = \(beetStructType)<\(className)>(
     fields:[
             \(discriminatorDecl)
             \(fieldDecls)
@@ -150,25 +143,41 @@ public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<\(cla
 """
         
     } else {
-        let beetArgsStructType = isFixable ? "FixableBeetArgsStruct": "BeetArgsStruct"
-        // -----------------
-        // Beet Args Struct (Instruction)
-        // -----------------
-        return """
-
-public struct \(argsTypename) \(structType)
-
-public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
-            fields: [
-                \(discriminatorDecl)
-                \(fieldDecls)
-            ],
-            description: "\(argsTypename)"
-        )
+        if isFixable {
+            let beetArgsStructType = "FixableBeetArgsStruct"
+            
+            return
 """
+public struct \(argsTypename) \(structType)
+public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
+        fields: [
+            \(discriminatorDecl)
+            \(fieldDecls)
+        ],
+        description: "\(argsTypename)"
+    )
+"""
+        } else {
+            let beetArgsStructType = "BeetArgsStruct"
+            
+            return
+"""
+public struct \(argsTypename) \(structType)
+public let \(structVarName) = \(beetArgsStructType)(
+        fields: [
+            \(pureFixable(type: discriminatorDecl))
+            \(pureFixable(type: fieldDecls))
+        ],
+        description: "\(argsTypename)"
+    )
+"""
+        }
+        
     }
 }
-
+func pureFixable(type: String) -> String {
+    return String(type.replacingOccurrences(of: "Beet.fixedBeet", with: ""))
+}
 /**
  * Renders DataStruct for user defined types
  */
