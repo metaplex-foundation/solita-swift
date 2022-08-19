@@ -115,12 +115,12 @@ public func serdeRenderDataStruct(
     let discriminatorType = discriminatorType ?? "[UInt8]"
     var extraFields: [String] = []
     if let discriminatorName = discriminatorName {
-        extraFields.append("\(discriminatorName): \(discriminatorType)")
+        extraFields.append("let \(discriminatorName): \(discriminatorType)")
     }
     
     if let paddingField = paddingField {
         extraFields.append(
-            "\(paddingField.name): [UInt8] /* size: \(paddingField.size) */"
+            "let \(paddingField.name): [UInt8] /* size: \(paddingField.size) */"
         )
     }
     let structType =
@@ -139,10 +139,7 @@ public func serdeRenderDataStruct(
         let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
         return
 """
-public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<
-    \(className),
-    \(structType)
-    >(
+public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<\(className)>(
     fields:[
             \(discriminatorDecl)
             \(fieldDecls)
@@ -153,14 +150,15 @@ public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetStructType)<
 """
         
     } else {
-        let beetArgsStructType = isFixable
-        ? "FixableBeetArgsStruct"
-        : "BeetArgsStruct"
+        let beetArgsStructType = isFixable ? "FixableBeetArgsStruct": "BeetArgsStruct"
         // -----------------
         // Beet Args Struct (Instruction)
         // -----------------
         return """
-public let \(structVarName) = \(BEET_EXPORT_NAME_STRING).\(beetArgsStructType)<\(structType)>(
+
+public struct \(argsTypename) \(structType)
+
+public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
             fields: [
                 \(discriminatorDecl)
                 \(fieldDecls)

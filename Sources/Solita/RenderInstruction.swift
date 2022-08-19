@@ -263,7 +263,7 @@ if accounts.\(key.name) != nil {
         if ix.args.count > 0 {
             createInstructionArgsComment = "\n  * @param args to provide as instruction data to the program\n * "
             createInstructionArgs = "args: \(self.argsTypename)"
-            createInstructionArgsSpread = "...args"
+            createInstructionArgsSpread = self.ix.args.map { renderIxArgField(arg: $0) }.joined(separator: ",\n  ")
             comma = ", "
         }
         
@@ -286,20 +286,18 @@ if accounts.\(key.name) != nil {
      * @category generated
      */
     public func create\(self.upperCamelIxName)Instruction(
-           \(accountsArg)
-           \(createInstructionArgs)
-           \(programIdArg)
+           \(accountsArg)\(createInstructionArgs)\(programIdArg)
     ) -> TransactionInstruction {
 
-      let data = \(self.structArgName).serialize(
-        instructionDiscriminator: \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? "": ",\n")\(createInstructionArgsSpread)
+    let data = \(self.structArgName).serialize(
+            instance: [ "instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)]
     )
 
     let keys: [Account.Meta] = \(keys)
     let ix = TransactionInstruction(
                 keys: keys,
                 programId: programId,
-                data: data
+                data: data.0.bytes
             )
     return ix
 }
