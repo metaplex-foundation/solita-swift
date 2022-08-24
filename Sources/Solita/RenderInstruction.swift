@@ -55,9 +55,22 @@ public class InstructionRenderer {
         return "\(arg.name): \(swiftType)"
     }
     
-    private func renderIxArgsType() -> String {
-        if self.ix.args.count == 0 { return "" }
-        let fields = self.ix.args.map { renderIxArgField(arg: $0) }.joined(separator: ",\n  ")
+    private func renderIxPropertyField(arg: IdlField) -> String {
+        let swiftType = self.typeMapper.map(ty: arg.type, name: arg.name)
+        return "let \(arg.name): \(swiftType)"
+    }
+    
+    private func renderIxArgsType(
+        discriminatorName: String?,
+        discriminatorField: TypeMappedSerdeField?,
+        discriminatorType: String?
+) -> String {
+        let fields = self.ix.args.map { renderIxPropertyField(arg: $0) }.joined(separator: ",\n  ")
+        let discriminatorDecl = renderField(field: discriminatorField, addSeparator: true)
+        let discriminatorType = discriminatorType ?? "[UInt8]"
+        let discriminatorField = self.typeMapper.mapSerdeField(
+            field: self.instructionDiscriminator.getField()
+        )
         
         let code =
 """
@@ -67,7 +80,8 @@ public class InstructionRenderer {
  * @category generated
  */
 public struct \(self.argsTypename){
-  \(fields)
+    let instructionDiscriminator: \(discriminatorType)
+    \(fields)
 }
 """
         return code
@@ -238,7 +252,6 @@ if accounts.\(key.name) != nil {
     
     public func render() -> String {
         self.typeMapper.clearUsages()
-        let ixArgType = self.renderIxArgsType()
         let processedKeys = self.processIxAccounts()
         let accountsType = self.renderAccountsType(processedKeys: processedKeys)
         
@@ -254,6 +267,12 @@ if accounts.\(key.name) != nil {
         
         let imports = self.renderImports(processedKeys: processedKeys)
         
+        let discriminatorField = self.typeMapper.mapSerdeField(
+            field: self.instructionDiscriminator.getField()
+        )
+        let discriminatorType = self.instructionDiscriminator.renderType()
+        let ixArgType = self.renderIxArgsType(discriminatorName: self.instructionDiscriminatorName, discriminatorField: discriminatorField, discriminatorType: discriminatorType)
+
         var createInstructionArgsComment: String = ""
         var createInstructionArgs: String = ""
         var createInstructionArgsSpread: String = ""
@@ -262,7 +281,7 @@ if accounts.\(key.name) != nil {
         if ix.args.count > 0 {
             createInstructionArgsComment = "\n  * @param args to provide as instruction data to the program\n * "
             createInstructionArgs = "args: \(self.argsTypename)"
-            createInstructionArgsSpread = self.ix.args.map { renderIxArgField(arg: $0) }.joined(separator: ",\n  ")
+            createInstructionArgsSpread = self.ix.args.map { "\"\($0.name)\": args.\($0.name)" }.joined(separator: ",\n  ")
             comma = ", "
         }
         
@@ -289,7 +308,7 @@ if accounts.\(key.name) != nil {
     ) -> TransactionInstruction {
 
     let data = \(self.structArgName).serialize(
-            instance: [ "instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)]
+            instance: ["instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)],  byteSize: nil
     )
 
     let keys: [Account.Meta] = \(keys)

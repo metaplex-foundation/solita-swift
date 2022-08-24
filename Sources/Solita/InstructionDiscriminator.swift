@@ -10,7 +10,7 @@ public class InstructionDiscriminator {
         self.typeMapper = typeMapper
     }
     public func renderValue() -> String {
-        return "[ \(instructionDiscriminator(name: self.ix.name).bytes) ]"
+        return "\(instructionDiscriminator(name: self.ix.name).bytes) as [UInt8]"
      }
     
     public func getField() -> IdlField {

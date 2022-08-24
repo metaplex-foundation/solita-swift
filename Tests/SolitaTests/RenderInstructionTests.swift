@@ -15,7 +15,7 @@ struct Ops {
 func checkRenderedIx(
     ix: IdlInstruction,
     imports: [SerdePackage],
-    ops: Ops=Ops(logImports: DIAGNOSTIC_ON, logCode: DIAGNOSTIC_ON, verify: false, lineNumbers: false)
+    ops: Ops=Ops(logImports: DIAGNOSTIC_ON, logCode: DIAGNOSTIC_ON, verify: true, lineNumbers: false)
 ) {
     let swift = renderInstruction(
         ix: ix,
@@ -40,6 +40,7 @@ func checkRenderedIx(
     if ops.verify {
         verifySyntacticCorrectness(swift: swift)
         let analyzed = analyzeCode(swift: swift)
+        XCTAssert(analyzed.output.last!.contains("Build complete!"))
     }
 }
 
@@ -49,6 +50,18 @@ final class RenderInstructionTests: XCTestCase {
         let ix = IdlInstruction(name: "empyArgs", accounts: [
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
         ], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxEmptyArgEemptyAccounts() {
+        let ix = IdlInstruction(name: "empyArgs", accounts: [], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxOneArgArgs() {
+        let ix = IdlInstruction(name: "oneArg", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
+        ], args: [.init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil)])
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
 }
