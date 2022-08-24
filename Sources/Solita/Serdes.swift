@@ -123,10 +123,6 @@ public func serdeRenderDataStruct(
             "let \(paddingField.name): [UInt8] /* size: \(paddingField.size) */"
         )
     }
-    let structType =
-    fields.count == 0 ? "{ \(extraFields.joined(separator: "\n    ")) }"
-    : extraFields.count == 0 ? "{ \(argsTypename) }"
-    : "{ \(argsTypename) \(extraFields.joined(separator: "\n      ")) } "
     
     if let className = className {
         let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
@@ -134,50 +130,29 @@ public func serdeRenderDataStruct(
 """
 public let \(structVarName) = \(beetStructType)<\(className)>(
     fields:[
-            \(discriminatorDecl)
-            \(fieldDecls)
-        ],
-         \(className).fromArgs,
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    \(className).fromArgs,
     \"\(className)\"
-    )
+)
 """
         
     } else {
-        if isFixable {
-            let beetArgsStructType = "FixableBeetArgsStruct"
-            
-            return
+        let beetArgsStructType = "FixableBeetArgsStruct"
+        return
 """
-public struct \(argsTypename) \(structType)
 public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
-        fields: [
-            \(discriminatorDecl)
-            \(fieldDecls)
-        ],
-        description: "\(argsTypename)"
-    )
-"""
-        } else {
-            let beetArgsStructType = "BeetArgsStruct"
-            
-            return
-"""
-public struct \(argsTypename) \(structType)
-public let \(structVarName) = \(beetArgsStructType)(
-        fields: [
-            \(pureFixable(type: discriminatorDecl))
-            \(pureFixable(type: fieldDecls))
-        ],
-        description: "\(argsTypename)"
-    )
-"""
-        }
-        
+    fields: [
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    description: "\(argsTypename)"
+)
+"""        
     }
 }
-func pureFixable(type: String) -> String {
-    return String(type.replacingOccurrences(of: "Beet.fixedBeet", with: ""))
-}
+
 /**
  * Renders DataStruct for user defined types
  */

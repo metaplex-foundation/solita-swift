@@ -55,10 +55,18 @@ public class InstructionRenderer {
         return "\(arg.name): \(swiftType)"
     }
     
-    private func renderIxArgsType() -> String {
-        if self.ix.args.count == 0 { return "" }
-        let fields = self.ix.args.map { renderIxArgField(arg: $0) }.joined(separator: ",\n  ")
-        
+    private func renderIxPropertyField(arg: IdlField) -> String {
+        let swiftType = self.typeMapper.map(ty: arg.type, name: arg.name)
+        return "let \(arg.name): \(swiftType)"
+    }
+    
+    private func renderIxArgsType(
+        discriminatorName: String?,
+        discriminatorField: TypeMappedSerdeField?,
+        discriminatorType: String?
+) -> String {
+        let fields = self.ix.args.map { renderIxPropertyField(arg: $0) }.joined(separator: "\n    ")
+        let discriminatorType = discriminatorType ?? "[UInt8]"
         let code =
 """
 /**
@@ -67,7 +75,8 @@ public class InstructionRenderer {
  * @category generated
  */
 public struct \(self.argsTypename){
-  \(fields)
+    let instructionDiscriminator: \(discriminatorType)
+    \(fields)
 }
 """
         return code
@@ -115,30 +124,30 @@ public struct \(self.argsTypename){
             isWritable: \(processedKeys.isMut)
         )
 """
-        }.joined(separator: ",\n")
+        }.joined(separator: ",\n    ")
         var optionalKeys: String
         if optionals.count > 0 {
             optionalKeys = optionals.indices.map { index -> String in
-                let key = processedKeys[index]
+                let key = optionals[index]
                 let requiredOptionals = optionals[0..<index]
                 let requiredChecks = requiredOptionals
                     .map { "accounts.\($0.name) == nil" }
                     .joined(separator: " || ")
                 
-                let checkRequireds = requiredChecks.count > 0 ? "if \(requiredChecks) { fatalError(\"When providing \(key.name)\" \(requiredOptionals.map{ "accounts.\($0.name)"}.joined(separator: ", ")) need(s) to be provided as well.\") }" : ""
+                let checkRequireds = requiredChecks.count > 0 ? "if \(requiredChecks) { fatalError(\"When providing \(key.name) \(requiredOptionals.map{ "accounts.\($0.name)"}.joined(separator: ", ")) need(s) to be provided as well.\") }" : ""
                 
                 return
 """
-if accounts.\(key.name) != nil {
-    \(checkRequireds)
-    keys.append(
-        Account.Meta(
-            publicKey: accounts.\(key.name),
-            isSigner: \(key.isSigner),
-            isWritable: \(key.isMut)
+    if accounts.\(key.name) != nil {
+        \(checkRequireds)
+        keys.append(
+            Account.Meta(
+                publicKey: accounts.\(key.name)!,
+                isSigner: \(key.isSigner),
+                isWritable: \(key.isMut)
+            )
         )
-    )
-}
+    }
 """
             }
             .joined(separator: "\n" ) + "\n"
@@ -156,7 +165,7 @@ if accounts.\(key.name) != nil {
             }
             let optional = key.optional == true ? "?" : ""
             return "let \(key.name): PublicKey\(optional)"
-        }.joined(separator: "\n")
+        }.joined(separator: "\n        ")
         
         let propertyComments = processedKeys
             .filter { !isKnownPubkey(id: $0.name) }
@@ -170,21 +179,21 @@ if accounts.\(key.name) != nil {
                 return ("* @property [\(attrs.joined(separator: ", "))] " + "\(key.name)\(optional)\(desc) ")
             }
         
-        let properties = propertyComments.count > 0 ? "\n *\n  \(propertyComments.joined(separator: "\n")) " : ""
+        let properties = propertyComments.count > 0 ? "\n*\n\(propertyComments.joined(separator: "\n")) " : ""
         let docs = """
 /**
- * Accounts required by the _\(self.ix.name)_ instruction\(properties)
- * @category Instructions
- * @category \(self.upperCamelIxName)
- * @category generated
- */
+* Accounts required by the _\(self.ix.name)_ instruction\(properties)
+* @category Instructions
+* @category \(self.upperCamelIxName)
+* @category generated
+*/
 """
         return
 """
 \(docs)
-    public struct \(self.accountsTypename) {
+public struct \(self.accountsTypename) {
         \(fields)
-    }
+}
 """
     }
     
@@ -192,8 +201,8 @@ if accounts.\(key.name) != nil {
         if processedKeys.count == 0 { return "  *" }
         return
 """
-    *
-    * @param accounts that will be accessed while the instruction is processed
+     *
+     * @param accounts that will be accessed while the instruction is processed
 """
     }
     
@@ -238,7 +247,6 @@ if accounts.\(key.name) != nil {
     
     public func render() -> String {
         self.typeMapper.clearUsages()
-        let ixArgType = self.renderIxArgsType()
         let processedKeys = self.processIxAccounts()
         let accountsType = self.renderAccountsType(processedKeys: processedKeys)
         
@@ -254,6 +262,12 @@ if accounts.\(key.name) != nil {
         
         let imports = self.renderImports(processedKeys: processedKeys)
         
+        let discriminatorField = self.typeMapper.mapSerdeField(
+            field: self.instructionDiscriminator.getField()
+        )
+        let discriminatorType = self.instructionDiscriminator.renderType()
+        let ixArgType = self.renderIxArgsType(discriminatorName: self.instructionDiscriminatorName, discriminatorField: discriminatorField, discriminatorType: discriminatorType)
+
         var createInstructionArgsComment: String = ""
         var createInstructionArgs: String = ""
         var createInstructionArgsSpread: String = ""
@@ -262,10 +276,10 @@ if accounts.\(key.name) != nil {
         if ix.args.count > 0 {
             createInstructionArgsComment = "\n  * @param args to provide as instruction data to the program\n * "
             createInstructionArgs = "args: \(self.argsTypename)"
-            createInstructionArgsSpread = self.ix.args.map { renderIxArgField(arg: $0) }.joined(separator: ",\n  ")
+            createInstructionArgsSpread = self.ix.args.map { "\"\($0.name)\": args.\($0.name)" }.joined(separator: ",\n  ")
             comma = ", "
         }
-        
+        let optionals = processedKeys.filter{ $0.optional == true }.count
         let programIdArg = "\(comma)programId: PublicKey=\(self.programIdPubkey)"
         return
 """
@@ -275,24 +289,22 @@ if accounts.\(key.name) != nil {
 \(argsStructType)
 \(accountsType)
 
-    public let \(self.instructionDiscriminatorName) = \(instructionDisc)
+public let \(self.instructionDiscriminatorName) = \(instructionDisc)
 
-    /**
-     * Creates a _\(self.upperCamelIxName)_ instruction.
+/**
+* Creates a _\(self.upperCamelIxName)_ instruction.
 \(accountsParamDoc)\(createInstructionArgsComment)
-     * @category Instructions
-     * @category \(self.upperCamelIxName)
-     * @category generated
-     */
-    public func create\(self.upperCamelIxName)Instruction(
-           \(accountsArg)\(createInstructionArgs)\(programIdArg)
-    ) -> TransactionInstruction {
+* @category Instructions
+* @category \(self.upperCamelIxName)
+* @category generated
+*/
+public func create\(self.upperCamelIxName)Instruction(\(accountsArg)\(createInstructionArgs)\(programIdArg)) -> TransactionInstruction {
 
     let data = \(self.structArgName).serialize(
-            instance: [ "instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)]
+            instance: ["instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)],  byteSize: nil
     )
 
-    let keys: [Account.Meta] = \(keys)
+    \((optionals > 0) ? "var" : "let") keys: [Account.Meta] = \(keys)
     let ix = TransactionInstruction(
                 keys: keys,
                 programId: programId,
