@@ -274,18 +274,7 @@ public indirect enum IdlType: Decodable {
             return beetType.key
         case .publicKey(let publicKey):
             return publicKey.key
-        case .idlTypeDefined(_):
-            fatalError("Not implemented")
-        case .idlTypeOption(_):
-            fatalError("Not implemented")
-        case .idlTypeVec(_):
-            fatalError("Not implemented")
-        case .idlTypeArray(_):
-            fatalError("Not implemented")
-        case .idlTypeEnum(_):
-            fatalError("Not implemented")
-        case .idlTypeDataEnum(_):
-            fatalError("Not implemented")
+        default: return ""
         }
     }
 }

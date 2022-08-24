@@ -102,7 +102,7 @@ public func serdeRenderDataStruct(
     discriminatorName: String?,
     discriminatorField: TypeMappedSerdeField?,
     discriminatorType: String?,
-    paddingField: (name: String, size: Int)?,
+    paddingField: PaddingField?,
     fields: [TypeMappedSerdeField],
     structVarName: String,
     className: String?,
@@ -126,18 +126,19 @@ public func serdeRenderDataStruct(
     
     if let className = className {
         let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
-        return
+        let renderedStruct =
 """
 public let \(structVarName) = \(beetStructType)<\(className)>(
     fields:[
         \(discriminatorDecl)
         \(fieldDecls)
     ],
-    \(className).fromArgs,
-    \"\(className)\"
+    construct: \(className).fromArgs,
+    description: \"\(className)\"
 )
 """
-        
+        if !isFixable { return renderedStruct.replacingOccurrences(of: "Beet.fixedBeet", with: "")} // Hack to avoid havinf the Beet.fixedBeet on all the types
+        return renderedStruct
     } else {
         let beetArgsStructType = "FixableBeetArgsStruct"
         return
