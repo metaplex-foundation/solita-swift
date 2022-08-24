@@ -53,15 +53,79 @@ final class RenderInstructionTests: XCTestCase {
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
-    func testIxEmptyArgEemptyAccounts() {
+    func testIxEmptyArgEmptyAccounts() {
         let ix = IdlInstruction(name: "empyArgs", accounts: [], args: [])
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
-    func testIxOneArgArgs() {
+    func testIxOneArg() {
         let ix = IdlInstruction(name: "oneArg", accounts: [
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
         ], args: [.init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil)])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxTwoArgs() {
+        let ix = IdlInstruction(name: "twoArg", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
+        ], args: [
+            .init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil),
+            .init(name: "authority", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil),
+        ])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxTwoAccountsAndTwoArgs() {
+        let ix = IdlInstruction(name: "twoArg", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "feeWithdrawalDestination", isMut: true, isSigner: false, desc: nil, optional: nil)
+        ], args: [
+            .init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil),
+            .init(name: "authority", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil),
+        ])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxThreeAccountsTwoOptionals() {
+        let ix = IdlInstruction(name: "choicy", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "useAuthorityRecord", isMut: true, isSigner: false, desc: "Use Authority Record PDA If present the program Assumes a delegated use authority", optional: true),
+            IdlInstructionAccount(name: "burner", isMut: false, isSigner: false, desc: "Program As Signer (Burner)", optional: true)
+        ], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxAccountsRenderCommentsWithAndWithoutDesc() {
+        let ix = IdlInstruction(name: "choicy", accounts: [
+            IdlInstructionAccount(name: "withoutDesc", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "withDesc", isMut: true, isSigner: false, desc: "Use Authority Record PDA If present the program Assumes a delegated use authority", optional: true),
+        ], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxEmptyArgsOneSystemProgramAccount() {
+        let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
+        ], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxWithArgsOneSystemProgramAccountAndProgramId() {
+        let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "programId", isMut: false, isSigner: false, desc: nil, optional: nil),
+        ], args: [])
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxEmptyArgsOneSystemProgramAccountOneOptionalRentAccount() {
+        let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "rent", isMut: false, isSigner: false, desc: nil, optional: true),
+        ], args: [])
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
 }

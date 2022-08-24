@@ -130,12 +130,12 @@ public func serdeRenderDataStruct(
 """
 public let \(structVarName) = \(beetStructType)<\(className)>(
     fields:[
-            \(discriminatorDecl)
-            \(fieldDecls)
-        ],
-         \(className).fromArgs,
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    \(className).fromArgs,
     \"\(className)\"
-    )
+)
 """
         
     } else {
@@ -143,12 +143,12 @@ public let \(structVarName) = \(beetStructType)<\(className)>(
         return
 """
 public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
-        fields: [
-            \(discriminatorDecl)
-            \(fieldDecls)
-        ],
-        description: "\(argsTypename)"
-    )
+    fields: [
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    description: "\(argsTypename)"
+)
 """        
     }
 }
