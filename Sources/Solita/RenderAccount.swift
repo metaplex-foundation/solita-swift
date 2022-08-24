@@ -1,0 +1,464 @@
+import Foundation
+import PathKit
+
+public struct PaddingField {
+    let name: String
+    let size: Int
+}
+
+struct AccountResolvedField {
+    let name: String
+    let swiftType: String
+    let isPadding: Bool?
+}
+
+func colonSeparatedTypedField(
+    field: AccountResolvedField,
+    prefix:String=""
+) -> String {
+    return "\(prefix)\(field.name): \(field.swiftType)"
+}
+
+class AccountRenderer {
+    public let upperCamelAccountName: String
+    public let camelAccountName: String
+    public let accountDataClassName: String
+    public let accountDataArgsTypeName: String
+    public let accountDiscriminatorName: String
+    public let beetName: String
+    public var paddingField: PaddingField?
+    
+    public let serializerSnippets: SerializerSnippets
+    private let programIdPubkey: String
+    
+    private let account: IdlAccount
+    private let fullFileDir: Path
+    private let hasImplicitDiscriminator: Bool
+    private let resolveFieldType: ResolveFieldType
+    private let programId: String
+    private let typeMapper: TypeMapper
+    private let serializers: CustomSerializers
+    
+    init(account: IdlAccount,
+         fullFileDir: Path,
+         hasImplicitDiscriminator: Bool,
+         resolveFieldType: @escaping ResolveFieldType,
+         programId: String,
+         typeMapper: TypeMapper,
+         serializers: CustomSerializers
+    ){
+        self.account = account
+        self.fullFileDir = fullFileDir
+        self.hasImplicitDiscriminator = hasImplicitDiscriminator
+        self.resolveFieldType = resolveFieldType
+        self.programId = programId
+        self.typeMapper = typeMapper
+        self.serializers = serializers
+        
+        self.upperCamelAccountName = upperCamelCase(ty: account.name).capitalized
+        self.camelAccountName = account.name.first!.lowercased() + account.name.dropFirst()
+        
+        self.accountDataClassName = self.upperCamelAccountName
+        self.accountDataArgsTypeName = "\(self.accountDataClassName)Args"
+        self.beetName = "\(self.camelAccountName)Beet"
+        self.accountDiscriminatorName = "\(self.camelAccountName)Discriminator"
+        
+        self.serializerSnippets = self.serializers.snippetsFor(
+            typeName: self.account.name,
+            modulePath: self.fullFileDir.string,
+            builtinSerializer: self.beetName
+        )
+        self.programIdPubkey = "PublicKey(string: \"\(self.programId)\")"
+        
+        self.paddingField = getPaddingField()
+    }
+    
+    private func getPaddingField() -> PaddingField? {
+        let paddingField = self.account.type.fields?.filter { hasPaddingAttr(field: $0) }
+        guard let paddingField = paddingField else { return  nil }
+        if paddingField.count == 0 { return  nil }
+        
+        assert(
+            paddingField.count == 1,
+            "only one field of an account can be padding"
+        )
+        let field = paddingField[0]
+        let ty = asIdlTypeArray(ty: field.type)
+        let inner = ty.idlType
+        let size = ty.size
+        assert(inner.key == "u8", "padding field must be [u8]")
+        
+        return PaddingField(name: field.name, size: size)
+    }
+    
+    private func serdeProcess() -> [TypeMappedSerdeField] {
+        return self.typeMapper.mapSerdeFields(fields: self.account.type.fields!)
+    }
+    
+    // -----------------
+    // Rendered Fields
+    // -----------------
+    private func getTypedFields() -> [AccountResolvedField] {
+        return self.account.type.fields!.map { f -> AccountResolvedField in
+            let swiftType = self.typeMapper.map(ty: f.type, name: f.name)
+            return AccountResolvedField(name: f.name, swiftType: swiftType, isPadding: hasPaddingAttr(field: f))
+        }
+    }
+    
+    private func getPrettyFields() -> [String] {
+        return self.account.type.fields!
+            .filter{ !hasPaddingAttr(field: $0) }
+            .map { f in
+                if case .publicKey = f.type {
+                    return "\(f.name): self.\(f.name).toBase58()"
+                }
+                
+                if case .beetTypeMapKey = f.type {
+                    return
+"""
+\(f.name) = {
+    return self.\(f.name)
+}()
+"""
+                }
+                
+                if case .idlTypeDefined(let defined) = f.type {
+                    let resolved = defined.defined
+                    fatalError("Not implemented")
+                }
+                
+                return "\(f.name): self.\(f.name)"
+            }
+    }
+    
+    // -----------------
+    // Account Args
+    // -----------------
+    
+    private func renderAccountDataArgsType(
+        fields: [AccountResolvedField]
+    ) -> String {
+        let renderedFields = fields
+            .filter{ $0.isPadding == false }
+            .map{ colonSeparatedTypedField(field: $0) }
+            .joined(separator: "{ get } \n    ")
+        let renderedDiscriminator = self.hasImplicitDiscriminator ? "\(renderAccountDiscriminatorField()) { get }" : ""
+        return
+"""
+/**
+* Arguments used to create {@link \(self.accountDataClassName)}
+* @category Accounts
+* @category generated
+*/
+protocol \(self.accountDataArgsTypeName) {
+    \(renderedDiscriminator)
+    \(renderedFields)
+}
+
+"""
+    }
+    
+    private func renderByteSizeMethods() -> String {
+        if self.typeMapper.usedFixableSerde {
+            let byteSizeValue = self.hasImplicitDiscriminator ?
+"""
+{
+    accountDiscriminator: ${this.accountDiscriminatorName},
+    ...instance,
+}
+"""
+            : "instance"
+            
+            return
+"""
+/**
+* Returns the byteSize of a {@link Buffer} holding the serialized data of
+* {@link \(self.accountDataClassName)} for the provided args.
+*
+* @param args need to be provided since the byte size for this account
+* depends on them
+*/
+static func byteSize(args: \(self.accountDataArgsTypeName) {
+    let instance = \(self.accountDataClassName).fromArgs(args)
+    return \(self.beetName).toFixedFromValue(\(byteSizeValue)).byteSize
+}
+/**
+* Fetches the minimum balance needed to exempt an account holding
+* {@link ${this.accountDataClassName}} data from rent
+*
+* @param args need to be provided since the byte size for this account
+* depends on them
+* @param connection used to retrieve the rent exemption information
+*/
+static func getMinimumBalanceForRentExemption(
+    args: \(self.accountDataArgsTypeName),
+    connection: Api,
+    commitment: Commitment?
+    onComplete: @escaping(Result<UInt64, Error>) -> Void
+) {
+    return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args), commitment: commitment, onComplete: onComplete)
+}
+"""
+        } else {
+            return
+"""
+/**
+* Returns the byteSize of a {@link Buffer} holding the serialized data of
+* {@link \(self.accountDataClassName)}
+*/
+static func byteSize() -> UInt {
+    return \(self.beetName).byteSize
+}
+/**
+* Fetches the minimum balance needed to exempt an account holding
+* {@link ${this.accountDataClassName}} data from rent
+*
+* @param connection used to retrieve the rent exemption information
+*/
+static func getMinimumBalanceForRentExemption(
+    connection: Api,
+    commitment: Commitment?,
+    onComplete: @escaping(Result<UInt64, Error>) -> Void
+) {
+    return connection.getMinimumBalanceForRentExemption(dataLength: UInt64(\(self.accountDataClassName).byteSize()), commitment: commitment, onComplete: onComplete)
+}
+/**
+* Determines if the provided {@link Buffer} has the correct byte size to
+* hold {@link \(self.accountDataClassName)} data.
+*/
+static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
+    return buf.bytes.count - offset == \(self.accountDataClassName).byteSize()
+}
+"""
+        }
+    }
+    
+    // -----------------
+    // Imports
+    // -----------------
+    private func renderImports() -> String{
+        let imports = self.typeMapper.importsUsed(
+            fileDir: self.fullFileDir,
+            forcePackages: [.SOLANA_WEB3_PACKAGE, .BEET_PACKAGE, .BEET_SOLANA_PACKAGE]
+        )
+        return imports.joined(separator: "\n")
+    }
+    
+    // -----------------
+    // AccountData class
+    // -----------------
+    private func renderAccountDiscriminatorVar() -> String {
+        if !self.hasImplicitDiscriminator { return "" }
+        
+        let accountDisc = accountDiscriminator(name: self.account.name)
+        
+        return "let \(self.accountDiscriminatorName) = \(accountDisc.bytes) as [UInt8]"
+    }
+    
+    private func renderAccountDiscriminatorField() -> String {
+        if !self.hasImplicitDiscriminator { return "" }
+                
+        return "var \(self.accountDiscriminatorName): [UInt8]"
+    }
+    
+    private func renderSerializeValue(fields: [AccountResolvedField]) -> String {
+        var serializeValues:[String] = []
+        if self.hasImplicitDiscriminator {
+            serializeValues.append(
+                "\(self.accountDiscriminatorName): \(self.accountDiscriminatorName)"
+            )
+        }
+        if self.paddingField != nil {
+            serializeValues.append("padding: Array(\(self.paddingField!.size).fill(0)")
+        }
+        
+        let constructorParams = fields
+            .filter{ $0.isPadding == false}
+            .map{ "args.\($0.name)" }
+            .joined(separator: ",\n    ")
+        
+        return
+"""
+\(serializeValues.joined(separator: ",\n     "))
+\(constructorParams)
+"""
+    }
+    
+    private func renderAccountDataClass(
+        fields: [AccountResolvedField]
+    ) -> String {
+        let constructorParams = fields
+            .filter{ $0.isPadding == false}
+            .map{ "\($0.name): args[\($0.name)]" }
+            .joined(separator: ",\n    ")
+        
+        let byteSizeMethods = self.renderByteSizeMethods()
+        let accountDiscriminatorVar = self.renderAccountDiscriminatorVar()
+        let serializeValue = self.renderSerializeValue(fields: fields)
+        let renderedArgDiscriminator = self.hasImplicitDiscriminator ? "\(self.accountDiscriminatorName) : args[\"\(self.accountDiscriminatorName)\"] as! [UInt8]" : ""
+        return
+"""
+\(accountDiscriminatorVar)
+/**
+ * Holds the data for the {@link \(self.upperCamelAccountName)} Account and provides de/serialization
+ * functionality for that data
+ *
+ * @category Accounts
+ * @category generated
+ */
+public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
+  \(renderAccountDiscriminatorField())
+  /**
+   * Creates a {@link \(self.accountDataClassName)} instance from the provided args.
+   */
+  static func fromArgs(args: Args) -> \(self.accountDataClassName) {
+    return \(self.accountDataClassName)(
+        \(renderedArgDiscriminator)
+        \(constructorParams)
+    )
+  }
+  /**
+   * Deserializes the {@link \(self.accountDataClassName)} from the data of the provided {@link web3.AccountInfo}.
+   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+   */
+  static func fromAccountInfo(
+    accountInfo: Data,
+    offset:Int=0
+  ) -> ( \(self.accountDataClassName), Int )  {
+    return \(self.accountDataClassName).deserialize(buf: accountInfo, offset: offset)
+  }
+  /**
+   * Retrieves the account info from the provided address and deserializes
+   * the {@link \(self.accountDataClassName)} from its data.
+   *
+   * @throws Error if no account info is found at the address or if deserialization fails
+   */
+  static func fromAccountAddress(
+    connection: Api,
+    address: PublicKey,
+    onComplete: @escaping (Result<BufferInfo<\(self.accountDataClassName)>, Error>) -> Void
+  ) {
+        return connection.getAccountInfo(account: address.base58EncodedString, decodedTo: BufferInfo<\(self.accountDataClassName)>, onComplete: onComplete)
+    /*
+    let accountInfo = connection.getAccountInfo(address)
+    if accountInfo == nil {
+      fatalError("Unable to find Auctionhouse account at (address)")
+    }
+    return Auctionhouse.fromAccountInfo(accountInfo, 0).0
+    */
+  }
+  /**
+   * Deserializes the {@link ${this.accountDataClassName}} from the provided data Buffer.
+   * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
+   */
+  static func deserialize(
+    buf: Data,
+    offset: Int = 0
+  ) -> ( \(self.accountDataClassName), Int ) {
+    return \(self.serializerSnippets.deserialize)(buffer: buf, offset: offset)
+  }
+  /**
+   * Serializes the {@link \(self.accountDataClassName)} into a Buffer.
+   * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
+   */
+  func serialize() -> ( Data, Int ) {
+    return \(self.serializerSnippets.serialize)(instance: \(self.accountDataClassName)(\(serializeValue)))
+  }
+  \(byteSizeMethods)
+}
+"""
+    }
+    
+    // -----------------
+    // Struct
+    // -----------------
+    private func renderBeet(fields: [TypeMappedSerdeField]) -> String {
+        var discriminatorName: String? = nil
+        var discriminatorField: TypeMappedSerdeField? = nil
+        var discriminatorType: String? = nil
+        
+        if (self.hasImplicitDiscriminator) {
+            discriminatorName = "accountDiscriminator"
+            discriminatorField = self.typeMapper.mapSerdeField(
+                field: anchorDiscriminatorField(name: "accountDiscriminator")
+            )
+            discriminatorType = anchorDiscriminatorType(
+                typeMapper: self.typeMapper,
+                context: "account \(self.account.name) discriminant type"
+            )
+        }
+        
+        let accountStruct = serdeRenderDataStruct(
+            discriminatorName: discriminatorName,
+            discriminatorField: discriminatorField,
+            discriminatorType: discriminatorType,
+            paddingField: self.paddingField,
+            fields: fields,
+            structVarName: self.beetName,
+            className: self.accountDataClassName,
+            argsTypename: self.accountDataArgsTypeName,
+            isFixable: self.typeMapper.usedFixableSerde
+        )
+        return
+"""
+  /**
+   * @category Accounts
+   * @category generated
+   */
+  \(accountStruct)
+"""
+    }
+    
+    func render() -> String {
+        self.typeMapper.clearUsages()
+        
+        let typedFields = self.getTypedFields()
+        let beetFields = self.serdeProcess()
+        let enums = renderScalarEnums(map: self.typeMapper.scalarEnumsUsed).joined(separator: "\n")
+        let imports = self.renderImports()
+        let accountDataArgsType = self.renderAccountDataArgsType(fields: typedFields)
+        let accountDataClass = self.renderAccountDataClass(fields: typedFields)
+        let beetDecl = self.renderBeet(fields: beetFields)
+        return
+"""
+import Foundation
+\(imports)
+\(self.serializerSnippets.importSnippet)
+\(enums)
+\(accountDataArgsType)
+\(accountDataClass)
+\(beetDecl)
+\(self.serializerSnippets.resolveFunctionsSnippet)
+"""
+    }
+}
+
+func renderAccount(
+    account: IdlAccount,
+    fullFileDir: Path,
+    accountFilesByType: Dictionary<String, String>,
+    customFilesByType: Dictionary<String, String>,
+    typeAliases: Dictionary<String, PrimitiveTypeKey>,
+    serializers: CustomSerializers,
+    forceFixable: @escaping ForceFixable,
+    programId: String,
+    resolveFieldType: @escaping ResolveFieldType,
+    hasImplicitDiscriminator: Bool
+) -> String {
+    let typeMapper = TypeMapper(
+        accountTypesPaths: accountFilesByType,
+        customTypesPaths: customFilesByType,
+        typeAliases: typeAliases,
+        forceFixable: forceFixable
+    )
+    let renderer = AccountRenderer(
+        account: account,
+        fullFileDir: fullFileDir,
+        hasImplicitDiscriminator: hasImplicitDiscriminator,
+        resolveFieldType: resolveFieldType,
+        programId: programId,
+        typeMapper: typeMapper,
+        serializers: serializers
+    )
+    return renderer.render()
+}

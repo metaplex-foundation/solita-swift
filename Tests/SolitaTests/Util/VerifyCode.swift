@@ -7,6 +7,7 @@ let swiftlint =
 """
 disabled_rules:
   - identifier_name
+  - force_cast
 """
 
 let package =

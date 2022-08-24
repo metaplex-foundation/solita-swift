@@ -2,12 +2,16 @@ import Foundation
 import Beet
 import BeetSolana
 
+public let IDL_FIELD_ATTR_PADDING = "padding"
 // -----------------
 // De/Serializers + Extensions
 // -----------------
 public typealias PrimitiveTypeKey = String
 public typealias PrimaryTypeMap = Dictionary<String, SupportedTypeDefinition>
-
+// -----------------
+// Resolvers
+// -----------------
+typealias ResolveFieldType = (_ typeName: String) -> (IdlType?)
 // -----------------
 // Guards
 // -----------------
@@ -70,6 +74,9 @@ public func isIdlInstructionAccountWithDesc(
   return ty.desc == "string"
 }
 
+public func hasPaddingAttr(field: IdlField) -> Bool {
+  return field.attrs?.contains(IDL_FIELD_ATTR_PADDING) == true
+}
 
 public let BEET_PACKAGE_STRING = "Beet"
 public let BEET_SOLANA_PACKAGE_STRING = "BeetSolana"

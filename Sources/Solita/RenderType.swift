@@ -148,6 +148,7 @@ func upperCamelCase(ty: String) -> String {
         .joined()
 }
 
+
 /**
  * Performs parts of the render process that is necessary to determine if the
  * type is fixed or fixable.
