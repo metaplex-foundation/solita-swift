@@ -13,10 +13,11 @@ struct AccountResolvedField {
 }
 
 func colonSeparatedTypedField(
+    readOnly: Bool,
     field: AccountResolvedField,
     prefix:String=""
 ) -> String {
-    return "\(prefix)\(field.name): \(field.swiftType)"
+    return "\(readOnly ? "let" : "var") \(prefix)\(field.name): \(field.swiftType)"
 }
 
 class AccountRenderer {
@@ -139,9 +140,9 @@ class AccountRenderer {
         fields: [AccountResolvedField]
     ) -> String {
         let renderedFields = fields
-            .filter{ $0.isPadding == false }
-            .map{ colonSeparatedTypedField(field: $0) }
-            .joined(separator: "{ get } \n    ")
+            .map{ colonSeparatedTypedField(readOnly: false, field: $0) }
+            .map{ "\($0) { get }" }
+            .joined(separator: "\n    ")
         let renderedDiscriminator = self.hasImplicitDiscriminator ? "\(renderAccountDiscriminatorField()) { get }" : ""
         return
 """
@@ -163,7 +164,7 @@ protocol \(self.accountDataArgsTypeName) {
             let byteSizeValue = self.hasImplicitDiscriminator ?
 """
 {
-    accountDiscriminator: ${this.accountDiscriminatorName},
+    accountDiscriminator: \(self.accountDiscriminatorName),
     ...instance,
 }
 """
@@ -184,7 +185,7 @@ static func byteSize(args: \(self.accountDataArgsTypeName) {
 }
 /**
 * Fetches the minimum balance needed to exempt an account holding
-* {@link ${this.accountDataClassName}} data from rent
+* {@link \(self.accountDataClassName)} data from rent
 *
 * @param args need to be provided since the byte size for this account
 * depends on them
@@ -211,7 +212,7 @@ static func byteSize() -> UInt {
 }
 /**
 * Fetches the minimum balance needed to exempt an account holding
-* {@link ${this.accountDataClassName}} data from rent
+* {@link \(self.accountDataClassName)} data from rent
 *
 * @param connection used to retrieve the rent exemption information
 */
@@ -263,39 +264,40 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
     
     private func renderSerializeValue(fields: [AccountResolvedField]) -> String {
         var serializeValues:[String] = []
-        if self.hasImplicitDiscriminator {
-            serializeValues.append(
-                "\(self.accountDiscriminatorName): \(self.accountDiscriminatorName)"
-            )
-        }
         if self.paddingField != nil {
-            serializeValues.append("padding: Array(\(self.paddingField!.size).fill(0)")
+            //serializeValues.append("padding: [UInt8](repeating: 0, count: \(self.paddingField!.size))")
         }
         
         let constructorParams = fields
-            .filter{ $0.isPadding == false}
-            .map{ "args.\($0.name)" }
-            .joined(separator: ",\n    ")
+            .map{ "\($0.name): self.\($0.name)" }
+            .joined(separator: ",\n        ")
         
         return
 """
 \(serializeValues.joined(separator: ",\n     "))
-\(constructorParams)
+        \(constructorParams)
 """
     }
     
     private func renderAccountDataClass(
         fields: [AccountResolvedField]
     ) -> String {
-        let constructorParams = fields
-            .filter{ $0.isPadding == false}
-            .map{ "\($0.name): args[\($0.name)]" }
-            .joined(separator: ",\n    ")
+        var editablefields = fields
+        if self.hasImplicitDiscriminator {
+            editablefields.insert(AccountResolvedField(name: self.accountDiscriminatorName, swiftType: "[UInt8]", isPadding: false), at: 0)
+        }
+        let constructorParams = editablefields
+            .map{ "\($0.name): args[\"\($0.name)\"] as! \($0.swiftType)" }
+            .joined(separator: ",\n        ")
+        
+        let interfaceRequiredFields = editablefields
+            .map{ colonSeparatedTypedField(readOnly: true, field: $0) }
+            .map{ "\($0)" }
+            .joined(separator: "\n  ")
         
         let byteSizeMethods = self.renderByteSizeMethods()
         let accountDiscriminatorVar = self.renderAccountDiscriminatorVar()
-        let serializeValue = self.renderSerializeValue(fields: fields)
-        let renderedArgDiscriminator = self.hasImplicitDiscriminator ? "\(self.accountDiscriminatorName) : args[\"\(self.accountDiscriminatorName)\"] as! [UInt8]" : ""
+        let serializeValue = self.renderSerializeValue(fields: editablefields)
         return
 """
 \(accountDiscriminatorVar)
@@ -307,13 +309,13 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
  * @category generated
  */
 public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
-  \(renderAccountDiscriminatorField())
+  \(interfaceRequiredFields)
+
   /**
    * Creates a {@link \(self.accountDataClassName)} instance from the provided args.
    */
   static func fromArgs(args: Args) -> \(self.accountDataClassName) {
     return \(self.accountDataClassName)(
-        \(renderedArgDiscriminator)
         \(constructorParams)
     )
   }
@@ -336,19 +338,23 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
   static func fromAccountAddress(
     connection: Api,
     address: PublicKey,
-    onComplete: @escaping (Result<BufferInfo<\(self.accountDataClassName)>, Error>) -> Void
+    onComplete: @escaping (Result<\(self.accountDataClassName), Error>) -> Void
   ) {
-        return connection.getAccountInfo(account: address.base58EncodedString, decodedTo: BufferInfo<\(self.accountDataClassName)>, onComplete: onComplete)
-    /*
-    let accountInfo = connection.getAccountInfo(address)
-    if accountInfo == nil {
-      fatalError("Unable to find Auctionhouse account at (address)")
+    connection.getAccountInfo(account: address.base58EncodedString) { result in
+        switch result {
+            case .success(let pureData):
+                if let data = pureData.data?.value {
+                    onComplete(.success(\(self.accountDataClassName).deserialize(buf: data).0))
+                } else {
+                    onComplete(.failure(SolanaError.nullValue))
+                }
+            case .failure(let error):
+                onComplete(.failure(error))
+        }
     }
-    return Auctionhouse.fromAccountInfo(accountInfo, 0).0
-    */
   }
   /**
-   * Deserializes the {@link ${this.accountDataClassName}} from the provided data Buffer.
+   * Deserializes the {@link \(self.accountDataClassName)} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static func deserialize(
