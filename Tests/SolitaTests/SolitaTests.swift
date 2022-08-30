@@ -8,9 +8,9 @@ final class SolitaTests: XCTestCase {
         return decoder
     }
     
-    func testExample() {
+    func testExample() async {
         let json = stubbedResponse("serum_multisig")
         let idl = try! getDencoder().decode(Idl.self, from: json)
-        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+        await Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
 }
