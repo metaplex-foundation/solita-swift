@@ -14,12 +14,19 @@ let package = Package(
         .library(
             name: "BeetSolana",
             targets: ["BeetSolana"]),
+        .executable(
+            name: "SolitaCLI",
+            targets: ["SolitaCLI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "master"),
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.9.0"),
+        .package(url: "https://github.com/jakeheis/SwiftCLI", from: "6.0.0"),
     ],
     targets: [
+        .target(
+            name: "SolitaCLI",
+            dependencies: ["Solita", "SwiftCLI", "PathKit",]),
         .target(
             name: "Solita",
             dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet", "PathKit", "BeetSolana"]),

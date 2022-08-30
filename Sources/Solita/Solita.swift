@@ -1,4 +1,5 @@
 import PathKit
+import SwiftCLI
 
 public class Solita {
     public let idl: Idl
@@ -188,7 +189,7 @@ public class Solita {
         return Rendered(instructions: instructions, accounts: accounts, types: types, errors: errors)
     }
     
-    func renderAndWriteTo(outputDir: String) {
+    public func renderAndWriteTo(outputDir: String) {
         self.paths = Paths(outputDir: outputDir)
         
         let rendered = renderCode()
