@@ -188,7 +188,7 @@ public class Solita {
         return Rendered(instructions: instructions, accounts: accounts, types: types, errors: errors)
     }
     
-    func renderAndWriteTo(outputDir: String) async {
+    func renderAndWriteTo(outputDir: String) {
         self.paths = Paths(outputDir: outputDir)
         
         let rendered = renderCode()
@@ -201,29 +201,29 @@ public class Solita {
         
         if self.hasInstructions {
             reexports.append("instructions")
-            await self.writeInstructions(instructions: instructions)
+            self.writeInstructions(instructions: instructions)
         }
         
         if !accounts.keys.isEmpty{
             reexports.append("accounts")
-            await self.writeAccounts(accounts: accounts)
+            self.writeAccounts(accounts: accounts)
         }
         
         if !types.keys.isEmpty{
             reexports.append("types")
-            await self.writeTypes(types: types)
+            self.writeTypes(types: types)
         }
         
         if let errors = errors {
             reexports.append("errors")
-            await self.writeErrors(errorsCode: errors)
+            self.writeErrors(errorsCode: errors)
         }
     }
     
     // -----------------
     // Instructions
     // -----------------
-    private func writeInstructions(instructions: Dictionary<String, String>) async {
+    private func writeInstructions(instructions: Dictionary<String, String>) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         prepareTargetDir(dir: paths.instructionsDir())
         debugPrint("Writing instructions to directory: \(paths.relInstructionsDir())")
@@ -236,7 +236,7 @@ public class Solita {
     // -----------------
     // Accounts
     // -----------------
-    private func writeAccounts(accounts: Dictionary<String, String>) async {
+    private func writeAccounts(accounts: Dictionary<String, String>) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         prepareTargetDir(dir: paths.accountsDir())
         debugPrint("Writing accounts to directory: \(paths.relAccountsDir())")
@@ -249,7 +249,7 @@ public class Solita {
     // -----------------
     // Types
     // -----------------
-    private func writeTypes(types: Dictionary<String, String>) async {
+    private func writeTypes(types: Dictionary<String, String>) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         prepareTargetDir(dir: paths.typesDir())
         debugPrint("Writing types to directory: \(paths.relTypesDir())")
@@ -262,7 +262,7 @@ public class Solita {
     // -----------------
     // Errors
     // -----------------
-    private func writeErrors(errorsCode: String) async {
+    private func writeErrors(errorsCode: String) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         prepareTargetDir(dir: paths.errorsDir())
         debugPrint("Writing errors to directory: \(paths.relErrorsDir())")
@@ -274,7 +274,7 @@ public class Solita {
     // Main Index File
     // -----------------
     
-    private func writeMainIndex(reexports: [String]) async {
+    private func writeMainIndex(reexports: [String]) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         
         let programAddress = self.idl.metadata?.address ?? ""
