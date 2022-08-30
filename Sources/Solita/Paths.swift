@@ -8,7 +8,7 @@ public class Paths {
     }
     
     public func root() -> Path {
-        return (outputDir + Path("accounts"))
+        return (outputDir)
     }
     
     public func accountsDir() -> Path {
@@ -39,7 +39,7 @@ public class Paths {
         return (outputDir + Path("errors"))
     }
     
-    public func relErrorDir() -> Path {
+    public func relErrorsDir() -> Path {
         return (outputDir + errorsDir())
     }
     
