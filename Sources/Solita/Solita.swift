@@ -186,13 +186,13 @@ public class Solita {
             errors = prependGeneratedWarningCode(e)
         }
         
-        return Rendered(instructions: instructions, accounts: accounts, types: types, errors: errors)
+        return Rendered(name: idl.name.uppercased(), instructions: instructions, accounts: accounts, types: types, errors: errors)
     }
     
     public func renderAndWriteTo(outputDir: String) {
-        self.paths = Paths(outputDir: outputDir)
-        
         let rendered = renderCode()
+        let name = rendered.name
+        self.paths = Paths(outputDir: outputDir, name: name)
         let instructions = rendered.instructions
         let accounts = rendered.accounts
         let types = rendered.types
@@ -220,7 +220,7 @@ public class Solita {
             self.writeErrors(errorsCode: errors)
         }
         self.writeMainIndex(reexports: reexports)
-        self.writeSwiftPackage()
+        self.writeSwiftPackage(name: name)
     }
     
     // -----------------
@@ -283,20 +283,25 @@ public class Solita {
         let programAddress = self.idl.metadata?.address ?? ""
         let programIdConsts =
 """
-  /**
-   * Program address
-   *
-   * @category constants
-   * @category generated
-   */
-  let PROGRAM_ADDRESS = "\(programAddress)"
-  /**
-   * Program public key
-   *
-   * @category constants
-   * @category generated
-   */
-  public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
+import Foundation
+
+/**
+* Program address
+*
+* @category constants
+* @category generated
+*/
+
+let PROGRAM_ADDRESS = "\(programAddress)"
+
+/**
+* Program public key
+*
+* @category constants
+* @category generated
+*/
+
+public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
 """
         let code = """
 \(programIdConsts)
@@ -308,7 +313,7 @@ public class Solita {
     // Swift Package File
     // -----------------
     
-    private func writeSwiftPackage() {
+    private func writeSwiftPackage(name: String) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         
         let swiftlint =
@@ -323,19 +328,19 @@ disabled_rules:
 // swift-tools-version: 5.5.0
 import PackageDescription
 let package = Package(
-    name: "Generated",
+    name: "\(name)",
     platforms: [.iOS(.v11), .macOS(.v10_12)],
         products: [
             .library(
-                name: "Generated",
-                targets: ["Generated"]),
+                name: "\(name)",
+                targets: ["\(name)"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/solita-swift.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "Generated",
+            name: "\(name)",
             dependencies: [.product(name: "Beet", package: "solita-swift"), .product(name: "BeetSolana", package: "solita-swift")]),
     ]
 )
@@ -346,6 +351,7 @@ let package = Package(
 }
 
 struct Rendered {
+    let name: String
     let instructions: Dictionary<String, String>
     let accounts: Dictionary<String, String>
     let types: Dictionary<String, String>

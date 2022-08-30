@@ -179,9 +179,9 @@ protocol \(self.accountDataArgsTypeName) {
 * @param args need to be provided since the byte size for this account
 * depends on them
 */
-static func byteSize(args: \(self.accountDataArgsTypeName) {
-    let instance = \(self.accountDataClassName).fromArgs(args)
-    return \(self.beetName).toFixedFromValue(\(byteSizeValue)).byteSize
+static func byteSize(args: \(self.accountDataArgsTypeName)) -> UInt64 {
+    let instance = \(self.accountDataClassName).fromArgs(args: args)
+    return UInt64(\(self.beetName).toFixedFromValue(val: \(byteSizeValue)).byteSize)
 }
 /**
 * Fetches the minimum balance needed to exempt an account holding
@@ -197,7 +197,7 @@ static func getMinimumBalanceForRentExemption(
     commitment: Commitment?
     onComplete: @escaping(Result<UInt64, Error>) -> Void
 ) {
-    return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args), commitment: commitment, onComplete: onComplete)
+    return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args: args), commitment: commitment, onComplete: onComplete)
 }
 """
         } else {
