@@ -1,4 +1,4 @@
-# Solita Swift
+# Solita Swift [![Swift](https://github.com/metaplex-foundation/solita-swift/actions/workflows/swift.yml/badge.svg)](https://github.com/metaplex-foundation/solita-swift/actions/workflows/swift.yml)
 
 **Sol** ana **I** DL **t** o **A** PI generator.
 
