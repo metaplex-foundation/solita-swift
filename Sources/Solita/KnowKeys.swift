@@ -25,7 +25,6 @@ func pubkeysPackageExportName(
       return .SOLANA_WEB3_EXPORT_NAME
   case .PROGRAM_ID_PACKAGE:
       return .PROGRAM_ID_EXPORT_NAME
-    default: fatalError("Unreachable Error")
   }
 }
 
