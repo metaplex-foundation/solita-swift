@@ -100,8 +100,7 @@ public class TypeMapper {
         let inner = self.map(ty: ty.option, name: name)
         let optionPackage = BEET_PACKAGE
         self.serdePackagesUsed.insert(SerdePackage(rawValue: optionPackage)!)
-        let exp = serdePackageExportName(pack: optionPackage)
-        return "\(exp!.rawValue).COption<\(inner)>"
+        return "COption<\(inner)>"
     }
     
     private func mapVecType(ty: IdlTypeVec, name: String) -> String{
@@ -253,7 +252,7 @@ public class TypeMapper {
         self.serdePackagesUsed.insert(SerdePackage(rawValue: scalarEnumPackage)!)
 
         self.updateScalarEnumsUsed(name: name, ty: ty)
-        return "\(exp!.rawValue).FixedScalarEnum(\(name))"
+        return "FixedSizeBeet(value: .scalar( FixedScalarEnum<\(name)>() ))"
     }
     
     private func mapOptionSerde(ty: IdlTypeOption, name: String) -> String {
@@ -306,7 +305,7 @@ public class TypeMapper {
             self.localImportsByPath[fullFileDir] = Set()
         }
         self.localImportsByPath[fullFileDir]?.insert(varName)
-        return ".fixedBeet(.init(value: .scalar(\(varName))))"
+        return "\(varName)Wrapped"
     }
 
     func mapSerde(ty: IdlType, name: String = NO_NAME_PROVIDED) -> String {

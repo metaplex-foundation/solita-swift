@@ -193,33 +193,33 @@ static func getMinimumBalanceForRentExemption(
         } else {
             return
 """
-/**
-* Returns the byteSize of a {@link Buffer} holding the serialized data of
-* {@link \(self.accountDataClassName)}
-*/
-static func byteSize() -> UInt {
-    return \(self.beetName).byteSize
-}
-/**
-* Fetches the minimum balance needed to exempt an account holding
-* {@link \(self.accountDataClassName)} data from rent
-*
-* @param connection used to retrieve the rent exemption information
-*/
-static func getMinimumBalanceForRentExemption(
-    connection: Api,
-    commitment: Commitment?,
-    onComplete: @escaping(Result<UInt64, Error>) -> Void
-) {
-    return connection.getMinimumBalanceForRentExemption(dataLength: UInt64(\(self.accountDataClassName).byteSize()), commitment: commitment, onComplete: onComplete)
-}
-/**
-* Determines if the provided {@link Buffer} has the correct byte size to
-* hold {@link \(self.accountDataClassName)} data.
-*/
-static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
-    return buf.bytes.count - offset == \(self.accountDataClassName).byteSize()
-}
+  /**
+  * Returns the byteSize of a {@link Buffer} holding the serialized data of
+  * {@link \(self.accountDataClassName)}
+  */
+  static func byteSize() -> UInt {
+      return \(self.beetName).byteSize
+  }
+  /**
+  * Fetches the minimum balance needed to exempt an account holding
+  * {@link \(self.accountDataClassName)} data from rent
+  *
+  * @param connection used to retrieve the rent exemption information
+  */
+  static func getMinimumBalanceForRentExemption(
+      connection: Api,
+      commitment: Commitment?,
+      onComplete: @escaping(Result<UInt64, Error>) -> Void
+  ) {
+      return connection.getMinimumBalanceForRentExemption(dataLength: UInt64(\(self.accountDataClassName).byteSize()), commitment: commitment, onComplete: onComplete)
+  }
+  /**
+  * Determines if the provided {@link Buffer} has the correct byte size to
+  * hold {@link \(self.accountDataClassName)} data.
+  */
+  static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
+      return buf.bytes.count - offset == \(self.accountDataClassName).byteSize()
+  }
 """
         }
     }
@@ -264,10 +264,9 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         
         return
 """
-[
-\(serializeValues.joined(separator: ",\n     "))
+[\(serializeValues.joined(separator: ",\n                "))
         \(constructorParams)
-]
+        ]
 """
     }
     
@@ -378,7 +377,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   func serialize() -> ( Data, Int ) {
-    return \(self.serializerSnippets.serialize)(instance: \(serializeValue), byteSize: nil)
+    return \(self.serializerSnippets.serialize)(instance: \(serializeValue))
   }
   \(byteSizeMethods)
 }
@@ -478,3 +477,63 @@ func renderAccount(
     )
     return renderer.render()
 }
+
+/**
+ * Renders DataStruct for Instruction Args and Account Args
+ */
+public func serdeRenderDataStruct(
+    discriminatorName: String?,
+    discriminatorField: TypeMappedSerdeField?,
+    discriminatorType: String?,
+    paddingField: PaddingField?,
+    fields: [TypeMappedSerdeField],
+    structVarName: String,
+    className: String?,
+    argsTypename: String,
+    isFixable: Bool
+) -> String {
+    
+    var fieldDecls = renderFields(fields: fields)
+    let discriminatorDecl = renderField(field: discriminatorField, addSeparator: true)
+    let discriminatorType = discriminatorType ?? "[UInt8]"
+    var extraFields: [String] = []
+    if let discriminatorName = discriminatorName {
+        extraFields.append("let \(discriminatorName): \(discriminatorType)")
+    }
+    
+    if let paddingField = paddingField {
+        extraFields.append(
+            "let \(paddingField.name): [UInt8] /* size: \(paddingField.size) */"
+        )
+    }
+    
+    if let className = className {
+        let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
+        let renderedStruct =
+"""
+public let \(structVarName) = \(beetStructType)\(isFixable ? "<\(className)>" : "")(
+    fields:[
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    construct: \(className).fromArgs,
+    description: \"\(className)\"
+)
+"""
+        if !isFixable { return renderedStruct.replacingOccurrences(of: "Beet.fixedBeet", with: "")} // Hack to avoid havinf the Beet.fixedBeet on all the types
+        return renderedStruct
+    } else {
+        let beetArgsStructType = "FixableBeetArgsStruct"
+        return
+"""
+public let \(structVarName) = \(beetArgsStructType)<\(argsTypename)>(
+    fields: [
+        \(discriminatorDecl)
+        \(fieldDecls)
+    ],
+    description: "\(argsTypename)"
+)
+"""
+    }
+}
+

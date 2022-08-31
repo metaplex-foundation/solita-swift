@@ -86,7 +86,10 @@ public struct \(upperCamelTyName) {
             let enumTy = self.typeMapper.map(ty: .idlTypeEnum(e), name: self.ty.name)
             self.typeMapper.serdePackagesUsed.insert(.BEET_PACKAGE)
             let exp = serdePackageExportName(pack: BEET_PACKAGE)
-            return "public let \(self.beetArgName) = \(exp!.rawValue).FixedSizeBeet(value: \(serde))"
+            return """
+public let \(self.beetArgName) = \(serde)
+public let \(self.beetArgName)Wrapped = Beet.fixedBeet(\(self.beetArgName))
+"""
         }
         if case .idlDefinedType(let d) = ty.type {
             let mappedFields = self.typeMapper.mapSerdeFields(fields: d.fields)
@@ -182,4 +185,60 @@ public func renderType(
     let code = renderer.render()
     let isFixable = renderer.typeMapper.usedFixableSerde
   return (code, isFixable)
+}
+
+
+/**
+ * Renders DataStruct for user defined types
+ */
+public func renderTypeDataStruct(
+    fields: [TypeMappedSerdeField],
+    beetVarName: String,
+    typeName: String,
+    isFixable: Bool
+) -> String {
+    assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
+    if isFixable {
+        return renderTypeDataFixableBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
+    } else {
+        return renderTypeDataBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
+    }
+}
+
+
+func renderTypeDataFixableBeetArgsStruct(
+    fields: [TypeMappedSerdeField],
+    beetVarName: String,
+    typeName: String
+) -> String {
+    assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
+    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
+    let beetArgsStructType = "FixableBeetArgsStruct"
+    
+    return """
+public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
+    \(fieldDecls)
+], description: "\(typeName)")
+
+public let \(beetVarName)Wrapped = Beet.fixableBeat(\(beetVarName))
+"""
+    
+}
+
+func renderTypeDataBeetArgsStruct(
+    fields: [TypeMappedSerdeField],
+    beetVarName: String,
+    typeName: String
+) -> String {
+    assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
+    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
+    let beetArgsStructType = "BeetArgsStruct"
+    
+    return """
+public let \(beetVarName) = \(beetArgsStructType)(fields: [
+    \(fieldDecls.replacingOccurrences(of: "Wrapped", with: "").replacingOccurrences(of: "Beet.fixedBeet", with: ""))
+], description: "\(typeName)")
+
+public let \(beetVarName)Wrapped = Beet.fixedBeet(.init(value: .scalar(\(beetVarName))))
+"""
 }

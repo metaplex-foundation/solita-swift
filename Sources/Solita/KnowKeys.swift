@@ -42,7 +42,7 @@ public enum PubkeysPackageExportName {
 
 let knownPubkeysMap: Dictionary<String, (exp: String, pack: PubkeysPackage)> = [
     "tokenProgram": (exp: "PublicKey.tokenProgramId", pack: .SOLANA_SPL_TOKEN_PACKAGE ),
-    "ataProgram": (exp: "ASSOCIATED_TOKEN_PROGRAM_ID", pack: .SOLANA_SPL_TOKEN_PACKAGE ),
+    "ataProgram": (exp: "PublicKey.splAssociatedTokenAccountProgramId", pack: .SOLANA_SPL_TOKEN_PACKAGE ),
     "systemProgram": (exp: "PublicKey.systemProgramId", pack: .SOLANA_WEB3_PACKAGE ),
     "rent": (exp: "PublicKey.sysvarRent", pack: .SOLANA_WEB3_PACKAGE ),
     "programId": (exp: PROGRAM_ID_EXPORT_NAME, pack: .PROGRAM_ID_PACKAGE ),

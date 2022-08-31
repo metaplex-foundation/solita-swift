@@ -5,6 +5,13 @@ public func renderScalarEnum(
     variants: [String],
     includePublic: Bool
 ) -> String {
+    var casedValueVariants: [String] = []
+    var casedVariantsRawValues: [String] = []
+    for i in variants.indices {
+        let variant = variants[i]
+        casedValueVariants.append("case \(i) : self = .\(variant)")
+        casedVariantsRawValues.append("case .\(variant) : return \(i)")
+    }
     return
 """
 /**
@@ -13,6 +20,23 @@ public func renderScalarEnum(
  */
 \(includePublic ? "public " : "")enum \(name) {
     case \(variants.joined(separator: ", "))
+}
+
+extension \(name) : CaseIterable & RawRepresentable {
+    \(includePublic ? "public " : "") typealias RawValue = UInt8
+
+    \(includePublic ? "public " : "") init?(rawValue: UInt8) {
+        switch rawValue {
+        \(casedValueVariants.joined(separator: "\n        "))
+        default : return nil
+        }
+    }
+    
+    \(includePublic ? "public " : "") var rawValue: UInt8 {
+        switch self {
+        \(casedVariantsRawValues.joined(separator: "\n        "))
+        }
+    }
 }
 """
 }
