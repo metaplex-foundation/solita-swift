@@ -13,4 +13,16 @@ final class SolitaTests: XCTestCase {
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
+    
+    func testActionHouse() {
+        let json = stubbedResponse("action_house")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+    }
+    
+    func testCandyMachine() {
+        let json = stubbedResponse("candy_machine")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+    }
 }
