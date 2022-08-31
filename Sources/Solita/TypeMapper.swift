@@ -306,7 +306,7 @@ public class TypeMapper {
             self.localImportsByPath[fullFileDir] = Set()
         }
         self.localImportsByPath[fullFileDir]?.insert(varName)
-        return varName
+        return ".fixedBeet(.init(value: .scalar(\(varName))))"
     }
 
     func mapSerde(ty: IdlType, name: String = NO_NAME_PROVIDED) -> String {
@@ -353,7 +353,7 @@ public class TypeMapper {
     // Imports Generator
     // -----------------
     func importsUsed(fileDir: Path, forcePackages: Set<SerdePackage>?) -> [String]{
-      return _importsForSerdePackages(forcePackages: forcePackages) + _importsForLocalPackages(fileDir: fileDir)
+      return _importsForSerdePackages(forcePackages: forcePackages) // + _importsForLocalPackages(fileDir: fileDir)
     }
 
     private func _importsForSerdePackages(forcePackages: Set<SerdePackage>?) -> [String] {

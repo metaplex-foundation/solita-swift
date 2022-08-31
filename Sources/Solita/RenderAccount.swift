@@ -161,14 +161,6 @@ protocol \(self.accountDataArgsTypeName) {
     
     private func renderByteSizeMethods() -> String {
         if self.typeMapper.usedFixableSerde {
-            let byteSizeValue = self.hasImplicitDiscriminator ?
-"""
-{
-    accountDiscriminator: \(self.accountDiscriminatorName),
-    ...instance,
-}
-"""
-            : "instance"
             
             return
 """
@@ -179,9 +171,8 @@ protocol \(self.accountDataArgsTypeName) {
 * @param args need to be provided since the byte size for this account
 * depends on them
 */
-static func byteSize(args: \(self.accountDataArgsTypeName) {
-    let instance = \(self.accountDataClassName).fromArgs(args)
-    return \(self.beetName).toFixedFromValue(\(byteSizeValue)).byteSize
+static func byteSize(args: \(self.accountDataArgsTypeName)) -> UInt64 {
+    return UInt64(\(self.beetName).toFixedFromValue(val: args).byteSize)
 }
 /**
 * Fetches the minimum balance needed to exempt an account holding
@@ -194,10 +185,10 @@ static func byteSize(args: \(self.accountDataArgsTypeName) {
 static func getMinimumBalanceForRentExemption(
     args: \(self.accountDataArgsTypeName),
     connection: Api,
-    commitment: Commitment?
+    commitment: Commitment?,
     onComplete: @escaping(Result<UInt64, Error>) -> Void
 ) {
-    return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args), commitment: commitment, onComplete: onComplete)
+    return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args: args), commitment: commitment, onComplete: onComplete)
 }
 """
         } else {
@@ -262,20 +253,38 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         return "var \(self.accountDiscriminatorName): [UInt8]"
     }
     
-    private func renderSerializeValue(fields: [AccountResolvedField]) -> String {
+    private func renderSerializeDictValue(fields: [AccountResolvedField]) -> String {
         var serializeValues:[String] = []
         if self.paddingField != nil {
             //serializeValues.append("padding: [UInt8](repeating: 0, count: \(self.paddingField!.size))")
         }
         
         let constructorParams = fields
-            .map{ "\($0.name): self.\($0.name)" }
+            .map{ "\"\($0.name)\" : self.\($0.name)" }
             .joined(separator: ",\n        ")
         
         return
 """
+[
 \(serializeValues.joined(separator: ",\n     "))
         \(constructorParams)
+]
+"""
+    }
+    
+    private func renderSerializeClassValue(argClassName :String, fields: [AccountResolvedField]) -> String {
+        var serializeValues:[String] = []
+        if self.paddingField != nil {
+            //serializeValues.append("padding: [UInt8](repeating: 0, count: \(self.paddingField!.size))")
+        }
+        
+        let constructorParams = fields
+            .map{ "\($0.name) : self.\($0.name)" }
+            .joined(separator: ",\n        ")
+        
+        return
+"""
+\(argClassName)(\(constructorParams))
 """
     }
     
@@ -297,7 +306,9 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         
         let byteSizeMethods = self.renderByteSizeMethods()
         let accountDiscriminatorVar = self.renderAccountDiscriminatorVar()
-        let serializeValue = self.renderSerializeValue(fields: editablefields)
+        let serializeValue = self.typeMapper.usedFixableSerde
+            ? self.renderSerializeDictValue(fields: editablefields)
+            : self.renderSerializeClassValue(argClassName: self.accountDataClassName, fields: editablefields)
         return
 """
 \(accountDiscriminatorVar)
@@ -368,7 +379,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   func serialize() -> ( Data, Int ) {
-    return \(self.serializerSnippets.serialize)(instance: \(self.accountDataClassName)(\(serializeValue)))
+    return \(self.serializerSnippets.serialize)(instance: \(serializeValue), byteSize: nil)
   }
   \(byteSizeMethods)
 }

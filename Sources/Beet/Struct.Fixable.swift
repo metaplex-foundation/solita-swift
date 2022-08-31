@@ -44,7 +44,7 @@ public class FixableBeetStruct<Class>: FixableBeet {
      * @param byteSize allows to override the size fo the created Buffer and
      * defaults to the size of the struct to serialize
      */
-    public func serialize(instance: Args, byteSize: Int?) -> (Data, Int) {
+    public func serialize(instance: Args, byteSize: Int?=nil) -> (Data, Int) {
         switch self.toFixedFromValue(val: instance).value {
         case .scalar(let value):
             let beetStruct = value as! BeetStruct<Class>

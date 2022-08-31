@@ -22,6 +22,7 @@ func prepareTargetDir(dir: Path) {
 
 func ensureDir(dir: Path) {
     if !dir.exists {
+        debugPrint(dir.string)
         try! dir.mkpath()
     }
     if !dir.isDirectory {

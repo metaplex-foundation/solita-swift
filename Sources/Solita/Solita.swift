@@ -186,7 +186,7 @@ public class Solita {
             errors = prependGeneratedWarningCode(e)
         }
         
-        return Rendered(instructions: instructions, accounts: accounts, types: types, errors: errors)
+        return Rendered(name: idl.name.uppercased(), instructions: instructions, accounts: accounts, types: types, errors: errors)
     }
     
     public func renderAndWriteTo(outputDir: String) {
@@ -283,25 +283,31 @@ public class Solita {
         let programAddress = self.idl.metadata?.address ?? ""
         let programIdConsts =
 """
-  /**
-   * Program address
-   *
-   * @category constants
-   * @category generated
-   */
-  let PROGRAM_ADDRESS = "\(programAddress)"
-  /**
-   * Program public key
-   *
-   * @category constants
-   * @category generated
-   */
-  public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
+import Foundation
+import Solana
+
+/**
+* Program address
+*
+* @category constants
+* @category generated
+*/
+
+let PROGRAM_ADDRESS = "\(programAddress)"
+
+/**
+* Program public key
+*
+* @category constants
+* @category generated
+*/
+
+public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
 """
         let code = """
 \(programIdConsts)
 """
-        try! (paths.root() + Path("Program.swift")).write(code)
+        try! (paths.root() + Path("Sources") + Path("Generated") + Path("Program.swift")).write(code)
     }
     
     // -----------------
@@ -346,6 +352,7 @@ let package = Package(
 }
 
 struct Rendered {
+    let name: String
     let instructions: Dictionary<String, String>
     let accounts: Dictionary<String, String>
     let types: Dictionary<String, String>

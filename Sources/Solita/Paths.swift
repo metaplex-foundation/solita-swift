@@ -11,8 +11,12 @@ public class Paths {
         return (outputDir)
     }
     
+    func sourcesFolder() -> Path {
+        return (outputDir + Path("Sources") + Path("Generated"))
+    }
+    
     public func accountsDir() -> Path {
-        return (outputDir + "accounts")
+        return sourcesFolder() + Path("accounts")
     }
     
     public func relAccountsDir() -> Path {
@@ -20,7 +24,7 @@ public class Paths {
     }
     
     public func instructionsDir() -> Path {
-        return (outputDir + Path("instructions"))
+        return (sourcesFolder() + Path("instructions"))
     }
     
     public func relInstructionsDir() -> Path {
@@ -28,7 +32,7 @@ public class Paths {
     }
     
     public func typesDir() -> Path {
-        return (outputDir + Path("types"))
+        return (sourcesFolder() + Path("types"))
     }
     
     public func relTypesDir() -> Path {
@@ -36,7 +40,7 @@ public class Paths {
     }
     
     public func errorsDir() -> Path {
-        return (outputDir + Path("errors"))
+        return sourcesFolder() + Path("errors")
     }
     
     public func relErrorsDir() -> Path {

@@ -46,6 +46,8 @@ func renderErrors(program: String, errors: [IdlError]) -> String? {
     let errorsCode = errors.map(renderErrorCode).joined(separator: "\n    ")
     let errorsMessages = errors.map(renderError).joined(separator: "\n    ")
     return """
+import Foundation
+
 public enum \(program)Error: String, Error {
     \(errorsCode)
 

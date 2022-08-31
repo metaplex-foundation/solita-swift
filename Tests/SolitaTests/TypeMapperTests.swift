@@ -235,7 +235,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "configDataBeet")
+        XCTAssert(serde == ".fixedBeet(.init(value: .scalar(configDataBeet)))")
         XCTAssert(tm.serdePackagesUsed.count == 0, "no serdePackages used")
         let expectedImports: Dictionary<String, Set<String>> = ["/module/of/config-data.swift": Set(["configDataBeet"])]
         XCTAssert(tm.localImportsByPath == expectedImports)
@@ -328,7 +328,7 @@ final class TypeMapperTests: XCTestCase {
         tm.clearUsages()
         
         let serde = tm.mapSerde(ty: type)
-        XCTAssert(serde == "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: configDataBeet))))", "publicKey serde")
+        XCTAssert(serde == "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: .fixedBeet(.init(value: .scalar(configDataBeet)))))))", "publicKey serde")
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         let expectedImports2: Dictionary<String, Set<String>> = ["/module/of/config-data.swift": Set(["configDataBeet"])]
         XCTAssert(tm.localImportsByPath == expectedImports2)
@@ -383,8 +383,8 @@ final class TypeMapperTests: XCTestCase {
         XCTAssert(mappedFields3 == [
             TypeMappedSerdeField(name: "u16", type: "Beet.fixedBeet(.init(value: .scalar(u16())))"),
             TypeMappedSerdeField(name: "optionPublicKey", type: "Beet.fixableBeat(coption(inner: Beet.fixedBeet(.init(value: .scalar(BeetPublicKey())))))"),
-            TypeMappedSerdeField(name: "configData", type: "configDataBeet"),
-            TypeMappedSerdeField(name: "vecOptionConfigData", type: "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: configDataBeet))))"),
+            TypeMappedSerdeField(name: "configData", type: ".fixedBeet(.init(value: .scalar(configDataBeet)))"),
+            TypeMappedSerdeField(name: "vecOptionConfigData", type: "Beet.fixableBeat(array(element: Beet.fixableBeat(coption(inner: .fixedBeet(.init(value: .scalar(configDataBeet)))))))"),
         ])
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
         XCTAssert(tm.serdePackagesUsed.contains(.BEET_SOLANA_PACKAGE))
