@@ -253,7 +253,7 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         return "var \(self.accountDiscriminatorName): [UInt8]"
     }
     
-    private func renderSerializeValue(fields: [AccountResolvedField]) -> String {
+    private func renderSerializeDictValue(fields: [AccountResolvedField]) -> String {
         var serializeValues:[String] = []
         if self.paddingField != nil {
             //serializeValues.append("padding: [UInt8](repeating: 0, count: \(self.paddingField!.size))")
@@ -265,8 +265,26 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         
         return
 """
+[
 \(serializeValues.joined(separator: ",\n     "))
         \(constructorParams)
+]
+"""
+    }
+    
+    private func renderSerializeClassValue(argClassName :String, fields: [AccountResolvedField]) -> String {
+        var serializeValues:[String] = []
+        if self.paddingField != nil {
+            //serializeValues.append("padding: [UInt8](repeating: 0, count: \(self.paddingField!.size))")
+        }
+        
+        let constructorParams = fields
+            .map{ "\($0.name) : self.\($0.name)" }
+            .joined(separator: ",\n        ")
+        
+        return
+"""
+\(argClassName)(\(constructorParams))
 """
     }
     
@@ -288,7 +306,9 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         
         let byteSizeMethods = self.renderByteSizeMethods()
         let accountDiscriminatorVar = self.renderAccountDiscriminatorVar()
-        let serializeValue = self.renderSerializeValue(fields: editablefields)
+        let serializeValue = self.typeMapper.usedFixableSerde
+            ? self.renderSerializeDictValue(fields: editablefields)
+            : self.renderSerializeClassValue(argClassName: self.accountDataClassName, fields: editablefields)
         return
 """
 \(accountDiscriminatorVar)
@@ -359,7 +379,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   func serialize() -> ( Data, Int ) {
-    return \(self.serializerSnippets.serialize)(instance: [\(serializeValue)], byteSize: nil)
+    return \(self.serializerSnippets.serialize)(instance: \(serializeValue), byteSize: nil)
   }
   \(byteSizeMethods)
 }
