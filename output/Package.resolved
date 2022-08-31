@@ -1,0 +1,70 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "PathKit",
+        "repositoryURL": "https://github.com/kylef/PathKit.git",
+        "state": {
+          "branch": null,
+          "revision": "e2f5be30e4c8f531c9c1e8765aa7b71c0a45d7a0",
+          "version": "0.9.2"
+        }
+      },
+      {
+        "package": "secp256k1",
+        "repositoryURL": "https://github.com/Boilertalk/secp256k1.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "45e458ec3be46cf0a6eb68bc947f797852dc65d8",
+          "version": "0.1.6"
+        }
+      },
+      {
+        "package": "Solana",
+        "repositoryURL": "https://github.com/metaplex-foundation/Solana.Swift.git",
+        "state": {
+          "branch": "master",
+          "revision": "75df095c2f4e2e75e5e8e6f6b0fcc9ee7388c68d",
+          "version": null
+        }
+      },
+      {
+        "package": "Solita",
+        "repositoryURL": "https://github.com/metaplex-foundation/solita-swift.git",
+        "state": {
+          "branch": "main",
+          "revision": "af2fa32b6d8dcfdb0e5cdf8e151e366f9b0f219c",
+          "version": null
+        }
+      },
+      {
+        "package": "Spectre",
+        "repositoryURL": "https://github.com/kylef/Spectre.git",
+        "state": {
+          "branch": null,
+          "revision": "f79d4ecbf8bc4e1579fbd86c3e1d652fb6876c53",
+          "version": "0.9.2"
+        }
+      },
+      {
+        "package": "Starscream",
+        "repositoryURL": "https://github.com/daltoniam/Starscream.git",
+        "state": {
+          "branch": null,
+          "revision": "df8d82047f6654d8e4b655d1b1525c64e1059d21",
+          "version": "4.0.4"
+        }
+      },
+      {
+        "package": "TweetNacl",
+        "repositoryURL": "https://github.com/bitmark-inc/tweetnacl-swiftwrap.git",
+        "state": {
+          "branch": null,
+          "revision": "f8fd111642bf2336b11ef9ea828510693106e954",
+          "version": "1.1.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

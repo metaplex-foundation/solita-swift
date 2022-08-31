@@ -161,14 +161,6 @@ protocol \(self.accountDataArgsTypeName) {
     
     private func renderByteSizeMethods() -> String {
         if self.typeMapper.usedFixableSerde {
-            let byteSizeValue = self.hasImplicitDiscriminator ?
-"""
-{
-    accountDiscriminator: \(self.accountDiscriminatorName),
-    ...instance,
-}
-"""
-            : "instance"
             
             return
 """
@@ -180,8 +172,7 @@ protocol \(self.accountDataArgsTypeName) {
 * depends on them
 */
 static func byteSize(args: \(self.accountDataArgsTypeName)) -> UInt64 {
-    let instance = \(self.accountDataClassName).fromArgs(args: args)
-    return UInt64(\(self.beetName).toFixedFromValue(val: \(byteSizeValue)).byteSize)
+    return UInt64(\(self.beetName).toFixedFromValue(val: args).byteSize)
 }
 /**
 * Fetches the minimum balance needed to exempt an account holding
@@ -194,7 +185,7 @@ static func byteSize(args: \(self.accountDataArgsTypeName)) -> UInt64 {
 static func getMinimumBalanceForRentExemption(
     args: \(self.accountDataArgsTypeName),
     connection: Api,
-    commitment: Commitment?
+    commitment: Commitment?,
     onComplete: @escaping(Result<UInt64, Error>) -> Void
 ) {
     return connection.getMinimumBalanceForRentExemption(dataLength: \(self.accountDataClassName).byteSize(args: args), commitment: commitment, onComplete: onComplete)
@@ -269,7 +260,7 @@ static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
         }
         
         let constructorParams = fields
-            .map{ "\($0.name): self.\($0.name)" }
+            .map{ "\"\($0.name)\" : self.\($0.name)" }
             .joined(separator: ",\n        ")
         
         return
@@ -368,7 +359,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   func serialize() -> ( Data, Int ) {
-    return \(self.serializerSnippets.serialize)(instance: \(self.accountDataClassName)(\(serializeValue)))
+    return \(self.serializerSnippets.serialize)(instance: [\(serializeValue)], byteSize: nil)
   }
   \(byteSizeMethods)
 }

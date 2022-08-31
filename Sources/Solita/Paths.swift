@@ -3,18 +3,20 @@ import PathKit
 
 public class Paths {
     private let outputDir: Path
-    private let name: String
-    init(outputDir: String, name: String){
+    init(outputDir: String){
         self.outputDir = Path(outputDir)
-        self.name = name
     }
     
     public func root() -> Path {
         return (outputDir)
     }
     
+    func sourcesFolder() -> Path {
+        return (outputDir + Path("Sources") + Path("Generated"))
+    }
+    
     public func accountsDir() -> Path {
-        return (outputDir + "Sources/\(name)/accounts")
+        return sourcesFolder() + Path("accounts")
     }
     
     public func relAccountsDir() -> Path {
@@ -22,7 +24,7 @@ public class Paths {
     }
     
     public func instructionsDir() -> Path {
-        return (outputDir + Path("Sources/\(name)/instructions"))
+        return (sourcesFolder() + Path("instructions"))
     }
     
     public func relInstructionsDir() -> Path {
@@ -30,7 +32,7 @@ public class Paths {
     }
     
     public func typesDir() -> Path {
-        return (outputDir + Path("Sources/\(name)/types"))
+        return (sourcesFolder() + Path("types"))
     }
     
     public func relTypesDir() -> Path {
@@ -38,7 +40,7 @@ public class Paths {
     }
     
     public func errorsDir() -> Path {
-        return (outputDir + Path("Sources/\(name)/errors"))
+        return sourcesFolder() + Path("errors")
     }
     
     public func relErrorsDir() -> Path {

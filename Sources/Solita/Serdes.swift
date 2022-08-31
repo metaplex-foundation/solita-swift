@@ -128,7 +128,7 @@ public func serdeRenderDataStruct(
         let beetStructType = isFixable ? "FixableBeetStruct" : "BeetStruct"
         let renderedStruct =
 """
-public let \(structVarName) = \(beetStructType)<\(className)>(
+public let \(structVarName) = \(beetStructType)\(isFixable ? "<\(className)>" : "")(
     fields:[
         \(discriminatorDecl)
         \(fieldDecls)
@@ -186,6 +186,7 @@ public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
     \(fieldDecls)
 ], description: "\(typeName)")
 """
+    
 }
 
 func renderTypeDataBeetArgsStruct(
@@ -198,8 +199,8 @@ func renderTypeDataBeetArgsStruct(
     let beetArgsStructType = "BeetArgsStruct"
     
     return """
-public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
+public let \(beetVarName) = \(beetArgsStructType)(fields: [
     \(fieldDecls)
 ], description: "\(typeName)")
-"""
+""".replacingOccurrences(of: "Beet.fixedBeet", with: "")
 }

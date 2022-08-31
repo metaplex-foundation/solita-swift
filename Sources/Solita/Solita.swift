@@ -190,9 +190,9 @@ public class Solita {
     }
     
     public func renderAndWriteTo(outputDir: String) {
+        self.paths = Paths(outputDir: outputDir)
+        
         let rendered = renderCode()
-        let name = rendered.name
-        self.paths = Paths(outputDir: outputDir, name: name)
         let instructions = rendered.instructions
         let accounts = rendered.accounts
         let types = rendered.types
@@ -220,7 +220,7 @@ public class Solita {
             self.writeErrors(errorsCode: errors)
         }
         self.writeMainIndex(reexports: reexports)
-        self.writeSwiftPackage(name: name)
+        self.writeSwiftPackage()
     }
     
     // -----------------
@@ -284,6 +284,7 @@ public class Solita {
         let programIdConsts =
 """
 import Foundation
+import Solana
 
 /**
 * Program address
@@ -306,14 +307,14 @@ public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
         let code = """
 \(programIdConsts)
 """
-        try! (paths.root() + Path("Program.swift")).write(code)
+        try! (paths.root() + Path("Sources") + Path("Generated") + Path("Program.swift")).write(code)
     }
     
     // -----------------
     // Swift Package File
     // -----------------
     
-    private func writeSwiftPackage(name: String) {
+    private func writeSwiftPackage() {
         guard let paths = self.paths else { fatalError("should have set paths") }
         
         let swiftlint =
@@ -328,19 +329,19 @@ disabled_rules:
 // swift-tools-version: 5.5.0
 import PackageDescription
 let package = Package(
-    name: "\(name)",
+    name: "Generated",
     platforms: [.iOS(.v11), .macOS(.v10_12)],
         products: [
             .library(
-                name: "\(name)",
-                targets: ["\(name)"]),
+                name: "Generated",
+                targets: ["Generated"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/solita-swift.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "\(name)",
+            name: "Generated",
             dependencies: [.product(name: "Beet", package: "solita-swift"), .product(name: "BeetSolana", package: "solita-swift")]),
     ]
 )

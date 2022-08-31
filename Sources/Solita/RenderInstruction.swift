@@ -201,8 +201,8 @@ public struct \(self.accountsTypename) {
         if processedKeys.count == 0 { return "  *" }
         return
 """
-     *
-     * @param accounts that will be accessed while the instruction is processed
+*
+* @param accounts that will be accessed while the instruction is processed
 """
     }
     
@@ -283,6 +283,7 @@ public struct \(self.accountsTypename) {
         let programIdArg = "\(comma)programId: PublicKey=\(self.programIdPubkey)"
         return
 """
+import Foundation
 \(imports)
 \(enums)
 \(ixArgType)
