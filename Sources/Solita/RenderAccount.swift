@@ -75,8 +75,7 @@ class AccountRenderer {
     }
     
     private func getPaddingField() -> PaddingField? {
-        let paddingField = self.account.type.fields?.filter { hasPaddingAttr(field: $0) }
-        guard let paddingField = paddingField else { return  nil }
+        let paddingField = self.account.type.fields.filter { hasPaddingAttr(field: $0) }
         if paddingField.count == 0 { return  nil }
         
         assert(
@@ -93,21 +92,21 @@ class AccountRenderer {
     }
     
     private func serdeProcess() -> [TypeMappedSerdeField] {
-        return self.typeMapper.mapSerdeFields(fields: self.account.type.fields!)
+        return self.typeMapper.mapSerdeFields(fields: self.account.type.fields)
     }
     
     // -----------------
     // Rendered Fields
     // -----------------
     private func getTypedFields() -> [AccountResolvedField] {
-        return self.account.type.fields!.map { f -> AccountResolvedField in
+        return self.account.type.fields.map { f -> AccountResolvedField in
             let swiftType = self.typeMapper.map(ty: f.type, name: f.name)
             return AccountResolvedField(name: f.name, swiftType: swiftType, isPadding: hasPaddingAttr(field: f))
         }
     }
     
     private func getPrettyFields() -> [String] {
-        return self.account.type.fields!
+        return self.account.type.fields
             .filter{ !hasPaddingAttr(field: $0) }
             .map { f in
                 if case .publicKey = f.type {

@@ -45,8 +45,8 @@ public class TypeRenderer {
         }
         
         if case .idlDefinedType(let d) = ty.type {
-            if d.fields?.count == 0 { return "" }
-            let fields = d.fields!.map{ renderTypeField(field: $0) }.joined(separator: "\n    ")
+            if d.fields.count == 0 { return "" }
+            let fields = d.fields.map{ renderTypeField(field: $0) }.joined(separator: "\n    ")
             return
 """
 public struct \(upperCamelTyName) {
@@ -89,7 +89,7 @@ public struct \(upperCamelTyName) {
             return "public let \(self.beetArgName) = \(exp!.rawValue).FixedSizeBeet(value: \(serde))"
         }
         if case .idlDefinedType(let d) = ty.type {
-            let mappedFields = self.typeMapper.mapSerdeFields(fields: d.fields!)
+            let mappedFields = self.typeMapper.mapSerdeFields(fields: d.fields)
             return renderTypeDataStruct(
                   fields: mappedFields,
                   beetVarName: self.beetArgName,

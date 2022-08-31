@@ -98,7 +98,7 @@ public class Solita {
                 debugPrint("Rendering type \(ty.name)")
                 debugPrint("kind: \(ty.kind)")
                 if case .idlDefinedType(let de) = ty.type {
-                    debugPrint("fields: \(de.fields!)")
+                    debugPrint("fields: \(de.fields)")
                 }
                 
                 if case .idlTypeEnum(let e) = ty.type {
