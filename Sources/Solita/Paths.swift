@@ -3,8 +3,10 @@ import PathKit
 
 public class Paths {
     private let outputDir: Path
-    init(outputDir: String){
+    private let projectName: String
+    init(outputDir: String, projectName: String){
         self.outputDir = Path(outputDir)
+        self.projectName = projectName
     }
     
     public func root() -> Path {
@@ -12,7 +14,7 @@ public class Paths {
     }
     
     func sourcesFolder() -> Path {
-        return (outputDir + Path("Sources") + Path("Generated"))
+        return (outputDir + Path("Sources") + Path(projectName))
     }
     
     public func accountsDir() -> Path {

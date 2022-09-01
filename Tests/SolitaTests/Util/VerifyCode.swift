@@ -93,9 +93,14 @@ func analyzeCode(swift: String, logBuild: Bool = false) -> BuildedLogCode {
     print("Build Location: \(tempDir.string)" )
     try! swift.write(to: filePath.url, atomically: true, encoding: String.Encoding.utf8)
     try! package.write(to: packagePath.url, atomically: true, encoding: String.Encoding.utf8)
-    let output = try! shell(command: "cd \(tempDir.string); swift build")
-    if logBuild { print(output) }
+    let output = build(projectFolder: tempDir)
     return BuildedLogCode(swift: swift, output: output)
+}
+
+func build(projectFolder: Path, logBuild: Bool = false) -> [String] {
+    let output = try! shell(command: "cd \(projectFolder.string); swift build")
+    if logBuild { print(output) }
+    return output
 }
 
 
