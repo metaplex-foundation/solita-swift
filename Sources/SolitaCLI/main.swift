@@ -14,6 +14,9 @@ class SolitaRenderCommand: Command {
     @Param var idlPath: String
     @Param var outputDir: String
     
+    @Key("-p", "--projectName", description: "Project Name")
+    var projectName: String?
+    
     func execute() throws {
         stdout <<< "Reading \(idlPath)"
         let path = Path(idlPath)
@@ -26,7 +29,7 @@ class SolitaRenderCommand: Command {
             return
         }
         let idl = try! getDencoder().decode(Idl.self, from: path.read())
-        let solita = Solita(idl: idl)
+        let solita = Solita(idl: idl, projectName: projectName ?? "Generated")
         solita.renderAndWriteTo(outputDir: outputDir)
     }
 }

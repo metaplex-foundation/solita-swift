@@ -4,19 +4,21 @@ import SwiftCLI
 public class Solita {
     public let idl: Idl
     public var paths: Paths?
+    public var projectName: String
     private let hasInstructions: Bool
     private let accountsHaveImplicitDiscriminator: Bool
     private let typeAliases: Dictionary<String, PrimitiveTypeKey>
     private let serializers: CustomSerializers
     private let prependGeneratedWarning: Bool
     public init(idl: Idl,
+                projectName: String="Generated",
                 prependGeneratedWarning: Bool=true,
                 accountsHaveImplicitDiscriminator: Bool=false,
-                typeAliases: Dictionary<String,
-                PrimitiveTypeKey>=[:],
+                typeAliases: Dictionary<String, PrimitiveTypeKey>=[:],
                 serializers: CustomSerializers?=nil
     ) {
         self.idl = idl
+        self.projectName = projectName
         self.hasInstructions = idl.instructions.count > 0
         self.typeAliases = typeAliases
         self.prependGeneratedWarning = prependGeneratedWarning
@@ -190,8 +192,7 @@ public class Solita {
     }
     
     public func renderAndWriteTo(outputDir: String) {
-        self.paths = Paths(outputDir: outputDir)
-        
+        self.paths = Paths(outputDir: outputDir, projectName: projectName)
         let rendered = renderCode()
         let instructions = rendered.instructions
         let accounts = rendered.accounts
@@ -307,7 +308,7 @@ public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
         let code = """
 \(programIdConsts)
 """
-        try! (paths.root() + Path("Sources") + Path("Generated") + Path("Program.swift")).write(code)
+        try! (paths.root() + Path("Sources") + Path(projectName) + Path("Program.swift")).write(code)
     }
     
     // -----------------
@@ -329,19 +330,19 @@ disabled_rules:
 // swift-tools-version: 5.5.0
 import PackageDescription
 let package = Package(
-    name: "Generated",
+    name: "\(projectName)",
     platforms: [.iOS(.v11), .macOS(.v10_12)],
         products: [
             .library(
-                name: "Generated",
-                targets: ["Generated"]),
+                name: "\(projectName)",
+                targets: ["\(projectName)"]),
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/solita-swift.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "Generated",
+            name: "\(projectName)",
             dependencies: [.product(name: "Beet", package: "solita-swift"), .product(name: "BeetSolana", package: "solita-swift")]),
     ]
 )
