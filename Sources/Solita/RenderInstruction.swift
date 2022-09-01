@@ -302,8 +302,7 @@ public let \(self.instructionDiscriminatorName) = \(instructionDisc)
 public func create\(self.upperCamelIxName)Instruction(\(accountsArg)\(createInstructionArgs)\(programIdArg)) -> TransactionInstruction {
 
     let data = \(self.structArgName).serialize(
-            instance: ["instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)],  byteSize: nil
-    )
+            instance: ["instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)])
 
     \((optionals > 0) ? "var" : "let") keys: [Account.Meta] = \(keys)
     let ix = TransactionInstruction(

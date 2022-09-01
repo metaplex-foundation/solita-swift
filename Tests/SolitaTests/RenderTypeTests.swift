@@ -69,7 +69,7 @@ final class RenderTypeTests: XCTestCase {
         )
         print("--------- <Swift> --------\n\(swift.code)\n--------- </Swift> --------\n")
         XCTAssert(swift.code.contains("let creators: [Creator]"))
-        XCTAssert(swift.code.contains("Beet.fixableBeat(array(element: .fixedBeet(.init(value: .scalar(creatorBeet))))))"))
+        XCTAssert(swift.code.contains("Beet.fixableBeat(array(element: creatorBeetWrapped))"))
     }
     
     func testTypeEnumWithInlineData() {

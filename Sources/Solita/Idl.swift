@@ -177,7 +177,7 @@ public enum IdlTypeDefTyKind: String, Decodable {
 
 public struct IdlDefinedType: Decodable {
     let kind: IdlTypeDefTyKind
-    let fields: IdlTypeDefStruct?
+    let fields: IdlTypeDefStruct
 }
 
 public typealias IdlTypeDefStruct = [IdlField]
