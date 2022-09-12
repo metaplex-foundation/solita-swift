@@ -156,14 +156,14 @@ extension IdlDefinedTypeDefinition: Decodable {
             self.type = .idlDefinedType(x)
             return
         }
-        if let x = try? container.decode(IdlTypeScalarEnum.self, forKey: .type) {
-            self.name = try container.decode(String.self, forKey: .name)
-            self.type = .idlTypeEnum(x)
-            return
-        }
         if let x = try? container.decode(IdlTypeDataEnum.self, forKey: .type) {
             self.name = try container.decode(String.self, forKey: .name)
             self.type = .idlTypeDataEnum(x)
+            return
+        }
+        if let x = try? container.decode(IdlTypeScalarEnum.self, forKey: .type) {
+            self.name = try container.decode(String.self, forKey: .name)
+            self.type = .idlTypeEnum(x)
             return
         }
         throw DecodingError.typeMismatch(IdlDefinedTypeDefinition.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for IdlDefinedTypeDefinition"))

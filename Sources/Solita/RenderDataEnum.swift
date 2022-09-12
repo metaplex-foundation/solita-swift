@@ -33,9 +33,11 @@ func renderTypeDataEnumBeet(
     
     return
 """
-public let \(beetVarName) = \(BEET_EXPORT_NAME_STRING).\(beetType)(DataEnum<\(enumRecordName)>(variants: [
+public let \(beetVarName) = DataEnum<\(enumRecordName)>(variants: [
 \(renderedBeets)
-]))
+])
+
+public let \(beetVarName)Wrapped = \(BEET_EXPORT_NAME_STRING).\(beetType)(\(beetVarName))
 """
 }
 
@@ -98,6 +100,24 @@ func renderDataEnumRecord(
         return "case \(variant.name)(\(fields.joined(separator: ", ")))"
     }
     
+    let renderedInitDiscriminator = variants.indices.map { index -> String in
+        let variant = variants[index]
+        let fields = variant.fields.map { field -> String in
+            let swiftType = typeMapper.map(ty: field.type, name: field.name)
+            let fieldName = upperCamelCase(ty: field.name)
+            return "\(fieldName): params[\"\(fieldName)\"] as! \(swiftType)"
+        }
+        return "case \(index): self = \(typeName)Record.\(variant.name)(\(fields.joined(separator: ", ")))"
+    }
+    
+    let renderedParamsOrderedKeys = variants.indices.map { index -> String in
+        let variant = variants[index]
+        let fields = variant.fields.map { field -> String in
+            let fieldName = upperCamelCase(ty: field.name)
+            return ".key(\"\(fieldName)\")"
+        }
+        return "case \(index): return [\(fields.joined(separator: ", "))]"
+    }
     return
 """
 /**
@@ -116,13 +136,14 @@ public enum \(typeName)Record: Equatable {
 extension \(typeName)Record: ConstructableWithDiscriminator {
     public init?(discriminator: UInt8, params: [String: Any]) {
         switch discriminator{
+        \(renderedInitDiscriminator.joined(separator: "\n        "))
         default: return nil
         }
     }
     
     public static func paramsOrderedKeys(discriminator: UInt8) -> [ParamkeyTypes] {
         switch discriminator{
-
+        \(renderedParamsOrderedKeys.joined(separator: "\n        "))
         default: return []
         }
     }

@@ -25,4 +25,16 @@ final class SolitaTests: XCTestCase {
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
+    
+    func testFanout() {
+        let json = stubbedResponse("fanout")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+    }
+    
+    func testDataEnum() {
+        let json = stubbedResponse("feat-data-enum")
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+    }
 }

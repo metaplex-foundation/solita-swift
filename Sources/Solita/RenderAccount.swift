@@ -520,7 +520,7 @@ public let \(structVarName) = \(beetStructType)\(isFixable ? "<\(className)>" : 
     description: \"\(className)\"
 )
 """
-        if !isFixable { return renderedStruct.replacingOccurrences(of: "Beet.fixedBeet", with: "")} // Hack to avoid havinf the Beet.fixedBeet on all the types
+        if !isFixable { return renderedStruct.replacingOccurrences(of: "Beet.fixedBeet", with: "").replacingOccurrences(of: "Wrapped", with: "")} // Hack to avoid havinf the Beet.fixedBeet on all the types
         return renderedStruct
     } else {
         let beetArgsStructType = "FixableBeetArgsStruct"
