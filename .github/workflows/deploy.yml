@@ -9,10 +9,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: swift build
-    - name: Run tests
-      run: swift test --enable-code-coverage
-    - name: Test coverage
-      uses: maxep/spm-lcov-action@0.3.0
-      with:
-        output-file: ./coverage/lcov.info
+      run: swift build -c release
+	- name: Archive code coverage results
+      uses: actions/upload-artifact@v3
+	  	with:
+            name: solita
+            path: .build/release/SolitaCLI
+	- name: Checksum
+      run: shasum -a 256 .build/release/SolitaCLI >> checksum
+ 	- name: Archive code coverage results
+       uses: actions/upload-artifact@v3
+ 	  	with:
+             name: checksum
+             path: checksum
