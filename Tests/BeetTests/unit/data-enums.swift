@@ -51,9 +51,9 @@ enum Ty: Equatable {
 extension Ty: ConstructableWithDiscriminator {
     init?(discriminator: UInt8, params: [String: Any]) {
         switch discriminator{
-        case 0: self = Ty.fixable(s: params["s"] as! String)
-        case 1: self = Ty.fixed(params.first!.value as! UInt8)
-        case 2: self = Ty.none
+        case 0: self = .fixable(s: params["s"] as! String)
+        case 1: self = .fixed(params.first!.value as! UInt8)
+        case 2: self = .none
         default: return nil
         }
     }
