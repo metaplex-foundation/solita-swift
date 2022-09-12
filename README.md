@@ -98,6 +98,7 @@ Beet implements the entire [borsh spec](https://borsh.io/).
 ## Examples
 
 ### Single Fixed Struct Configuration
+
 ```swift
 import Beet
 
@@ -125,6 +126,7 @@ struct Results: Equatable {
 ```
 
 ### Nested Struct Configuration
+
 ```swift
 import Beet
 import Solana
@@ -156,12 +158,16 @@ let (buf,_) = Trader.struct.serialize(instance: trader, byteSize: Int(Trader.str
 let (deserialized, _) = Trader.struct.deserialize(buffer: buf)
 ```
 
-### Struct with non-primitive fields
-```swift
-import Beet
-import Solana
+## Build from Source
 
+Run the following command on shell to compile 
+
+```sh
+swift build -c release
 ```
+
+the output binary file will be here `.build/release/SolitaCLI`
+
 ## LICENSE
 
 Apache-2.0
