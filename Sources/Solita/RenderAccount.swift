@@ -217,7 +217,7 @@ static func getMinimumBalanceForRentExemption(
   * Determines if the provided {@link Buffer} has the correct byte size to
   * hold {@link \(self.accountDataClassName)} data.
   */
-  static func hasCorrectByteSize(buf: Data, offset:Int=0) -> Bool {
+  static func hasCorrectByteSize(buf: Foundation.Data, offset:Int=0) -> Bool {
       return buf.bytes.count - offset == \(self.accountDataClassName).byteSize()
   }
 """
@@ -333,7 +333,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static func fromAccountInfo(
-    accountInfo: Data,
+    accountInfo: Foundation.Data,
     offset:Int=0
   ) -> ( \(self.accountDataClassName), Int )  {
     return \(self.accountDataClassName).deserialize(buf: accountInfo, offset: offset)
@@ -367,7 +367,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static func deserialize(
-    buf: Data,
+    buf: Foundation.Data,
     offset: Int = 0
   ) -> ( \(self.accountDataClassName), Int ) {
     return \(self.serializerSnippets.deserialize)(buffer: buf, offset: offset)
@@ -376,7 +376,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * Serializes the {@link \(self.accountDataClassName)} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
-  func serialize() -> ( Data, Int ) {
+  func serialize() -> ( Foundation.Data, Int ) {
     return \(self.serializerSnippets.serialize)(instance: \(serializeValue))
   }
   \(byteSizeMethods)
