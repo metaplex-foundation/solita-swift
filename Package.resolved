@@ -23,8 +23,8 @@
         "package": "Solana",
         "repositoryURL": "https://github.com/metaplex-foundation/Solana.Swift.git",
         "state": {
-          "branch": "master",
-          "revision": "f487b256658634d7bdc178c6e6e7abf7fd905580",
+          "branch": "1.3.0",
+          "revision": "9342eb1e96a0a8b78f4a38f255f1fcbfe0797383",
           "version": null
         }
       },
