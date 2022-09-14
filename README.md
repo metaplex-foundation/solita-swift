@@ -168,6 +168,21 @@ swift build -c release
 
 the output binary file will be here `.build/release/SolitaCLI`
 
+### Errors
+
+If you receive the following error:
+
+```sh
+error: 'solita-swift': Invalid manifest
+.../solita-swift/Package.swift:2:8: error: no such module 'PackageDescription'
+```
+
+Running the following command should resolve the issue:
+
+```sh
+sudo xcode-select --reset
+```
+
 ## LICENSE
 
 Apache-2.0
