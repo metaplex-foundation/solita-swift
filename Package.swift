@@ -16,7 +16,7 @@ let package = Package(
             targets: ["SolitaCLI"]),
     ],
     dependencies: [
-        .package(name:"Beet", url: "https://github.com/metaplex-foundation/beet-swift.git", branch: "main"),
+        .package(name: "Beet", url: "https://github.com/metaplex-foundation/beet-swift.git", from: "1.0.0"),
         .package(name: "Solana", url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "1.3.0"),
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.9.0"),
         .package(url: "https://github.com/jakeheis/SwiftCLI", from: "6.0.0"),

@@ -5,9 +5,9 @@
         "package": "Beet",
         "repositoryURL": "https://github.com/metaplex-foundation/beet-swift.git",
         "state": {
-          "branch": "main",
-          "revision": "e7ff7888ae892817ccb27cb274b0e8b47036b58d",
-          "version": null
+          "branch": null,
+          "revision": "0873ff2e674e64e1c40fceeb6c040064015bdc09",
+          "version": "1.0.0"
         }
       },
       {
