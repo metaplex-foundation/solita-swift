@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 struct GameScore: Equatable {
     let win: UInt8

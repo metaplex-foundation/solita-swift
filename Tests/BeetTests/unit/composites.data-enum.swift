@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 final class CompositesDataEnumsTests: XCTestCase {
     func testCompositesDataEnumColorString() {

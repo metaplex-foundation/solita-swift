@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 enum Directions: CaseIterable {
     case Up

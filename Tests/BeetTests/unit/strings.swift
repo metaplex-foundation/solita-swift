@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 func checkCases<U: Equatable>(
     offsets: [Int],

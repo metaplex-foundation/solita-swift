@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 enum Simples: ConstructableWithDiscriminator & Equatable{
     case First(first_field: UInt32)

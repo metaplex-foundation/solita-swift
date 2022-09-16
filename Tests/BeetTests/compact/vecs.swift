@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 final class vecsTests: XCTestCase {
     func testCompatVecsU8s() {

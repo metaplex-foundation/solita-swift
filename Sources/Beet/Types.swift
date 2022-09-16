@@ -1,5 +1,4 @@
 import Foundation
-import Solana
 
 /**
  * Base Beet type.

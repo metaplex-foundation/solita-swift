@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 let result1 = { Results(win: 20, totalWin: 1200, losses: -455) }
 let result2 = { Results(win: 30, totalWin: 100, losses: -3) }

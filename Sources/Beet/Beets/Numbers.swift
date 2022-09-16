@@ -1,5 +1,4 @@
 import Foundation
-import Solana
 
 /**
  * De/Serializer for 8-bit unsigned integers aka `u8`.

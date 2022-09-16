@@ -1,7 +1,6 @@
 import Foundation
 import XCTest
 @testable import Beet
-import Solana
 
 final class collectionArrayUniformTests: XCTestCase {
     func testCollectionsFixedSizeArrayOfu8IncludeSize() {

@@ -32,7 +32,7 @@ let package = Package(
             dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet", "PathKit", "BeetSolana"]),
         .target(
             name: "Beet",
-            dependencies: [.product(name: "Solana", package: "Solana.Swift")]),
+            dependencies: []),
         .target(
             name: "BeetSolana",
             dependencies: [.product(name: "Solana", package: "Solana.Swift"), "Beet"]),
@@ -42,7 +42,7 @@ let package = Package(
             resources: [ .process("Resources")]),
         .testTarget(
             name: "BeetTests",
-            dependencies: ["Solita"],
+            dependencies: ["Beet"],
             resources: [ .process("Resources")]),
         .testTarget(
             name: "SolitaTests",
