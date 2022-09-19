@@ -339,11 +339,15 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/metaplex-foundation/solita-swift.git", branch: "main"),
+        .package(name: "Beet", url: "https://github.com/metaplex-foundation/beet-swift.git", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "\(projectName)",
-            dependencies: [.product(name: "Beet", package: "solita-swift"), .product(name: "BeetSolana", package: "solita-swift")]),
+            dependencies: [
+                "Beet",
+                .product(name: "BeetSolana", package: "solita-swift")
+            ]),
     ]
 )
 """
