@@ -49,7 +49,7 @@ final class RenderAccountsTests: XCTestCase {
         let ix = IdlAccount(name: "AuctionHouse", type: .init(kind: .struct, fields: []))
         checkRenderedAccount(account: ix, imports: [], opts: CheckRenderedAccountOpts(
             logImports: DIAGNOSTIC_ON,
-            logCode: true,
+            logCode: true, 
             serializers: CustomSerializers.empty(),
             hasImplicitDiscriminator: nil,
             verifyBuild: true)
