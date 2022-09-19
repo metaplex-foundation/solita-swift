@@ -8,6 +8,7 @@ let swiftlint =
 disabled_rules:
   - identifier_name
   - force_cast
+  - line_length
 """
 
 let package =
