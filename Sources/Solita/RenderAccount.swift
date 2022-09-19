@@ -323,7 +323,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
   /**
    * Creates a {@link \(self.accountDataClassName)} instance from the provided args.
    */
-  static func fromArgs(args: Args) -> \(self.accountDataClassName) {
+  public static func fromArgs(args: Args) -> \(self.accountDataClassName) {
     return \(self.accountDataClassName)(
         \(constructorParams)
     )
@@ -332,7 +332,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * Deserializes the {@link \(self.accountDataClassName)} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static func fromAccountInfo(
+  public static func fromAccountInfo(
     accountInfo: Foundation.Data,
     offset:Int=0
   ) -> ( \(self.accountDataClassName), Int )  {
@@ -344,7 +344,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
-  static func fromAccountAddress(
+  public static func fromAccountAddress(
     connection: Api,
     address: PublicKey,
     onComplete: @escaping (Result<\(self.accountDataClassName), Error>) -> Void
@@ -366,7 +366,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * Deserializes the {@link \(self.accountDataClassName)} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static func deserialize(
+  public static func deserialize(
     buf: Foundation.Data,
     offset: Int = 0
   ) -> ( \(self.accountDataClassName), Int ) {
@@ -376,7 +376,7 @@ public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
    * Serializes the {@link \(self.accountDataClassName)} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
-  func serialize() -> ( Foundation.Data, Int ) {
+  public func serialize() -> ( Foundation.Data, Int ) {
     return \(self.serializerSnippets.serialize)(instance: \(serializeValue))
   }
   \(byteSizeMethods)
