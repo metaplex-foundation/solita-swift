@@ -17,7 +17,7 @@ func colonSeparatedTypedField(
     field: AccountResolvedField,
     prefix:String=""
 ) -> String {
-    return "\(readOnly ? "let" : "var") \(prefix)\(field.name): \(field.swiftType)"
+    return "\(prefix) \(readOnly ? "let" : "var") \(field.name): \(field.swiftType)"
 }
 
 class AccountRenderer {
@@ -150,7 +150,7 @@ class AccountRenderer {
 * @category Accounts
 * @category generated
 */
-protocol \(self.accountDataArgsTypeName) {
+public protocol \(self.accountDataArgsTypeName) {
     \(renderedDiscriminator)
     \(renderedFields)
 }
@@ -298,7 +298,7 @@ static func getMinimumBalanceForRentExemption(
             .joined(separator: ",\n        ")
         
         let interfaceRequiredFields = editablefields
-            .map{ colonSeparatedTypedField(readOnly: true, field: $0) }
+            .map{ colonSeparatedTypedField(readOnly: true, field: $0, prefix: "public") }
             .map{ "\($0)" }
             .joined(separator: "\n  ")
         
