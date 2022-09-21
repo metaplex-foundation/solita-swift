@@ -17,6 +17,9 @@ class SolitaRenderCommand: Command {
     @Key("-p", "--projectName", description: "Project Name")
     var projectName: String?
     
+    @Key("-a", "--accountsHaveImplicitDiscriminator", description: "Accounts have implicit discriminator (Default False).")
+    var accountsHaveImplicitDiscriminator: Bool?
+    
     func execute() throws {
         stdout <<< "Reading \(idlPath)"
         let path = Path(idlPath)
@@ -29,7 +32,7 @@ class SolitaRenderCommand: Command {
             return
         }
         let idl = try! getDencoder().decode(Idl.self, from: path.read())
-        let solita = Solita(idl: idl, projectName: projectName ?? "Generated")
+        let solita = Solita(idl: idl, projectName: projectName ?? "Generated", accountsHaveImplicitDiscriminator: accountsHaveImplicitDiscriminator ?? false)
         solita.renderAndWriteTo(outputDir: outputDir)
     }
 }
