@@ -66,6 +66,12 @@ let PROGRAM_ADDRESS = "<publickey>"
 
 public let PROGRAM_ID = PublicKey(string: PROGRAM_ADDRESS)
 ```
+## Options
+
+| Option                                 | Short     | Long                                      | Value          |
+|----------------------------------------|-----------|-------------------------------------------|----------------|
+| Project Name                           | -p        | --projectName                             | String         |
+| AccountsHaveImplicitDiscriminator      | -a        | --accountsHaveImplicitDiscriminator       | True or False  |
 
 ## Build from Source
 
