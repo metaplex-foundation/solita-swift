@@ -8,6 +8,7 @@ public struct PaddingField {
 
 struct AccountResolvedField {
     let name: String
+    let key: String
     let swiftType: String
     let isPadding: Bool?
 }
@@ -101,7 +102,7 @@ class AccountRenderer {
     private func getTypedFields() -> [AccountResolvedField] {
         return self.account.type.fields.map { f -> AccountResolvedField in
             let swiftType = self.typeMapper.map(ty: f.type, name: f.name)
-            return AccountResolvedField(name: f.name, swiftType: swiftType, isPadding: hasPaddingAttr(field: f))
+            return AccountResolvedField(name: f.name, key: f.name, swiftType: swiftType, isPadding: hasPaddingAttr(field: f))
         }
     }
     
@@ -243,7 +244,7 @@ static func getMinimumBalanceForRentExemption(
         
         let accountDisc = accountDiscriminator(name: self.account.name)
         
-        return "let \(self.accountDiscriminatorName) = \(accountDisc.bytes) as [UInt8]"
+        return "public static let \(self.accountDiscriminatorName) = \(accountDisc.bytes) as [UInt8]"
     }
     
     private func renderAccountDiscriminatorField() -> String {
@@ -289,15 +290,19 @@ static func getMinimumBalanceForRentExemption(
     private func renderAccountDataClass(
         fields: [AccountResolvedField]
     ) -> String {
-        var editablefields = fields
+        var constructorFields = fields
+        var editableFields = fields
+
         if self.hasImplicitDiscriminator {
-            editablefields.insert(AccountResolvedField(name: self.accountDiscriminatorName, swiftType: "[UInt8]", isPadding: false), at: 0)
+            constructorFields.insert(AccountResolvedField(name: self.accountDiscriminatorName, key: "accountDiscriminator", swiftType: "[UInt8]", isPadding: false), at: 0)
+            editableFields.insert(AccountResolvedField(name: self.accountDiscriminatorName, key: self.accountDiscriminatorName, swiftType: "[UInt8]", isPadding: false), at: 0)
         }
-        let constructorParams = editablefields
-            .map{ "\($0.name): args[\"\($0.name)\"] as! \($0.swiftType)" }
+
+        let constructorParams = constructorFields
+            .map{ "\($0.name): args[\"\($0.key)\"] as! \($0.swiftType)" }
             .joined(separator: ",\n        ")
         
-        let interfaceRequiredFields = editablefields
+        let interfaceRequiredFields = editableFields
             .map{ colonSeparatedTypedField(readOnly: true, field: $0, prefix: "public") }
             .map{ "\($0)" }
             .joined(separator: "\n  ")
@@ -305,11 +310,10 @@ static func getMinimumBalanceForRentExemption(
         let byteSizeMethods = self.renderByteSizeMethods()
         let accountDiscriminatorVar = self.renderAccountDiscriminatorVar()
         let serializeValue = self.typeMapper.usedFixableSerde
-            ? self.renderSerializeDictValue(fields: editablefields)
-            : self.renderSerializeClassValue(argClassName: self.accountDataClassName, fields: editablefields)
+            ? self.renderSerializeDictValue(fields: editableFields)
+            : self.renderSerializeClassValue(argClassName: self.accountDataClassName, fields: editableFields)
         return
 """
-\(accountDiscriminatorVar)
 /**
  * Holds the data for the {@link \(self.upperCamelAccountName)} Account and provides de/serialization
  * functionality for that data
@@ -318,6 +322,8 @@ static func getMinimumBalanceForRentExemption(
  * @category generated
  */
 public struct \(self.accountDataClassName): \(self.accountDataArgsTypeName) {
+  \(accountDiscriminatorVar)
+
   \(interfaceRequiredFields)
 
   /**
