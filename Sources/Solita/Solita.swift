@@ -13,7 +13,7 @@ public class Solita {
     public init(idl: Idl,
                 projectName: String="Generated",
                 prependGeneratedWarning: Bool=true,
-                accountsHaveImplicitDiscriminator: Bool=true,
+                accountsHaveImplicitDiscriminator: Bool=false,
                 typeAliases: Dictionary<String, PrimitiveTypeKey>=[:],
                 serializers: CustomSerializers?=nil
     ) {
