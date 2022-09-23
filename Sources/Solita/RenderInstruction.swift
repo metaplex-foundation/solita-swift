@@ -118,7 +118,7 @@ public struct \(self.argsTypename){
             : "accounts.\(processedKeys.name) ?? \(renderKnownPubkeyAccess(knownPubkey: processedKeys.knownPubkey!, programIdPubkey: self.programIdPubkey))"
             return
 """
-    Account.Meta(
+    AccountMeta(
             publicKey: \(pubkey),
             isSigner: \(processedKeys.isSigner),
             isWritable: \(processedKeys.isMut)
@@ -141,7 +141,7 @@ public struct \(self.argsTypename){
     if accounts.\(key.name) != nil {
         \(checkRequireds)
         keys.append(
-            Account.Meta(
+            AccountMeta(
                 publicKey: accounts.\(key.name)!,
                 isSigner: \(key.isSigner),
                 isWritable: \(key.isMut)
@@ -304,7 +304,7 @@ public func create\(self.upperCamelIxName)Instruction(\(accountsArg)\(createInst
     let data = \(self.structArgName).serialize(
             instance: ["instructionDiscriminator": \(self.instructionDiscriminatorName)\(createInstructionArgsSpread == "" ? " ": ",\n")\(createInstructionArgsSpread)])
 
-    \((optionals > 0) ? "var" : "let") keys: [Account.Meta] = \(keys)
+    \((optionals > 0) ? "var" : "let") keys: [AccountMeta] = \(keys)
     let ix = TransactionInstruction(
                 keys: keys,
                 programId: programId,
