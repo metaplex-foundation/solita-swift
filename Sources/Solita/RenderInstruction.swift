@@ -54,6 +54,18 @@ public class InstructionRenderer {
         let swiftType = self.typeMapper.map(ty: arg.type, name: arg.name)
         return "\(arg.name): \(swiftType)"
     }
+
+    private func renderIxParametersField(arg: IdlField) -> String {
+        let swiftType = self.typeMapper.map(ty: arg.type, name: arg.name)
+        if arg.type.key.hasSuffix("?") {
+            return "\(arg.name): \(swiftType) = nil"
+        }
+        return "\(arg.name): \(swiftType)"
+    }
+
+    private func renderIxParametersFieldValue(arg: IdlField) -> String {
+        return "self.\(arg.name) = \(arg.name)"
+    }
     
     private func renderIxPropertyField(arg: IdlField) -> String {
         let swiftType = self.typeMapper.map(ty: arg.type, name: arg.name)
@@ -64,9 +76,24 @@ public class InstructionRenderer {
         discriminatorName: String?,
         discriminatorField: TypeMappedSerdeField?,
         discriminatorType: String?
-) -> String {
-        let fields = self.ix.args.map { renderIxPropertyField(arg: $0) }.joined(separator: "\n    ")
+    ) -> String {
         let discriminatorType = discriminatorType ?? "[UInt8]"
+        var parameterStrings = ["instructionDiscriminator: \(discriminatorType) = \(instructionDiscriminatorName)"]
+        parameterStrings.append(contentsOf: self.ix.args.map { renderIxArgField(arg: $0) })
+        let parameters = parameterStrings.joined(separator: ",\n        ")
+
+        var parameterValueStrings = ["self.instructionDiscriminator = instructionDiscriminator"]
+        parameterValueStrings.append(contentsOf: self.ix.args.map { renderIxParametersFieldValue(arg: $0) })
+        let parameterValues = parameterValueStrings.joined(separator: "\n        ")
+        let fields = self.ix.args.map { renderIxPropertyField(arg: $0) }.joined(separator: "\n    ")
+        let initializer =
+"""
+public init(
+        \(parameters)
+    ) {
+        \(parameterValues)
+    }
+"""
         let code =
 """
 /**
@@ -77,6 +104,8 @@ public class InstructionRenderer {
 public struct \(self.argsTypename){
     let instructionDiscriminator: \(discriminatorType)
     \(fields)
+
+    \(initializer)
 }
 """
         return code
@@ -165,7 +194,27 @@ public struct \(self.argsTypename){
             }
             let optional = key.optional == true ? "?" : ""
             return "let \(key.name): PublicKey\(optional)"
+        }.joined(separator: "\n    ")
+
+        let parameters = processedKeys.map { key -> String in
+            if key.knownPubkey != nil {
+                return "\(key.name): PublicKey? = nil"
+            }
+            let optional = key.optional == true ? "? = nil" : ""
+            return "\(key.name): PublicKey\(optional)"
+        }.joined(separator: ",\n        ")
+
+        let parameterValues = processedKeys.map { key -> String in
+            return "self.\(key.name) = \(key.name)"
         }.joined(separator: "\n        ")
+
+        let initializer = """
+        public init(
+                \(parameters)
+            ) {
+                \(parameterValues)
+            }
+        """
         
         let propertyComments = processedKeys
             .filter { !isKnownPubkey(id: $0.name) }
@@ -192,7 +241,9 @@ public struct \(self.argsTypename){
 """
 \(docs)
 public struct \(self.accountsTypename) {
-        \(fields)
+    \(fields)
+
+    \(initializer)
 }
 """
     }

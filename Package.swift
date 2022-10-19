@@ -17,12 +17,12 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "Beet", url: "https://github.com/metaplex-foundation/beet-swift.git", from: "1.0.0"),
-        .package(name: "Solana", url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "2.0.0"),
+        .package(name: "Solana", url: "https://github.com/metaplex-foundation/Solana.Swift.git", branch: "2.0.1"),
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.9.0"),
         .package(url: "https://github.com/jakeheis/SwiftCLI", from: "6.0.0"),
     ],
     targets: [
-        .target(
+        .executableTarget(
             name: "SolitaCLI",
             dependencies: ["Solita", "SwiftCLI", "PathKit",]),
         .target(
