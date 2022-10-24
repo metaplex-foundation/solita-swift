@@ -9,31 +9,31 @@ final class SolitaTests: XCTestCase {
     }
     
     func testSerumMultisig() {
-        let json = stubbedResponse("serum_multisig")
+        let json = TestDataProvider.serumMultisigJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
     
     func testActionHouse() {
-        let json = stubbedResponse("action_house")
+        let json = TestDataProvider.auctionHouseJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
     
     func testCandyMachine() {
-        let json = stubbedResponse("candy_machine")
+        let json = TestDataProvider.candyMachineJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
     
     func testFanout() {
-        let json = stubbedResponse("fanout")
+        let json = TestDataProvider.fanoutJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
     
     func testDataEnum() {
-        let json = stubbedResponse("feat-data-enum")
+        let json = TestDataProvider.featDataEnum
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
