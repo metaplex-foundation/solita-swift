@@ -99,12 +99,11 @@ func instructionDiscriminator(name: String) -> Data {
 
 func sighash(nameSpace: String, ixName: String) -> Data {
     let name = snakeCased(string: ixName)
-    let preimage = "\(nameSpace):\(name)"
-    var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-    let data = preimage.data(using: .utf8)!
-    data.withUnsafeBytes {
-        _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash)
-    }
+    let preimage = Data("\(nameSpace):\(name)".bytes) as NSData
+    let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
+    var hash = [UInt8](repeating: 0, count: digestLength)
+    CC_SHA256(preimage.bytes, UInt32(preimage.length), &hash)
+    let data = Data(NSData(bytes: hash, length: digestLength))
     return data.subdata(in: 0..<8)
 }
 
