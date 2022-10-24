@@ -8,7 +8,7 @@ final class IdlTests: XCTestCase {
     }
     
     func testSerumMultisigJsonParsedSuccess() {
-        let json = stubbedResponse("serum_multisig")
+        let json = TestDataProvider.serumMultisigJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         XCTAssertEqual(idl.name, "serum_multisig")
         XCTAssertEqual(idl.instructions.first!.name, "createMultisig")
@@ -23,7 +23,7 @@ final class IdlTests: XCTestCase {
     }
     
     func testActionHouseJsonParsedSuccess() {
-        let json = stubbedResponse("action_house")
+        let json = TestDataProvider.auctionHouseJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         XCTAssertEqual(idl.instructions.count, 28)
         XCTAssertEqual(idl.accounts!.count, 5)
@@ -34,7 +34,7 @@ final class IdlTests: XCTestCase {
     }
     
     func testCandyMachineJsonParsedSuccess() {
-        let json = stubbedResponse("candy_machine")
+        let json = TestDataProvider.candyMachineJson
         let idl = try! getDencoder().decode(Idl.self, from: json)
         XCTAssertEqual(idl.instructions.count, 9)
         XCTAssertEqual(idl.accounts!.count, 2)
@@ -42,12 +42,4 @@ final class IdlTests: XCTestCase {
         XCTAssertEqual(idl.errors!.count, 36)
         XCTAssertEqual(idl.name, "candy_machine")
     }
-}
-
-func stubbedResponse(_ filename: String) -> Data {
-    @objc class FeelitTests: NSObject { }
-    let thisSourceFile = URL(fileURLWithPath: #file)
-    let thisDirectory = thisSourceFile.deletingLastPathComponent()
-    let resourceURL = thisDirectory.appendingPathComponent("Resources/\(filename).json")
-    return try! Data(contentsOf: resourceURL)
 }
