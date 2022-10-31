@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/metaplex-foundation/beet-swift.git",
         "state": {
           "branch": null,
-          "revision": "315ce190ec192fabfee83fc38dcb82ca3600d374",
-          "version": "1.0.1"
+          "revision": "05657fa3511b8b72ea8da77745373215445c9885",
+          "version": "1.0.2"
         }
       },
       {
@@ -32,8 +32,8 @@
         "package": "Solana",
         "repositoryURL": "https://github.com/metaplex-foundation/Solana.Swift.git",
         "state": {
-          "branch": "2.0.1",
-          "revision": "ec39cf85ee103c78fa46451c21c4bb341aac87bc",
+          "branch": "2.0.2",
+          "revision": "f7bd54eee1ccf31f717b1a98b64b9ae12413e66d",
           "version": null
         }
       },

@@ -1,5 +1,5 @@
 //
-//  InstructionDiscriminatorTests.swift
+//  DiscriminatorTests.swift
 //  
 //
 //  Created by Michael J. Huber Jr. on 10/24/22.
@@ -8,7 +8,7 @@
 import XCTest
 @testable import Solita
 
-final class InstructionDiscriminatorTests: XCTestCase {
+final class DiscriminatorTests: XCTestCase {
     func testInstructionDiscriminatorRenderValue() {
         let discriminatorInstruction = TestDataProvider.discriminatorInstruction
         XCTAssertEqual(discriminatorInstruction.renderValue(), TestDataProvider.expectedDiscriminatorRenderValue)
@@ -22,5 +22,10 @@ final class InstructionDiscriminatorTests: XCTestCase {
     func testInstructionDiscriminatorRenderType() {
         let discriminatorInstruction = TestDataProvider.discriminatorInstruction
         XCTAssertEqual(discriminatorInstruction.renderType(), TestDataProvider.expectedDiscriminatorRenderType)
+    }
+
+    func testAccountDiscriminatorRenderValue() {
+        let accountDiscriminatorBytes = accountDiscriminator(name: "BidReceipt").bytes
+        XCTAssertEqual(accountDiscriminatorBytes, TestDataProvider.expectedAccountDescriminatorBytes)
     }
 }
