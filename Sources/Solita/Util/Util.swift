@@ -73,13 +73,8 @@ let ACCOUNT_DISCRIMINATOR_SIZE = 8
  * @param name The name of the account to calculate the discriminator.
  */
 func accountDiscriminator(name: String) -> Data {
-    let preimage = "account:\(name.pascalCase.camelized)"
-    var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-    let data = preimage.data(using: .utf8)!
-    data.withUnsafeBytes {
-        _ = CC_SHA256($0.baseAddress, CC_LONG(data.count), &hash)
-    }
-    return data.subdata(in: 0..<ACCOUNT_DISCRIMINATOR_SIZE)
+    let ixName = name.pascalCase
+    return sighash(nameSpace: "account", ixName: ixName)
 }
 
 /**
@@ -94,17 +89,17 @@ let SIGHASH_GLOBAL_NAMESPACE = "global"
  * @param name The name of the instruction to calculate the discriminator.
  */
 func instructionDiscriminator(name: String) -> Data {
-    return sighash(nameSpace: SIGHASH_GLOBAL_NAMESPACE, ixName: name)
+    let ixName = snakeCased(string: name)
+    return sighash(nameSpace: SIGHASH_GLOBAL_NAMESPACE, ixName: ixName)
 }
 
 func sighash(nameSpace: String, ixName: String) -> Data {
-    let name = snakeCased(string: ixName)
-    let preimage = Data("\(nameSpace):\(name)".bytes) as NSData
+    let preimage = Data("\(nameSpace):\(ixName)".bytes) as NSData
     let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
     var hash = [UInt8](repeating: 0, count: digestLength)
     CC_SHA256(preimage.bytes, UInt32(preimage.length), &hash)
     let data = Data(NSData(bytes: hash, length: digestLength))
-    return data.subdata(in: 0..<8)
+    return data.subdata(in: 0..<ACCOUNT_DISCRIMINATOR_SIZE)
 }
 
 func snakeCased(string: String) -> String {
@@ -129,20 +124,10 @@ public func anchorDiscriminatorType(
 
 private extension String {
     var pascalCase: String {
-        return self.components(separatedBy: " ")
-            .map {
-                if $0.count <= 3 {
-                    return $0.uppercased()
-                } else {
-                    if $0.firstIndex(of: "-") != nil {
-                        return $0.components(separatedBy: "-").map { $0.pascalCase }.joined(separator: "-")
-                    } else {
-                        return $0.capitalized
-                    }
-                }
-            }
-            .joined(separator: " ")
+        let camelized = self.camelized
+        return camelized.uppercasingFirst
     }
+
     var uppercasingFirst: String {
         return prefix(1).uppercased() + dropFirst()
     }

@@ -24,6 +24,8 @@ struct TestDataProvider {
     static let expectedDiscriminatorFieldName = "createAuctionHouse"
     static let expectedDiscriminatorRenderType = "[UInt8] /* size: 8 */"
 
+    static let expectedAccountDescriminatorBytes: [UInt8] = [186, 150, 141, 135, 59, 122, 39, 99]
+
     private static func stubbedResponse(_ filename: String) -> Data {
         let thisSourceFile = URL(fileURLWithPath: #file)
         let thisDirectory = thisSourceFile.deletingLastPathComponent()

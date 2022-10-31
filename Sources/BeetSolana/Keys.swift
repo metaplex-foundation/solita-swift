@@ -27,6 +27,7 @@ public class BeetPublicKey: ScalarFixedSizeBeet {
     
     public func read<T>(buf: Data, offset: Int) -> T {
         let data: Data = beet.read(buf: buf, offset: offset)
+        debugPrint("read \(description): \(data.bytes)")
         return PublicKey(data: data) as! T
     }
 }
