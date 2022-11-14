@@ -47,7 +47,7 @@ public class InstructionRenderer {
             fieldName: "instructionDiscriminator",
             typeMapper: typeMapper
         )
-        self.programIdPubkey = "PROGRAM_ID!"
+        self.programIdPubkey = "PublicKey(string: \"\(self.programId)\")!"
     }
     
     private func renderIxArgField(arg: IdlField) -> String {
