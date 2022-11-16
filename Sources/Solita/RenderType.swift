@@ -28,7 +28,21 @@ public class TypeRenderer {
     // -----------------
     private func renderTypeField(field: IdlField) -> String {
         let swiftType = self.typeMapper.map(ty: field.type, name: field.name)
-        return "let \(field.name): \(swiftType)"
+        return "public let \(field.name): \(swiftType)"
+    }
+
+    private func renderParameterField(field: IdlField) -> String {
+        let swiftType = self.typeMapper.map(ty: field.type, name: field.name)
+        return "\(field.name): \(swiftType)"
+    }
+
+    private func renderParameterFieldValue(field: IdlField) -> String {
+        return "self.\(field.name) = \(field.name)"
+    }
+
+    private func renderArgs(field: IdlField) -> String {
+        let swiftType = self.typeMapper.map(ty: field.type, name: field.name)
+        return "\(field.name): args[\"\(field.name)\"] as! \(swiftType)"
     }
     
     private func renderSwiftType() -> String {
@@ -46,11 +60,33 @@ public class TypeRenderer {
         
         if case .idlDefinedType(let d) = ty.type {
             if d.fields.count == 0 { return "" }
-            let fields = d.fields.map{ renderTypeField(field: $0) }.joined(separator: "\n    ")
+            let fields = d.fields.map { renderTypeField(field: $0) }.joined(separator: "\n    ")
+            let parameters = d.fields.map { renderParameterField(field: $0) }.joined(separator: ",\n        ")
+            let parameterValues = d.fields.map { renderParameterFieldValue(field: $0) }.joined(separator: "\n        ")
+            let initializer = """
+            public init(
+                    \(parameters)
+                ) {
+                    \(parameterValues)
+                }
+            """
+            let args = d.fields.map { renderArgs(field: $0) }.joined(separator: ",\n            ")
+            let fromArgs =
+"""
+static func fromArgs(args: Args) -> \(upperCamelTyName) {
+        return \(upperCamelTyName)(
+            \(args)
+        )
+    }
+"""
             return
 """
 public struct \(upperCamelTyName) {
     \(fields)
+
+    \(initializer)
+
+    \(fromArgs)
 }
 """
         }
@@ -199,45 +235,53 @@ public func renderTypeDataStruct(
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
     if isFixable {
-        return renderTypeDataFixableBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
+        return renderTypeDataFixableBeetStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
     } else {
-        return renderTypeDataBeetArgsStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
+        return renderTypeDataBeetStruct(fields: fields, beetVarName: beetVarName, typeName: typeName)
     }
 }
 
 
-func renderTypeDataFixableBeetArgsStruct(
+func renderTypeDataFixableBeetStruct(
     fields: [TypeMappedSerdeField],
     beetVarName: String,
     typeName: String
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
-    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
-    let beetArgsStructType = "FixableBeetArgsStruct"
+    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n        ")
+    let beetStructType = "FixableBeetStruct"
     
     return """
-public let \(beetVarName) = \(beetArgsStructType)<\(typeName)>(fields: [
-    \(fieldDecls)
-], description: "\(typeName)")
+public let \(beetVarName) = \(beetStructType)<\(typeName)>(
+    fields: [
+        \(fieldDecls)
+    ],
+    construct: \(typeName).fromArgs,
+    description: "\(typeName)"
+)
 
 public let \(beetVarName)Wrapped = Beet.fixableBeat(\(beetVarName))
 """
     
 }
 
-func renderTypeDataBeetArgsStruct(
+func renderTypeDataBeetStruct(
     fields: [TypeMappedSerdeField],
     beetVarName: String,
     typeName: String
 ) -> String {
     assert( fields.count > 0, "Rendering struct for \(typeName) should have at least 1 field" )
-    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n    ")
-    let beetArgsStructType = "BeetArgsStruct"
+    let fieldDecls = fields.map{ "(\"\($0.name)\", \($0.type))" }.joined(separator: ",\n        ")
+    let beetStructType = "BeetStruct"
     
     return """
-public let \(beetVarName) = \(beetArgsStructType)(fields: [
-    \(fieldDecls.replacingOccurrences(of: "Wrapped", with: "").replacingOccurrences(of: "Beet.fixedBeet", with: ""))
-], description: "\(typeName)")
+public let \(beetVarName) = \(beetStructType)(
+    fields: [
+        \(fieldDecls.replacingOccurrences(of: "Wrapped", with: "").replacingOccurrences(of: "Beet.fixedBeet", with: ""))
+    ],
+    construct: \(typeName).fromArgs,
+    description: "\(typeName)"
+)
 
 public let \(beetVarName)Wrapped = Beet.fixedBeet(.init(value: .scalar(\(beetVarName))))
 """

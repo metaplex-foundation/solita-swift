@@ -5,6 +5,7 @@ public class Solita {
     public let idl: Idl
     public var paths: Paths?
     public var projectName: String
+    public var programId: String?
     private let hasInstructions: Bool
     private let accountsHaveImplicitDiscriminator: Bool
     private let typeAliases: Dictionary<String, PrimitiveTypeKey>
@@ -15,7 +16,8 @@ public class Solita {
                 prependGeneratedWarning: Bool=true,
                 accountsHaveImplicitDiscriminator: Bool=false,
                 typeAliases: Dictionary<String, PrimitiveTypeKey>=[:],
-                serializers: CustomSerializers?=nil
+                serializers: CustomSerializers?=nil,
+                programId: String?=nil
     ) {
         self.idl = idl
         self.projectName = projectName
@@ -24,6 +26,7 @@ public class Solita {
         self.prependGeneratedWarning = prependGeneratedWarning
         self.accountsHaveImplicitDiscriminator = accountsHaveImplicitDiscriminator
         self.serializers = serializers ?? CustomSerializers.empty()
+        self.programId = programId
     }
     
     
@@ -55,7 +58,7 @@ public class Solita {
     private func renderCode() -> Rendered {
         guard let paths = self.paths else { fatalError("should have set paths") }
         
-        let programId = self.idl.metadata?.address ?? ""
+        let programId = self.programId ?? (self.idl.metadata?.address ?? "")
         var fixableTypes: Set<String> = Set()
         
         let accountFiles = self.accountFilesByType()
@@ -281,7 +284,7 @@ public class Solita {
     private func writeMainIndex(reexports: [String]) {
         guard let paths = self.paths else { fatalError("should have set paths") }
         
-        let programAddress = self.idl.metadata?.address ?? ""
+        let programAddress = self.programId ?? (self.idl.metadata?.address ?? "")
         let programIdConsts =
 """
 import Foundation
