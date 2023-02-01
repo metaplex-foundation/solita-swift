@@ -16,7 +16,7 @@ struct TestDataProvider {
     static let featDataEnum = stubbedResponse("feat-data-enum")
 
     static let discriminatorInstruction = InstructionDiscriminator(
-        ix: IdlInstruction(name: "createAuctionHouse", accounts: [], args: []),
+        ix: IdlInstruction(name: "createAuctionHouse", accounts: [], args: [], defaultOptionalAccounts: nil, docs: nil),
         fieldName: "createAuctionHouse",
         typeMapper: TypeMapper()
     )

@@ -49,19 +49,19 @@ final class RenderInstructionTests: XCTestCase {
     func testIxEmptyArgs() {
         let ix = IdlInstruction(name: "empyArgs", accounts: [
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
     func testIxEmptyArgEmptyAccounts() {
-        let ix = IdlInstruction(name: "empyArgs", accounts: [], args: [])
+        let ix = IdlInstruction(name: "empyArgs", accounts: [], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
     func testIxOneArg() {
         let ix = IdlInstruction(name: "oneArg", accounts: [
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil)
-        ], args: [.init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil)])
+        ], args: [.init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil)], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -71,7 +71,7 @@ final class RenderInstructionTests: XCTestCase {
         ], args: [
             .init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil),
             .init(name: "authority", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil),
-        ])
+        ], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -82,7 +82,7 @@ final class RenderInstructionTests: XCTestCase {
         ], args: [
             .init(name: "amount", type: .beetTypeMapKey(.numbersTypeMapKey(.u64)), attrs: nil),
             .init(name: "authority", type: .publicKey(.keysTypeMapKey(.publicKey)), attrs: nil),
-        ])
+        ], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -91,7 +91,7 @@ final class RenderInstructionTests: XCTestCase {
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
             IdlInstructionAccount(name: "useAuthorityRecord", isMut: true, isSigner: false, desc: "Use Authority Record PDA If present the program Assumes a delegated use authority", optional: true),
             IdlInstructionAccount(name: "burner", isMut: false, isSigner: false, desc: "Program As Signer (Burner)", optional: true)
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -99,7 +99,7 @@ final class RenderInstructionTests: XCTestCase {
         let ix = IdlInstruction(name: "choicy", accounts: [
             IdlInstructionAccount(name: "withoutDesc", isMut: false, isSigner: true, desc: nil, optional: nil),
             IdlInstructionAccount(name: "withDesc", isMut: true, isSigner: false, desc: "Use Authority Record PDA If present the program Assumes a delegated use authority", optional: true),
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -107,7 +107,7 @@ final class RenderInstructionTests: XCTestCase {
         let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
             IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -116,7 +116,7 @@ final class RenderInstructionTests: XCTestCase {
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
             IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
             IdlInstructionAccount(name: "programId", isMut: false, isSigner: false, desc: nil, optional: nil),
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
     
@@ -125,7 +125,25 @@ final class RenderInstructionTests: XCTestCase {
             IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
             IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
             IdlInstructionAccount(name: "rent", isMut: false, isSigner: false, desc: nil, optional: true),
-        ], args: [])
+        ], args: [], defaultOptionalAccounts: nil, docs: nil)
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxEmptyArgsOneSystemProgramAccountOneOptionalRentAccountAndDefaultOptionalAccountsTrue() {
+        let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "rent", isMut: false, isSigner: false, desc: nil, optional: true),
+        ], args: [], defaultOptionalAccounts: true, docs: nil)
+        checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
+    }
+    
+    func testIxEmptyArgsOneSystemProgramAccountOneOptionalRentAccountAndDefaultOptionalAccountsFalse() {
+        let ix = IdlInstruction(name: "empyArgsWithSystemProgram", accounts: [
+            IdlInstructionAccount(name: "authority", isMut: false, isSigner: true, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "systemProgram", isMut: false, isSigner: false, desc: nil, optional: nil),
+            IdlInstructionAccount(name: "rent", isMut: false, isSigner: false, desc: nil, optional: true),
+        ], args: [], defaultOptionalAccounts: false, docs: nil)
         checkRenderedIx(ix: ix, imports: [.BEET_PACKAGE, .SOLANA_WEB3_PACKAGE])
     }
 }

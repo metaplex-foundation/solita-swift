@@ -61,6 +61,8 @@ public struct IdlInstruction: Decodable {
     let name: String
     let accounts: [IdlInstructionAccount]
     let args: [IdlField]
+    let defaultOptionalAccounts: Bool?
+    let docs: [String]?
 }
 
 public struct IdlState: Decodable {

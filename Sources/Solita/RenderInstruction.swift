@@ -165,6 +165,18 @@ public struct \(self.argsTypename){
                 
                 let checkRequireds = requiredChecks.count > 0 ? "if \(requiredChecks) { fatalError(\"When providing \(key.name) \(requiredOptionals.map{ "accounts.\($0.name)"}.joined(separator: ", ")) need(s) to be provided as well.\") }" : ""
                 
+                let elseIfDefaultOptionalAccounts = ix.defaultOptionalAccounts == true ?
+"""
+ else {
+        keys.append(
+            AccountMeta(
+                publicKey: programId,
+                isSigner: false,
+                isWritable: false
+            )
+        )
+    }
+""" : ""
                 return
 """
     if accounts.\(key.name) != nil {
@@ -176,7 +188,7 @@ public struct \(self.argsTypename){
                 isWritable: \(key.isMut)
             )
         )
-    }
+    } \(elseIfDefaultOptionalAccounts)
 """
             }
             .joined(separator: "\n" ) + "\n"
