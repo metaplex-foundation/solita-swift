@@ -208,6 +208,7 @@ public indirect enum IdlType: Decodable {
     case idlTypeArray(IdlTypeArray)
     case idlTypeEnum(IdlTypeScalarEnum)
     case idlTypeDataEnum(IdlTypeDataEnum)
+    case idlTypeHashMap(IdlTypeHashMap)
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -229,6 +230,11 @@ public indirect enum IdlType: Decodable {
         }
         if let x = try? container.decode(IdlTypeDefined.self) {
             self = .idlTypeDefined(x)
+            return
+        }
+        
+        if let x = try? container.decode(IdlTypeHashMap.self) {
+            self = .idlTypeHashMap(x)
             return
         }
         
@@ -319,6 +325,10 @@ public struct IdlTypeDefined: Decodable {
 public struct IdlEnumVariant: Decodable {
     let name: String
     let fields: IdlEnumFields?
+}
+
+public struct IdlTypeHashMap: Decodable {
+    let hashMap: [IdlType]
 }
 
 public enum IdlEnumFields: Decodable {

@@ -14,7 +14,8 @@ struct TestDataProvider {
     static let candyMachineJson = stubbedResponse("candy_machine")
     static let fanoutJson = stubbedResponse("fanout")
     static let featDataEnum = stubbedResponse("feat-data-enum")
-
+    static let tokenMetadata = stubbedResponse("mpl_token_metadata")
+    
     static let discriminatorInstruction = InstructionDiscriminator(
         ix: IdlInstruction(name: "createAuctionHouse", accounts: [], args: [], defaultOptionalAccounts: nil, docs: nil),
         fieldName: "createAuctionHouse",

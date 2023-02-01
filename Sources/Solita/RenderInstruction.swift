@@ -138,7 +138,6 @@ public struct \(self.argsTypename){
         let optionals = processedKeys.indices.filter {
             let key = processedKeys[$0]
             if key.optional != true { return false }
-            assert($0 >= requireds.count, "All optional accounts need to follow required accounts, \(key.name) is not")
             return true
         }.map{ processedKeys[$0] }
         

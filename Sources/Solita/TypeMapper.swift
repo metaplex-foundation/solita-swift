@@ -226,6 +226,10 @@ public class TypeMapper {
             }
         }
         
+        if case .idlTypeHashMap(let hashMap) = ty {
+            return self.mapHashMapSerde(ty: hashMap, name: name)
+        }
+        
         fatalError("Type \(ty) required for \(name) is not yet supported")
     }
     
@@ -241,6 +245,24 @@ public class TypeMapper {
           let ty = self.mapSerde(ty: field.type, name: field.name)
           return TypeMappedSerdeField(name: field.name, type: ty)
     }
+    
+    private func mapHashMapSerde(ty: IdlTypeHashMap, name: String) -> String {
+        return self.mapMapSerde(inners: (ty.hashMap[0], ty.hashMap[1]), name: name)
+    }
+    
+    private func mapMapSerde(inners: (IdlType, IdlType), name: String) -> String {
+        let mapPackage = BEET_PACKAGE
+        let exp = serdePackageExportName(pack: BEET_PACKAGE)
+        self.serdePackagesUsed.insert(SerdePackage(rawValue: mapPackage)!)
+        self.usedFixableSerde = true
+
+        let key = self.mapSerde(ty: inners.0, name: name)
+        let val = self.mapSerde(ty: inners.1, name: name)
+        
+        let map = self.primaryTypeMap["map"]!
+        let a = "\(map.beet)(\(key), \(val))".replacingOccurrences(of: "{{innerK}}", with: "\(key)").replacingOccurrences(of: "{{innerV}}", with: "\(val)")
+        return a
+      }
     
     private func mapEnumSerde(ty: IdlTypeScalarEnum, name: String) -> String {
         assert(
@@ -312,7 +334,7 @@ public class TypeMapper {
         if (self.forceFixable(ty)) {
             self.usedFixableSerde = true
         }
-        
+                
         if case .beetTypeMapKey(let type) = ty {
             return self.mapPrimitiveSerde(ty: type.key, name: name)
         }
@@ -343,6 +365,10 @@ public class TypeMapper {
             } else {
                 return self.mapDefinedSerde(ty: defined)
             }
+        }
+        
+        if case .idlTypeHashMap(let hashMap) = ty {
+            return self.mapHashMapSerde(ty: hashMap, name: name)
         }
         
         fatalError("Type \(ty) required for \(name) is not yet supported")
