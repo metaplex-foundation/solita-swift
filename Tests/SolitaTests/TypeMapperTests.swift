@@ -102,6 +102,24 @@ final class TypeMapperTests: XCTestCase {
         XCTAssert(tm.usedFixableSerde, "did not use fixable serde")
     }
     
+    func testTypeMapperMap() {
+        let tm = TypeMapper()
+        let types: Array<IdlType> = [.idlTypeHashMap(IdlTypeHashMap(hashMap: [.beetTypeMapKey(.stringTypeMapKey(.string)), .beetTypeMapKey(.stringTypeMapKey(.string))]))]
+        for type in types {
+            let ty = tm.map(ty: type)
+            XCTAssert(ty == "[String: String]")
+        }
+        XCTAssert(tm.localImportsByPath.count == 0, "used no local imports")
+        tm.clearUsages()
+        
+        for type in types {
+            let serde = tm.mapSerde(ty: type)
+            XCTAssert(serde == "Beet.fixableBeat(hashmap(keyElement: Beet.fixableBeat(Utf8String()), valElement: Beet.fixableBeat(Utf8String())))", "'\(type)' maps to '\(serde)' serde")
+        }
+        XCTAssert(tm.serdePackagesUsed.contains(.BEET_PACKAGE))
+        XCTAssert(tm.usedFixableSerde, "did not use fixable serde")
+    }
+    
     // -----------------
     // Enums Scalar
     // -----------------

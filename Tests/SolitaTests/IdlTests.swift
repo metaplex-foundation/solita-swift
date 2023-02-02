@@ -42,4 +42,14 @@ final class IdlTests: XCTestCase {
         XCTAssertEqual(idl.errors!.count, 36)
         XCTAssertEqual(idl.name, "candy_machine")
     }
+    
+    func testTokenMetadataJsonParsedSuccess() {
+        let json = TestDataProvider.tokenMetadata
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        XCTAssertEqual(idl.instructions.count, 53)
+        XCTAssertEqual(idl.accounts!.count, 12)
+        XCTAssertEqual(idl.types!.count, 55)
+        XCTAssertEqual(idl.errors!.count, 169)
+        XCTAssertEqual(idl.name, "mpl_token_metadata")
+    }
 }

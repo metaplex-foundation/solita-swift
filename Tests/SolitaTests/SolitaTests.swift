@@ -37,4 +37,10 @@ final class SolitaTests: XCTestCase {
         let idl = try! getDencoder().decode(Idl.self, from: json)
         Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
     }
+    
+    func testTokenMetadata() {
+        let json = TestDataProvider.tokenMetadata
+        let idl = try! getDencoder().decode(Idl.self, from: json)
+        Solita(idl: idl).renderAndWriteTo(outputDir: Path.current.string)
+    }
 }
