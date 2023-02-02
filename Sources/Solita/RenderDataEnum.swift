@@ -129,7 +129,7 @@ func renderDataEnumRecord(
  * @category generated
  * @private
  */
-public enum \(typeName)Record: Equatable {
+public enum \(typeName)Record {
   \(renderedVariants.joined(separator: "\n  "))
 }
 

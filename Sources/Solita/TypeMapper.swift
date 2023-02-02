@@ -108,6 +108,12 @@ public class TypeMapper {
         return "[\(inner)]"
     }
     
+    private func mapHashMapType(ty: IdlTypeHashMap, name: String) -> String{
+        let first = self.map(ty: ty.hashMap[0], name: ty.hashMap[0].key)
+        let second = self.map(ty: ty.hashMap[1], name: ty.hashMap[0].key)
+        return "[\(first): \(second)]"
+    }
+    
     private func mapArrayType(ty: IdlTypeArray, name: String) -> String {
         let inner = self.map(ty: ty.array[0].idlType, name: name)
         let size = ty.array[0].size
@@ -227,7 +233,7 @@ public class TypeMapper {
         }
         
         if case .idlTypeHashMap(let hashMap) = ty {
-            return self.mapHashMapSerde(ty: hashMap, name: name)
+            return self.mapHashMapType(ty: hashMap, name: name)
         }
         
         fatalError("Type \(ty) required for \(name) is not yet supported")
@@ -259,8 +265,8 @@ public class TypeMapper {
         let key = self.mapSerde(ty: inners.0, name: name)
         let val = self.mapSerde(ty: inners.1, name: name)
         
-        let map = self.primaryTypeMap["map"]!
-        let a = "\(map.beet)(\(key), \(val))".replacingOccurrences(of: "{{innerK}}", with: "\(key)").replacingOccurrences(of: "{{innerV}}", with: "\(val)")
+        let map = self.primaryTypeMap["hashmap"]!
+        let a = "\(exp!.rawValue).fixableBeat(\(map.beet)".replacingOccurrences(of: "{{innerK}}", with: "\(key)").replacingOccurrences(of: "{{innerV}}", with: "\(val))")
         return a
       }
     

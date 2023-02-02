@@ -5,9 +5,9 @@
         "package": "Beet",
         "repositoryURL": "https://github.com/metaplex-foundation/beet-swift.git",
         "state": {
-          "branch": "feature/enable-map",
-          "revision": "b55f8fa08788f09f937eff5e48add033e18c662a",
-          "version": null
+          "branch": null,
+          "revision": "e4708bf28b55ce42727006c1cb7882f069d07bd8",
+          "version": "1.0.7"
         }
       },
       {
